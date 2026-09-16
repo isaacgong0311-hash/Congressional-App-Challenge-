@@ -43,7 +43,7 @@ function allow(ip: string, path: string): boolean {
   return true;
 }
 
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   const path = req.nextUrl.pathname;
   if (!path.startsWith("/api/") || path === "/api/health") {
     return NextResponse.next();

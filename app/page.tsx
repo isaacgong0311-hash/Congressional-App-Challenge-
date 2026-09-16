@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import {
   RESOURCES,
@@ -159,7 +160,6 @@ export default function Home() {
   const [highContrast, setHighContrast] = useState(false);
   const [largeText, setLargeText] = useState(false);
   const [zip, setZip] = useState("");
-  const [privacyOpen, setPrivacyOpen] = useState(false);
   const [scamExpanded, setScamExpanded] = useState(false);
   const [photoQuality, setPhotoQuality] = useState<"ok" | "dark" | null>(null);
   const [whyNotOpen, setWhyNotOpen] = useState(false);
@@ -183,13 +183,18 @@ export default function Home() {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const saved = localStorage.getItem("ttf-hc");
-    const savedLt = localStorage.getItem("ttf-lt");
-    if (saved === "1") setHighContrast(true);
-    if (savedLt === "1") setLargeText(true);
-    const browserLang = navigator.language?.slice(0, 2).toLowerCase();
-    const match = LANGUAGES.find((l) => l.bcp47 === browserLang || l.bcp47.startsWith(browserLang));
-    if (match) setLanguage(match.label);
+    const frame = window.requestAnimationFrame(() => {
+      const saved = localStorage.getItem("ttf-hc");
+      const savedLt = localStorage.getItem("ttf-lt");
+      if (saved === "1") setHighContrast(true);
+      if (savedLt === "1") setLargeText(true);
+      const browserLang = navigator.language?.slice(0, 2).toLowerCase();
+      const match = LANGUAGES.find(
+        (l) => l.bcp47 === browserLang || l.bcp47.startsWith(browserLang),
+      );
+      if (match) setLanguage(match.label);
+    });
+    return () => window.cancelAnimationFrame(frame);
   }, []);
 
   useEffect(() => {
@@ -538,13 +543,13 @@ export default function Home() {
                       <button key={i} onClick={() => setDemoIdx(i)} className={`h-1.5 rounded-full transition-all ${i === demoIdx ? "w-5 bg-blue-600" : "w-1.5 bg-slate-300"}`} aria-label={`Demo ${i + 1}`} />
                     ))}
                   </div>
-                  <span className="text-xs font-medium text-emerald-600">✓ Nothing stored</span>
+                  <span className="text-xs font-medium text-emerald-600">✓ No app storage</span>
                 </div>
               </div>
 
               {/* stats */}
               <div className="mt-6 flex w-full max-w-md divide-x divide-slate-200 overflow-hidden rounded-2xl border border-slate-200 bg-white text-center shadow-sm">
-                {[["10+", "languages"], ["16", "verified programs"], ["0", "data stored"]].map(([n, l]) => (
+                {[["10+", "languages"], ["16", "verified programs"], ["0", "accounts needed"]].map(([n, l]) => (
                   <div key={l} className="flex-1 py-4">
                     <p className="text-xl font-bold text-blue-700">{n}</p>
                     <p className="text-xs text-slate-500">{l}</p>
@@ -568,6 +573,29 @@ export default function Home() {
                 ))}
               </div>
             </div>
+
+            <Link
+              className="group mt-8 flex w-full items-center gap-5 overflow-hidden rounded-3xl border border-indigo-300/50 bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 p-5 text-left text-white shadow-xl shadow-indigo-950/10 transition hover:-translate-y-0.5 hover:shadow-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 sm:p-6"
+              href="/first-day"
+            >
+              <span className="flex h-14 w-14 flex-none items-center justify-center rounded-2xl bg-amber-300 text-2xl text-slate-950 shadow-lg shadow-amber-400/10">
+                🏫
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="inline-flex rounded-full border border-white/15 bg-white/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-indigo-100">
+                  New · First Day
+                </span>
+                <strong className="mt-2 block text-xl tracking-tight">
+                  Get ready for school
+                </strong>
+                <span className="mt-1 block text-sm leading-6 text-slate-300">
+                  Turn enrollment letters into a source-backed plan you can check and complete.
+                </span>
+              </span>
+              <span className="flex h-10 w-10 flex-none items-center justify-center rounded-full border border-white/15 bg-white/10 text-xl transition group-hover:translate-x-1">
+                →
+              </span>
+            </Link>
 
             {/* CTAs */}
             <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -1456,82 +1484,6 @@ function LocalHelpFinder({ category }: { category: Category }) {
           </p>
         </div>
       )}
-    </div>
-  );
-}
-
-function PersonaCard({
-  icon,
-  title,
-  desc,
-}: {
-  icon: string;
-  title: string;
-  desc: string;
-}) {
-  return (
-    <div className="ttf-fade-in rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-      <span className="text-2xl">{icon}</span>
-      <h3 className="mt-2 font-bold text-slate-900">{title}</h3>
-      <p className="mt-1 text-sm leading-relaxed text-slate-600">{desc}</p>
-    </div>
-  );
-}
-
-function HowItWorks() {
-  const steps = [
-    {
-      icon: "📸",
-      label: "Take a photo",
-      desc: "Snap or upload any letter, bill, or notice — up to 10 MB.",
-    },
-    {
-      icon: "🤖",
-      label: "AI reads it",
-      desc: "Extracts every date, name, amount, and warning sign.",
-    },
-    {
-      icon: "🌐",
-      label: "Plain language",
-      desc: "Explains what it means in 10+ languages.",
-    },
-    {
-      icon: "✅",
-      label: "Know what to do",
-      desc: "Checklist, reply letter, and phone script — all ready.",
-    },
-  ];
-  return (
-    <div className="mb-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-      <p className="mb-4 text-xs font-bold uppercase tracking-wider text-slate-400">
-        How it works
-      </p>
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-        {steps.map((s, i) => (
-          <div key={i} className="flex flex-col items-center text-center">
-            <span className="mb-2 flex h-11 w-11 items-center justify-center rounded-xl bg-slate-100 text-xl">
-              {s.icon}
-            </span>
-            <p className="text-sm font-semibold text-slate-800">{s.label}</p>
-            <p className="mt-0.5 text-xs leading-relaxed text-slate-500">
-              {s.desc}
-            </p>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function SectionHeader({ n, title }: { n: number; title: string }) {
-  return (
-    <div className="ttf-fade-in flex items-center gap-2.5 px-1 pt-2">
-      <span className="flex h-6 w-6 flex-none items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white">
-        {n}
-      </span>
-      <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500">
-        {title}
-      </h2>
     </div>
   );
 }
