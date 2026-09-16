@@ -8,7 +8,7 @@
 
 **Tech Stack:** Next.js 16 App Router, React 19, TypeScript 5, Tailwind CSS 4, Zod 4, Vitest 4, Vercel AI SDK 6, Groq, Vercel
 
-**Plan status:** Approved by Isaac on 2026-09-16. Tasks 1–2 are complete; Task 3 is next.
+**Plan status:** Approved by Isaac on 2026-09-16. Tasks 1–3 are complete; Task 4 is next.
 
 ---
 
@@ -488,7 +488,7 @@ git commit -m "refactor: split First Day workflow screens"
 - Create: `app/features/first-day/adapters/live-extraction.ts`
 - Create: `tests/first-day/live-extraction.test.ts`
 
-- [ ] **Step 1: Write failing schema-adapter tests**
+- [x] **Step 1: Write failing schema-adapter tests**
 
 ```ts
 import { describe, expect, it } from "vitest";
@@ -537,12 +537,12 @@ describe("adaptLiveExtraction", () => {
 });
 ```
 
-- [ ] **Step 2: Run the test and verify failure**
+- [x] **Step 2: Run the test and verify failure**
 
 Run: `npm test -- tests/first-day/live-extraction.test.ts`  
 Expected: failure because `live-extraction.ts` does not exist.
 
-- [ ] **Step 3: Add domain types**
+- [x] **Step 3: Add domain types**
 
 Add to `types.ts`:
 
@@ -581,7 +581,7 @@ export type FirstDayExtractionResponse = {
 
 Add `"informational_note"` to `FactKind`. Add `semanticKey?: string` and `confidence?: number` to `Fact`. Change `Procedure.reviewerStatus` to `ProcedureReviewState`.
 
-- [ ] **Step 4: Add the server Zod schema**
+- [x] **Step 4: Add the server Zod schema**
 
 ```ts
 // app/features/first-day/server/extraction-schema.ts
@@ -611,11 +611,11 @@ export const FirstDayExtractionSchema = z.object({
 });
 ```
 
-- [ ] **Step 5: Implement the adapter using existing evidence normalization**
+- [x] **Step 5: Implement the adapter using existing evidence normalization**
 
 `adaptLiveExtraction(response, pageIndex)` must construct the ready document, evidence IDs, and proposed facts. Before returning, call `validateEvidence` on a temporary case containing the new records and throw `new Error(issue.code)` for its first issue. Keep normalized values only when non-null.
 
-- [ ] **Step 6: Verify and commit**
+- [x] **Step 6: Verify and commit**
 
 Run `npm test -- tests/first-day/live-extraction.test.ts tests/first-day/evidence.test.ts && npm run lint`. Expected: all pass.
 

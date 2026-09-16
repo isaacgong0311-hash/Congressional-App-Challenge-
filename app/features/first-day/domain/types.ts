@@ -20,7 +20,14 @@ export type FactKind =
   | "requested_item"
   | "contact"
   | "preference"
-  | "appointment";
+  | "appointment"
+  | "informational_note";
+
+export type ProcedureReviewState =
+  | "fictional"
+  | "source_checked"
+  | "school_reviewed"
+  | "pending";
 
 export type FirstDayDocument = {
   id: string;
@@ -29,6 +36,8 @@ export type FirstDayDocument = {
   status: DocumentStatus;
   extractedText: string;
   sourceVersion: string;
+  confidence?: number;
+  photoQualityNote?: string;
 };
 
 export type Evidence = {
@@ -42,9 +51,11 @@ export type Evidence = {
 export type Fact = {
   id: string;
   kind: FactKind;
+  semanticKey?: string;
   label: string;
   originalValue: string;
   normalizedValue?: string;
+  confidence?: number;
   evidenceIds: string[];
   confirmationState: ConfirmationState;
 };
@@ -56,8 +67,33 @@ export type Procedure = {
   sourceSection: string;
   quote: string;
   checkedAt: string;
-  reviewerStatus: "fictional" | "reviewed" | "pending";
+  reviewerStatus: ProcedureReviewState;
   ruleVersion: string;
+};
+
+export type ExtractedFactProposal = {
+  clientKey: string;
+  kind: Exclude<FactKind, "preference">;
+  semanticKey: string;
+  label: string;
+  originalValue: string;
+  normalizedValue: string | null;
+  quote: string;
+  location: string;
+  confidence: number;
+};
+
+export type FirstDayExtractionResponse = {
+  schemaVersion: "first-day-extraction-v1";
+  requestId: string;
+  documentId: string;
+  document: {
+    label: string;
+    confidence: number;
+    originalText: string;
+    photoQualityNote: string | null;
+  };
+  facts: ExtractedFactProposal[];
 };
 
 export type Dependency =
