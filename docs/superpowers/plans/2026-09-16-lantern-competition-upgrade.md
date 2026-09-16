@@ -8,7 +8,7 @@
 
 **Tech Stack:** Next.js 16 App Router, React 19, TypeScript 5, Tailwind CSS 4, Zod 4, Vitest 4, Vercel AI SDK 6, Groq, Vercel
 
-**Plan status:** Approved by Isaac on 2026-09-16. Tasks 1–4 are complete; Task 5 is next.
+**Plan status:** Approved by Isaac on 2026-09-16. Tasks 1–5 are complete; Task 6 is next.
 
 ---
 
@@ -735,7 +735,7 @@ git commit -m "feat: add First Day extraction endpoint"
 - Create: `app/features/first-day/domain/extraction.ts`
 - Create: `tests/first-day/extraction.test.ts`
 
-- [ ] **Step 1: Write failing merge tests**
+- [x] **Step 1: Write failing merge tests**
 
 Test these exact behaviors with a small live case and adapted response:
 
@@ -747,7 +747,7 @@ expect(() => mergeExtraction(removedCase, extraction)).toThrow("document_removed
 expect(mergeExtraction(caseWithOtherPage, extraction).documents).toHaveLength(2);
 ```
 
-- [ ] **Step 2: Implement a stable replacement merge**
+- [x] **Step 2: Implement a stable replacement merge**
 
 ```ts
 export type AdaptedExtraction = {
@@ -776,7 +776,7 @@ export function mergeExtraction(
 
 Preserve the original page index from the queued document when replacing it. Sort documents by page index; do not sort facts across documents.
 
-- [ ] **Step 3: Verify and commit**
+- [x] **Step 3: Verify and commit**
 
 Run `npm test -- tests/first-day/extraction.test.ts tests/first-day/upload-queue.test.ts`. Expected: all pass.
 

@@ -1,4 +1,5 @@
 import { validateEvidence } from "../domain/evidence";
+import type { AdaptedExtraction } from "../domain/extraction";
 import type {
   Evidence,
   Fact,
@@ -7,16 +8,10 @@ import type {
   FirstDayExtractionResponse,
 } from "../domain/types";
 
-export type AdaptedLiveExtraction = {
-  document: FirstDayDocument;
-  evidence: Evidence[];
-  facts: Fact[];
-};
-
 export function adaptLiveExtraction(
   response: FirstDayExtractionResponse,
   pageIndex: number,
-): AdaptedLiveExtraction {
+): AdaptedExtraction {
   const clientKeys = new Set<string>();
   const document: FirstDayDocument = {
     id: response.documentId,
