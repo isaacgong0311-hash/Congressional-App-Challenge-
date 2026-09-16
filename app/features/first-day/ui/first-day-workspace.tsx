@@ -3,18 +3,30 @@
 import Link from "next/link";
 import {
   useCallback,
+  useEffect,
   useMemo,
+  useReducer,
   useRef,
   useState,
   type ReactNode,
 } from "react";
 
+import { explanationToDocument } from "../adapters/explanation";
 import {
   appendFactConfirmation,
   appendFactCorrection,
+  appendSourceRemoval,
   appendTaskCompletion,
 } from "../domain/events";
 import { planCase } from "../domain/planner";
+import {
+  MAX_CASE_BYTES,
+  MAX_DOCUMENTS,
+  MAX_DOCUMENT_BYTES,
+  reduceUploadQueue,
+  validateUploadSelection,
+  type UploadRejectionCode,
+} from "../domain/upload-queue";
 import type {
   CaseEvent,
   ConfirmationState,
@@ -215,7 +227,15 @@ export function FirstDayWorkspace({ initialCase }: { initialCase: FirstDayCase }
   const [largeText, setLargeText] = useState(false);
   const [highContrast, setHighContrast] = useState(false);
   const [sourceId, setSourceId] = useState<string | null>(null);
+  const [uploadQueue, dispatchUpload] = useReducer(reduceUploadQueue, []);
+  const [uploadNotice, setUploadNotice] = useState<string | null>(null);
   const sourceTriggerRef = useRef<HTMLButtonElement | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const uploadFilesRef = useRef(new Map<string, File>());
+  const requestTokensRef = useRef(new Map<string, string>());
+  const abortControllersRef = useRef(new Map<string, AbortController>());
+  const processingDocumentRef = useRef<string | null>(null);
+  const uploadSequence = useRef(0);
   const eventSequence = useRef(0);
 
   const plan = useMemo(() => planCase(caseData), [caseData]);
@@ -229,10 +249,296 @@ export function FirstDayWorkspace({ initialCase }: { initialCase: FirstDayCase }
   const openProcedure = openEvidence?.procedureId
     ? caseData.procedures.find((procedure) => procedure.id === openEvidence.procedureId)
     : undefined;
+  const visibleDocuments = caseData.documents.filter(
+    (document) => document.status !== "removed",
+  );
+
+  useEffect(() => {
+    if (caseData.mode !== "live" || processingDocumentRef.current) return;
+    const next = uploadQueue.find((item) => item.status === "queued");
+    if (!next) return;
+    const queuedPage = next;
+
+    const file = uploadFilesRef.current.get(queuedPage.documentId);
+    if (!file) return;
+    const selectedFile = file;
+
+    const requestId = `${queuedPage.documentId}-request-${Date.now()}`;
+    const controller = new AbortController();
+    processingDocumentRef.current = queuedPage.documentId;
+    requestTokensRef.current.set(queuedPage.documentId, requestId);
+    abortControllersRef.current.set(queuedPage.documentId, controller);
+    dispatchUpload({
+      type: "start",
+      documentId: queuedPage.documentId,
+      requestId,
+    });
+
+    async function processPage() {
+      try {
+        const form = new FormData();
+        form.append("image", selectedFile);
+        form.append("language", language === "Español" ? "Spanish" : "English");
+        form.append("readingLevel", "normal");
+
+        const response = await fetch("/api/explain", {
+          method: "POST",
+          body: form,
+          signal: controller.signal,
+        });
+        const payload: unknown = await response.json();
+        if (!response.ok) {
+          const message =
+            payload &&
+            typeof payload === "object" &&
+            "error" in payload &&
+            typeof payload.error === "string"
+              ? payload.error
+              : "Could not read this page.";
+          throw new Error(message);
+        }
+        if (!payload || typeof payload !== "object") {
+          throw new Error("The document service returned an invalid response.");
+        }
+
+        const currentPage = caseData.documents.find(
+          (document) => document.id === queuedPage.documentId,
+        );
+        const readyDocument = explanationToDocument({
+          documentId: queuedPage.documentId,
+          fallbackLabel: queuedPage.fileName,
+          pageIndex: currentPage?.pageIndex ?? 1,
+          response: payload,
+        });
+
+        if (requestTokensRef.current.get(queuedPage.documentId) !== requestId) return;
+        setCaseData((current) => ({
+          ...current,
+          documents: current.documents.map((document) =>
+            document.id === queuedPage.documentId && document.status !== "removed"
+              ? readyDocument
+              : document,
+          ),
+        }));
+        dispatchUpload({
+          type: "succeed",
+          documentId: queuedPage.documentId,
+          requestId,
+        });
+      } catch (error) {
+        if (controller.signal.aborted) return;
+        const message =
+          error instanceof Error ? error.message : "Could not read this page.";
+        if (requestTokensRef.current.get(queuedPage.documentId) !== requestId) return;
+        setCaseData((current) => ({
+          ...current,
+          documents: current.documents.map((document) =>
+            document.id === queuedPage.documentId && document.status !== "removed"
+              ? { ...document, status: "error" }
+              : document,
+          ),
+        }));
+        dispatchUpload({
+          type: "fail",
+          documentId: queuedPage.documentId,
+          requestId,
+          error: message,
+        });
+      } finally {
+        abortControllersRef.current.delete(queuedPage.documentId);
+        if (processingDocumentRef.current === queuedPage.documentId) {
+          processingDocumentRef.current = null;
+        }
+      }
+    }
+
+    void processPage();
+  }, [caseData.documents, caseData.mode, language, uploadQueue]);
+
+  useEffect(
+    () => () => {
+      for (const controller of abortControllersRef.current.values()) {
+        controller.abort();
+      }
+    },
+  );
 
   function nextEventId(label: string) {
     eventSequence.current += 1;
     return `event-ui-${label}-${eventSequence.current}`;
+  }
+
+  function startLiveCase() {
+    for (const controller of abortControllersRef.current.values()) controller.abort();
+    uploadFilesRef.current.clear();
+    requestTokensRef.current.clear();
+    abortControllersRef.current.clear();
+    processingDocumentRef.current = null;
+    dispatchUpload({ type: "reset" });
+    setUploadNotice(null);
+    setCaseData({
+      id: `case-live-${Date.now()}`,
+      mode: "live",
+      language,
+      district: translated(
+        language,
+        "School enrollment case",
+        "Caso de inscripción escolar",
+      ),
+      childFirstName: "",
+      ruleVersion: "live-intake-v1",
+      documents: [],
+      evidence: [],
+      facts: [],
+      procedures: [],
+      tasks: [],
+      conflicts: [],
+      events: [],
+    });
+    setCurrentStep("documents");
+  }
+
+  function openSampleCase() {
+    for (const controller of abortControllersRef.current.values()) controller.abort();
+    uploadFilesRef.current.clear();
+    requestTokensRef.current.clear();
+    abortControllersRef.current.clear();
+    processingDocumentRef.current = null;
+    dispatchUpload({ type: "reset" });
+    setUploadNotice(null);
+    setCaseData(initialCase);
+    setCurrentStep("documents");
+  }
+
+  function rejectionMessage(code: UploadRejectionCode) {
+    const messages: Record<UploadRejectionCode, [string, string]> = {
+      unsupported_type: [
+        "Use a JPG or PNG image.",
+        "Use una imagen JPG o PNG.",
+      ],
+      file_too_large: [
+        "Each page must be 10 MB or smaller.",
+        "Cada página debe tener 10 MB o menos.",
+      ],
+      case_too_large: [
+        "This case can contain up to 25 MB total.",
+        "Este caso puede contener hasta 25 MB en total.",
+      ],
+      too_many: [
+        "A case can contain up to five pages.",
+        "Un caso puede contener hasta cinco páginas.",
+      ],
+    };
+    const [english, spanish] = messages[code];
+    return translated(language, english, spanish);
+  }
+
+  function addUploadFiles(files: File[]) {
+    const { accepted, rejected } = validateUploadSelection(uploadQueue, files);
+    if (rejected.length) {
+      setUploadNotice(
+        rejected
+          .map((item) => `${item.fileName}: ${rejectionMessage(item.code)}`)
+          .join(" "),
+      );
+    } else {
+      setUploadNotice(
+        accepted.length
+          ? translated(
+              language,
+              `${accepted.length} page${accepted.length === 1 ? "" : "s"} added. Lantern will read them one at a time.`,
+              `${accepted.length} página${accepted.length === 1 ? "" : "s"} añadida${accepted.length === 1 ? "" : "s"}. Lantern las leerá una por una.`,
+            )
+          : null,
+      );
+    }
+    if (!accepted.length) return;
+
+    const pageStart =
+      caseData.documents.filter((document) => document.status !== "removed").length + 1;
+    const queueItems = accepted.map((file, index) => {
+      uploadSequence.current += 1;
+      const documentId = `doc-live-${Date.now()}-${uploadSequence.current}`;
+      uploadFilesRef.current.set(documentId, file);
+      return {
+        documentId,
+        fileName: file.name,
+        mimeType: file.type,
+        size: file.size,
+        status: "queued" as const,
+        pageIndex: pageStart + index,
+      };
+    });
+
+    dispatchUpload({
+      type: "enqueue",
+      items: queueItems.map((item) => ({
+        documentId: item.documentId,
+        fileName: item.fileName,
+        mimeType: item.mimeType,
+        size: item.size,
+        status: item.status,
+      })),
+    });
+    setCaseData((current) => ({
+      ...current,
+      documents: [
+        ...current.documents,
+        ...queueItems.map((item) => ({
+          id: item.documentId,
+          label: item.fileName,
+          pageIndex: item.pageIndex,
+          status: "processing" as const,
+          extractedText: "",
+          sourceVersion: "waiting-for-extraction",
+        })),
+      ],
+    }));
+  }
+
+  function retryUpload(documentId: string) {
+    requestTokensRef.current.delete(documentId);
+    setCaseData((current) => ({
+      ...current,
+      documents: current.documents.map((document) =>
+        document.id === documentId
+          ? {
+              ...document,
+              status: "processing",
+              extractedText: "",
+              sourceVersion: "waiting-for-extraction",
+            }
+          : document,
+      ),
+    }));
+    dispatchUpload({ type: "retry", documentId });
+  }
+
+  function removeUpload(documentId: string) {
+    abortControllersRef.current.get(documentId)?.abort();
+    abortControllersRef.current.delete(documentId);
+    requestTokensRef.current.delete(documentId);
+    uploadFilesRef.current.delete(documentId);
+    if (processingDocumentRef.current === documentId) {
+      processingDocumentRef.current = null;
+    }
+    dispatchUpload({ type: "remove", documentId });
+    const removalEvent = {
+      id: nextEventId("source"),
+      documentId,
+      timestamp: new Date().toISOString(),
+    };
+    setCaseData((current) => {
+      const withRemoval = appendSourceRemoval(current, removalEvent);
+      return {
+        ...withRemoval,
+        documents: withRemoval.documents.map((document) =>
+          document.id === documentId
+            ? { ...document, status: "removed" }
+            : document,
+        ),
+      };
+    });
   }
 
   function openSource(evidenceId: string, trigger: HTMLButtonElement) {
@@ -406,11 +712,17 @@ export function FirstDayWorkspace({ initialCase }: { initialCase: FirstDayCase }
         className="border-y border-[#f1c76f]/50 bg-[#fff8df] px-4 py-2.5 text-center text-xs font-semibold text-[#71551c] print:border-[#999] print:bg-white print:text-black"
         inert={openEvidence ? true : undefined}
       >
-        {translated(
-          language,
-          "Fictional demonstration · Mesa View is not a real district",
-          "Demostración ficticia · Mesa View no es un distrito real",
-        )}
+        {caseData.mode === "fictional"
+          ? translated(
+              language,
+              "Fictional demonstration · Mesa View is not a real district",
+              "Demostración ficticia · Mesa View no es un distrito real",
+            )
+          : translated(
+              language,
+              "Live document intake · images are sent to Lantern’s external AI provider and are not saved as a case",
+              "Carga de documentos · las imágenes se envían al proveedor externo de IA de Lantern y no se guardan como caso",
+            )}
       </div>
 
       <div
@@ -436,11 +748,13 @@ export function FirstDayWorkspace({ initialCase }: { initialCase: FirstDayCase }
               {STEPS.map((step, index) => {
                 const active = step.id === currentStep;
                 const visited = index < activeStepIndex;
+                const unavailable = caseData.mode === "live" && index > 1;
                 return (
                   <li className="min-w-max lg:min-w-0" key={step.id}>
                     <button
                       aria-current={active ? "step" : undefined}
                       className={`fd-step-button ${active ? "is-active" : ""}`}
+                      disabled={unavailable}
                       onClick={() => setCurrentStep(step.id)}
                       type="button"
                     >
@@ -464,8 +778,12 @@ export function FirstDayWorkspace({ initialCase }: { initialCase: FirstDayCase }
             </strong>
             {translated(
               language,
-              "This demo stays in this page. No account or cloud case history.",
-              "Esta demo queda en esta página. Sin cuenta ni historial en la nube.",
+              caseData.mode === "fictional"
+                ? "This demo stays in this page. No account or cloud case history."
+                : "Pages are processed one at a time. Lantern does not create an account or cloud case history.",
+              caseData.mode === "fictional"
+                ? "Esta demo queda en esta página. Sin cuenta ni historial en la nube."
+                : "Las páginas se procesan una por una. Lantern no crea una cuenta ni un historial en la nube.",
             )}
           </div>
         </aside>
@@ -500,16 +818,20 @@ export function FirstDayWorkspace({ initialCase }: { initialCase: FirstDayCase }
                     <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                       <button
                         className="fd-primary-button"
-                        onClick={() => setCurrentStep("documents")}
+                        onClick={openSampleCase}
                         type="button"
                       >
                         {translated(language, "Open the sample case", "Abrir el caso de ejemplo")}
                         <ArrowRightIcon className="h-5 w-5" />
                       </button>
-                      <span className="inline-flex items-center justify-center gap-2 rounded-2xl border border-[#d9dfda] bg-white px-5 py-3.5 text-sm font-semibold text-[#68746e]">
-                        <ShieldIcon className="h-4 w-4" />
-                        {translated(language, "No account needed", "No necesita una cuenta")}
-                      </span>
+                      <button
+                        className="fd-secondary-button"
+                        onClick={startLiveCase}
+                        type="button"
+                      >
+                        <DocumentIcon className="h-4 w-4" />
+                        {translated(language, "Add my documents", "Añadir mis documentos")}
+                      </button>
                     </div>
                   </div>
 
@@ -593,9 +915,73 @@ export function FirstDayWorkspace({ initialCase }: { initialCase: FirstDayCase }
                 )}
               </p>
 
+              {caseData.mode === "live" ? (
+                <div className="fd-upload-zone mt-8">
+                  <input
+                    accept=".jpg,.jpeg,.png,image/jpeg,image/png"
+                    aria-label={translated(
+                      language,
+                      "School page images",
+                      "Imágenes de páginas escolares",
+                    )}
+                    className="hidden"
+                    multiple
+                    onChange={(event) => {
+                      addUploadFiles(Array.from(event.currentTarget.files ?? []));
+                      event.currentTarget.value = "";
+                    }}
+                    ref={fileInputRef}
+                    type="file"
+                  />
+                  <div className="flex flex-col items-start justify-between gap-5 sm:flex-row sm:items-center">
+                    <div>
+                      <p className="text-lg font-semibold">
+                        {translated(language, "Add school pages", "Añada páginas escolares")}
+                      </p>
+                      <p className="mt-2 max-w-2xl text-sm leading-6 text-[#59665f]">
+                        {translated(
+                          language,
+                          "Choose up to five JPG or PNG pages. Each page can be 10 MB, with a 25 MB case limit. Lantern reads one page at a time so one failure does not erase the others.",
+                          "Elija hasta cinco páginas JPG o PNG. Cada página puede tener 10 MB, con un límite total de 25 MB. Lantern lee una página a la vez para que un error no borre las demás.",
+                        )}
+                      </p>
+                    </div>
+                    <button
+                      className="fd-primary-button shrink-0"
+                      disabled={visibleDocuments.length >= MAX_DOCUMENTS}
+                      onClick={() => fileInputRef.current?.click()}
+                      type="button"
+                    >
+                      <DocumentIcon className="h-5 w-5" />
+                      {translated(language, "Choose pages", "Elegir páginas")}
+                    </button>
+                  </div>
+                  <div className="mt-5 flex flex-wrap gap-3 text-xs font-semibold text-[#53615a]">
+                    <span className="rounded-full bg-white px-3 py-1.5">
+                      {visibleDocuments.length} / {MAX_DOCUMENTS}{" "}
+                      {translated(language, "pages", "páginas")}
+                    </span>
+                    <span className="rounded-full bg-white px-3 py-1.5">
+                      {Math.round(MAX_DOCUMENT_BYTES / 1024 / 1024)} MB / {translated(language, "page", "página")}
+                    </span>
+                    <span className="rounded-full bg-white px-3 py-1.5">
+                      {Math.round(MAX_CASE_BYTES / 1024 / 1024)} MB {translated(language, "total", "en total")}
+                    </span>
+                  </div>
+                  {uploadNotice ? (
+                    <p aria-live="polite" className="mt-4 text-sm font-medium text-[#44534c]" role="status">
+                      {uploadNotice}
+                    </p>
+                  ) : null}
+                </div>
+              ) : null}
+
               <div className="mt-8 space-y-4">
-                {caseData.documents.map((document, index) => {
+                {visibleDocuments.map((document, index) => {
                   const evidence = caseData.evidence.find(
+                    (item) => item.documentId === document.id,
+                  );
+                  const queued = uploadQueue.find(
                     (item) => item.documentId === document.id,
                   );
                   return (
@@ -608,21 +994,56 @@ export function FirstDayWorkspace({ initialCase }: { initialCase: FirstDayCase }
                           <div>
                             <h2 className="text-lg font-semibold tracking-[-0.02em]">
                               {language === "Español"
-                                ? DOCUMENT_ES[document.id]
+                                ? DOCUMENT_ES[document.id] ?? document.label
                                 : document.label}
                             </h2>
                             <p className="mt-1 text-xs font-semibold uppercase tracking-[0.15em] text-[#5f6d66]">
-                              {translated(language, `Page ${document.pageIndex}`, `Página ${document.pageIndex}`)} · {document.sourceVersion}
+                              {translated(language, `Page ${document.pageIndex}`, `Página ${document.pageIndex}`)} · {caseData.mode === "live" && queued
+                                ? `${(queued.size / 1024 / 1024).toFixed(1)} MB`
+                                : document.sourceVersion}
                             </p>
                           </div>
-                          <span className="fd-ready-pill">
-                            <CircleCheckIcon className="h-4 w-4" />
-                            {translated(language, "Text ready", "Texto listo")}
+                          <span
+                            aria-live="polite"
+                            className={`fd-ready-pill ${document.status === "error" ? "is-error" : ""}`}
+                          >
+                            {document.status === "ready" ? (
+                              <CircleCheckIcon className="h-4 w-4" />
+                            ) : document.status === "error" ? (
+                              <WarningIcon className="h-4 w-4" />
+                            ) : (
+                              <ClockIcon className="h-4 w-4" />
+                            )}
+                            {document.status === "ready"
+                              ? translated(language, "Text ready", "Texto listo")
+                              : document.status === "error"
+                                ? translated(language, "Needs retry", "Reintentar")
+                                : queued?.status === "processing"
+                                  ? translated(language, "Reading page", "Leyendo página")
+                                  : translated(language, "Waiting", "En espera")}
                           </span>
                         </div>
-                        <p className="mt-4 line-clamp-2 text-sm leading-6 text-[#5d6963]">
-                          {document.extractedText}
-                        </p>
+                        {document.extractedText ? (
+                          caseData.mode === "live" ? (
+                            <details className="mt-4 rounded-2xl border border-[#e0e5e1] bg-white/70 p-4">
+                              <summary className="cursor-pointer text-sm font-semibold text-[#35453e]">
+                                {translated(language, "Read extracted text", "Leer el texto extraído")}
+                              </summary>
+                              <p className="mt-4 whitespace-pre-wrap text-sm leading-6 text-[#5d6963]">
+                                {document.extractedText}
+                              </p>
+                            </details>
+                          ) : (
+                            <p className="mt-4 line-clamp-2 text-sm leading-6 text-[#5d6963]">
+                              {document.extractedText}
+                            </p>
+                          )
+                        ) : null}
+                        {queued?.error ? (
+                          <p className="mt-4 text-sm font-medium text-[#8a3f31]" role="alert">
+                            {queued.error}
+                          </p>
+                        ) : null}
                         {evidence ? (
                           <div className="mt-4">
                             <SourceButton
@@ -631,24 +1052,59 @@ export function FirstDayWorkspace({ initialCase }: { initialCase: FirstDayCase }
                             />
                           </div>
                         ) : null}
+                        {caseData.mode === "live" ? (
+                          <div className="mt-4 flex flex-wrap gap-2">
+                            {document.status === "error" ? (
+                              <button
+                                className="fd-secondary-button"
+                                onClick={() => retryUpload(document.id)}
+                                type="button"
+                              >
+                                {translated(language, "Retry page", "Reintentar página")}
+                              </button>
+                            ) : null}
+                            <button
+                              className="fd-remove-button"
+                              onClick={() => removeUpload(document.id)}
+                              type="button"
+                            >
+                              {translated(language, "Remove page", "Eliminar página")}
+                            </button>
+                          </div>
+                        ) : null}
                       </div>
                     </article>
                   );
                 })}
               </div>
 
-              <div className="mt-5 rounded-3xl border border-dashed border-[#bfc9c2] bg-white/50 p-6 text-center">
-                <p className="font-semibold">
-                  {translated(language, "Live uploads are the next milestone", "Las cargas reales son el próximo objetivo")}
-                </p>
-                <p className="mt-1 text-sm text-[#68756e]">
+              {caseData.mode === "live" && visibleDocuments.length === 0 ? (
+                <div className="mt-5 rounded-3xl border border-dashed border-[#bfc9c2] bg-white/50 p-6 text-center">
+                  <p className="font-semibold">
+                    {translated(language, "No pages added yet", "Todavía no hay páginas")}
+                  </p>
+                  <p className="mt-1 text-sm text-[#68756e]">
+                    {translated(
+                      language,
+                      "Your pages appear here with separate progress and retry controls.",
+                      "Sus páginas aparecerán aquí con progreso y opciones para reintentar por separado.",
+                    )}
+                  </p>
+                </div>
+              ) : null}
+
+              {caseData.mode === "live" && visibleDocuments.some((document) => document.status === "ready") ? (
+                <div className="mt-5 rounded-3xl border border-[#cbd6ff] bg-[#eef2ff] p-5 text-sm leading-6 text-[#34487f]">
+                  <strong className="block">
+                    {translated(language, "Source text is ready", "El texto de la fuente está listo")}
+                  </strong>
                   {translated(
                     language,
-                    "This first build proves the evidence and planning flow with safe fictional documents.",
-                    "Esta primera versión prueba el flujo con documentos ficticios seguros.",
+                    "Lantern has kept each page separate. Fact proposals and evidence review are the next build step; use the fictional sample to explore the complete planning workflow now.",
+                    "Lantern ha mantenido cada página separada. Las propuestas de datos y la revisión de evidencia son el siguiente paso; use el ejemplo ficticio para explorar ahora el flujo completo.",
                   )}
-                </p>
-              </div>
+                </div>
+              ) : null}
             </section>
           ) : null}
 
@@ -995,7 +1451,8 @@ export function FirstDayWorkspace({ initialCase }: { initialCase: FirstDayCase }
                 <ArrowLeftIcon className="h-4 w-4" />
                 {copy.back}
               </button>
-              {currentStep !== "export" ? (
+              {currentStep !== "export" &&
+              !(caseData.mode === "live" && currentStep === "documents") ? (
                 <button className="fd-primary-button" onClick={goForward} type="button">
                   {copy.continue}
                   <ArrowRightIcon className="h-5 w-5" />

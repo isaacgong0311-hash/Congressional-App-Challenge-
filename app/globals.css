@@ -279,6 +279,32 @@ body {
   font-weight: 750;
 }
 
+.fd-ready-pill.is-error {
+  background: #fbe8e3;
+  color: #8a3f31;
+}
+
+.fd-upload-zone {
+  border: 1px dashed #aebbb3;
+  border-radius: 1.75rem;
+  background: rgba(255, 255, 255, 0.7);
+  padding: 1.5rem;
+  box-shadow: 0 10px 35px rgba(20, 39, 31, 0.04);
+}
+
+.fd-remove-button {
+  min-height: 44px;
+  border-radius: 0.9rem;
+  padding: 0.65rem 0.9rem;
+  color: #7d3b30;
+  font-size: 0.8125rem;
+  font-weight: 750;
+}
+
+.fd-remove-button:hover {
+  background: #fbe8e3;
+}
+
 .fd-fact-card,
 .fd-conflict-card {
   border: 1px solid #d9dfda;

@@ -51,6 +51,14 @@ Provider pricing and retention terms are external and may change. The project do
 - Exposed text-size and contrast controls on mobile, labeled icon-only controls, and improved secondary-text contrast.
 - Verified the workflow at desktop and mobile sizes, including Spanish copy, conflict resolution, dependent task unlocking, focus behavior, reduced-motion rendering, and a WCAG A/AA automated audit with zero violations.
 
+## 2026-09-16 — Multi-document intake
+
+- Added a live First Day intake path for up to five JPG/PNG pages, limited to 10 MB per page and 25 MB per in-memory case.
+- Reused the existing `/api/explain` endpoint through a small adapter that retains the original extracted text and a stable document ID without changing the general Lantern response contract.
+- Added a sequential client queue with per-page progress, retry, removal, request cancellation, and request-token checks so a late response cannot restore a removed page.
+- Kept downstream fact review and planning disabled for live cases until source-backed fact proposals are implemented; the complete fictional case remains available for the end-to-end workflow.
+- Added seven tests for selection limits, sequential processing, retry isolation, late-response handling, and explanation-response adaptation.
+
 ## AI assistance disclosure
 
 OpenAI Codex assisted with:
