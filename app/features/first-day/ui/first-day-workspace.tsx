@@ -310,10 +310,22 @@ export function FirstDayWorkspace({ initialCase }: { initialCase: FirstDayCase }
       data-fd-hc={highContrast ? "true" : "false"}
       data-fd-lt={largeText ? "true" : "false"}
     >
-      <header className="fd-header print:hidden">
+      <header
+        aria-hidden={openEvidence ? true : undefined}
+        className="fd-header print:hidden"
+        inert={openEvidence ? true : undefined}
+      >
         <div className="mx-auto flex w-full max-w-[1400px] items-center justify-between gap-4 px-4 py-4 sm:px-7 lg:px-10">
           <div className="flex items-center gap-3">
-            <Link className="fd-back-link" href="/">
+            <Link
+              aria-label={translated(
+                language,
+                "Back to all Lantern tools",
+                "Volver a todas las herramientas de Lantern",
+              )}
+              className="fd-back-link"
+              href="/"
+            >
               <ArrowLeftIcon className="h-4 w-4" />
               <span className="hidden sm:inline">
                 {translated(language, "All Lantern tools", "Todas las herramientas")}
@@ -325,12 +337,13 @@ export function FirstDayWorkspace({ initialCase }: { initialCase: FirstDayCase }
                 <LanternIcon className="h-5 w-5" />
               </span>
               <span>Lantern</span>
-              <span className="font-normal text-[#7a857f]">/ First Day</span>
+              <span className="font-normal text-[#5f6d66]">/ First Day</span>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
             <button
+              aria-label={translated(language, "Toggle large text", "Cambiar texto grande")}
               aria-pressed={largeText}
               className="fd-utility-button hidden sm:inline-flex"
               onClick={() => setLargeText((value) => !value)}
@@ -339,6 +352,7 @@ export function FirstDayWorkspace({ initialCase }: { initialCase: FirstDayCase }
               Aa
             </button>
             <button
+              aria-label={translated(language, "Toggle high contrast", "Cambiar alto contraste")}
               aria-pressed={highContrast}
               className="fd-utility-button hidden sm:inline-flex"
               onClick={() => setHighContrast((value) => !value)}
@@ -365,9 +379,33 @@ export function FirstDayWorkspace({ initialCase }: { initialCase: FirstDayCase }
             </div>
           </div>
         </div>
+        <div className="flex items-center justify-end gap-2 px-4 pb-3 sm:hidden">
+          <button
+            aria-label={translated(language, "Toggle large text", "Cambiar texto grande")}
+            aria-pressed={largeText}
+            className="fd-utility-button inline-flex"
+            onClick={() => setLargeText((value) => !value)}
+            type="button"
+          >
+            Aa
+          </button>
+          <button
+            aria-label={translated(language, "Toggle high contrast", "Cambiar alto contraste")}
+            aria-pressed={highContrast}
+            className="fd-utility-button inline-flex"
+            onClick={() => setHighContrast((value) => !value)}
+            type="button"
+          >
+            ◐
+          </button>
+        </div>
       </header>
 
-      <div className="border-y border-[#f1c76f]/50 bg-[#fff8df] px-4 py-2.5 text-center text-xs font-semibold text-[#71551c] print:border-[#999] print:bg-white print:text-black">
+      <div
+        aria-hidden={openEvidence ? true : undefined}
+        className="border-y border-[#f1c76f]/50 bg-[#fff8df] px-4 py-2.5 text-center text-xs font-semibold text-[#71551c] print:border-[#999] print:bg-white print:text-black"
+        inert={openEvidence ? true : undefined}
+      >
         {translated(
           language,
           "Fictional demonstration · Mesa View is not a real district",
@@ -375,11 +413,15 @@ export function FirstDayWorkspace({ initialCase }: { initialCase: FirstDayCase }
         )}
       </div>
 
-      <div className="mx-auto grid w-full max-w-[1400px] grid-cols-1 gap-8 px-4 py-6 sm:px-7 lg:grid-cols-[250px_minmax(0,1fr)] lg:px-10 lg:py-10">
+      <div
+        aria-hidden={openEvidence ? true : undefined}
+        className="mx-auto grid w-full max-w-[1400px] grid-cols-1 gap-8 px-4 py-6 sm:px-7 lg:grid-cols-[250px_minmax(0,1fr)] lg:px-10 lg:py-10"
+        inert={openEvidence ? true : undefined}
+      >
         <aside className="print:hidden lg:sticky lg:top-6 lg:self-start">
           <nav aria-label="First Day progress" className="fd-step-nav">
             <div className="mb-5 px-3">
-              <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#7a857f]">
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#5f6d66]">
                 {translated(language, "Your path", "Su camino")}
               </p>
               <p className="mt-2 text-sm leading-6 text-[#55625c]">
@@ -496,7 +538,7 @@ export function FirstDayWorkspace({ initialCase }: { initialCase: FirstDayCase }
                       <div className="mr-7 rounded-3xl bg-white p-5 text-[#1b2d26] shadow-2xl">
                         <div className="flex items-start justify-between gap-4">
                           <div>
-                            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#708078]">
+                            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#5f6d66]">
                               {translated(language, "Your next step", "Su próximo paso")}
                             </p>
                             <p className="mt-2 text-lg font-semibold">
@@ -569,7 +611,7 @@ export function FirstDayWorkspace({ initialCase }: { initialCase: FirstDayCase }
                                 ? DOCUMENT_ES[document.id]
                                 : document.label}
                             </h2>
-                            <p className="mt-1 text-xs font-semibold uppercase tracking-[0.15em] text-[#7b8781]">
+                            <p className="mt-1 text-xs font-semibold uppercase tracking-[0.15em] text-[#5f6d66]">
                               {translated(language, `Page ${document.pageIndex}`, `Página ${document.pageIndex}`)} · {document.sourceVersion}
                             </p>
                           </div>
@@ -632,7 +674,7 @@ export function FirstDayWorkspace({ initialCase }: { initialCase: FirstDayCase }
                     <article className="fd-fact-card" key={fact.id}>
                       <div className="flex items-start justify-between gap-3">
                         <div>
-                          <p className="text-xs font-bold uppercase tracking-[0.15em] text-[#7a867f]">
+                          <p className="text-xs font-bold uppercase tracking-[0.15em] text-[#5f6d66]">
                             {fact.kind.replace("_", " ")}
                           </p>
                           <h2 className="mt-2 text-base font-semibold">
@@ -720,7 +762,7 @@ export function FirstDayWorkspace({ initialCase }: { initialCase: FirstDayCase }
                                   <p className="mt-2 text-sm leading-6 text-[#52615a]">
                                     {taskCopy.action}
                                   </p>
-                                  <p className="mt-2 text-xs font-medium leading-5 text-[#7b8781]">
+                                  <p className="mt-2 text-xs font-medium leading-5 text-[#5f6d66]">
                                     {language === "Español"
                                       ? taskCopy.detail
                                       : `${task.detail} ${task.reason}`}
@@ -900,7 +942,7 @@ export function FirstDayWorkspace({ initialCase }: { initialCase: FirstDayCase }
                           <p className="mt-1 text-sm leading-6 text-[#5d6963]">
                             {taskCopy.action}
                           </p>
-                          <p className="mt-2 text-xs text-[#7b8781]">
+                          <p className="mt-2 text-xs text-[#5f6d66]">
                             {translated(language, "Source references", "Referencias")}: {task.evidenceIds.join(", ")}
                           </p>
                         </div>
@@ -911,13 +953,13 @@ export function FirstDayWorkspace({ initialCase }: { initialCase: FirstDayCase }
 
                 <div className="mt-7 grid gap-4 border-t border-[#dfe4df] pt-6 sm:grid-cols-2">
                   <div>
-                    <p className="text-xs font-bold uppercase tracking-[0.15em] text-[#7b8781]">
+                    <p className="text-xs font-bold uppercase tracking-[0.15em] text-[#5f6d66]">
                       {translated(language, "Rule version", "Versión de reglas")}
                     </p>
                     <p className="mt-2 text-sm font-semibold">{caseData.ruleVersion}</p>
                   </div>
                   <div>
-                    <p className="text-xs font-bold uppercase tracking-[0.15em] text-[#7b8781]">
+                    <p className="text-xs font-bold uppercase tracking-[0.15em] text-[#5f6d66]">
                       {translated(language, "Evidence note", "Nota de evidencia")}
                     </p>
                     <p className="mt-2 text-sm leading-6 text-[#5d6963]">
@@ -968,6 +1010,7 @@ export function FirstDayWorkspace({ initialCase }: { initialCase: FirstDayCase }
         <SourcePanel
           document={openDocument}
           evidence={openEvidence}
+          language={language}
           onClose={closeSource}
           procedure={openProcedure}
         />

@@ -13,22 +13,41 @@ type SourcePanelProps = {
   evidence: Evidence;
   document?: FirstDayDocument;
   procedure?: Procedure;
+  language: "English" | "Español";
   onClose: () => void;
 };
 
 export function SourcePanel({
   evidence,
-  document,
+  document: sourceDocument,
   procedure,
+  language,
   onClose,
 }: SourcePanelProps) {
   const closeRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     closeRef.current?.focus();
 
     function closeOnEscape(event: KeyboardEvent) {
       if (event.key === "Escape") onClose();
+      if (event.key !== "Tab") return;
+
+      const focusable = panelRef.current?.querySelectorAll<HTMLElement>(
+        'button, [href], summary, input, select, textarea, [tabindex]:not([tabindex="-1"])',
+      );
+      if (!focusable?.length) return;
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
     }
 
     window.addEventListener("keydown", closeOnEscape);
@@ -36,7 +55,11 @@ export function SourcePanel({
   }, [onClose]);
 
   const isProcedure = Boolean(procedure);
-  const label = document?.label ?? procedure?.sourceSection ?? "Source";
+  const isSpanish = language === "Español";
+  const label =
+    sourceDocument?.label ??
+    procedure?.sourceSection ??
+    (isSpanish ? "Fuente" : "Source");
 
   return (
     <div className="fd-source-backdrop fixed inset-0 z-50 flex items-end justify-center bg-[#0d1b17]/45 p-0 backdrop-blur-sm sm:items-center sm:p-6">
@@ -44,6 +67,7 @@ export function SourcePanel({
         aria-labelledby="source-panel-title"
         aria-modal="true"
         className="fd-source-panel max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-t-[2rem] border border-white/60 bg-[#fffefb] shadow-[0_30px_100px_rgba(13,27,23,.28)] sm:rounded-[2rem]"
+        ref={panelRef}
         role="dialog"
       >
         <div className="flex items-start justify-between border-b border-[#dfe4df] px-6 py-5 sm:px-8">
@@ -53,7 +77,13 @@ export function SourcePanel({
             </span>
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#68746f]">
-                {isProcedure ? "Fictional procedure" : "Document evidence"}
+                {isProcedure
+                  ? isSpanish
+                    ? "Procedimiento ficticio"
+                    : "Fictional procedure"
+                  : isSpanish
+                    ? "Evidencia del documento"
+                    : "Document evidence"}
               </p>
               <h2
                 className="mt-1 text-lg font-semibold text-[#13221d]"
@@ -64,7 +94,7 @@ export function SourcePanel({
             </div>
           </div>
           <button
-            aria-label="Close source"
+            aria-label={isSpanish ? "Cerrar fuente" : "Close source"}
             className="fd-icon-button"
             onClick={onClose}
             ref={closeRef}
@@ -76,7 +106,9 @@ export function SourcePanel({
 
         <div className="space-y-6 px-6 py-7 sm:px-8">
           <div>
-            <p className="text-sm font-medium text-[#68746f]">Where this appears</p>
+            <p className="text-sm font-medium text-[#68746f]">
+              {isSpanish ? "Dónde aparece" : "Where this appears"}
+            </p>
             <p className="mt-1 text-sm font-semibold text-[#24342e]">
               {evidence.location}
             </p>
@@ -88,17 +120,21 @@ export function SourcePanel({
 
           <div className="rounded-2xl bg-[#edf2ff] p-4 text-sm leading-6 text-[#334577]">
             {isProcedure
-              ? "This rule is fictional and exists only for the demo. It is not a real district requirement."
-              : "Lantern keeps the exact wording visible so you can check the plan against the original document."}
+              ? isSpanish
+                ? "Esta regla es ficticia y existe solo para la demostración. No es un requisito de un distrito real."
+                : "This rule is fictional and exists only for the demo. It is not a real district requirement."
+              : isSpanish
+                ? "Lantern mantiene visibles las palabras exactas para que pueda comparar el plan con el documento original."
+                : "Lantern keeps the exact wording visible so you can check the plan against the original document."}
           </div>
 
-          {document ? (
+          {sourceDocument ? (
             <details className="rounded-2xl border border-[#dfe4df] bg-white p-4">
               <summary className="cursor-pointer text-sm font-semibold text-[#24342e]">
-                Read extracted page text
+                {isSpanish ? "Leer el texto extraído" : "Read extracted page text"}
               </summary>
               <p className="mt-4 whitespace-pre-wrap text-sm leading-6 text-[#56625d]">
-                {document.extractedText}
+                {sourceDocument.extractedText}
               </p>
             </details>
           ) : null}

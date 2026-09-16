@@ -45,6 +45,12 @@ Provider pricing and retention terms are external and may change. The project do
 - Corrected overbroad home-page privacy phrases from “nothing stored” to wording that distinguishes application storage from external processing.
 - Fixed the imported React lint error and migrated the rate limiter from `middleware.ts` to `proxy.ts` for Next.js 16.
 
+## 2026-09-16 — Acceptance pass
+
+- Added a trapped, localized evidence dialog with focus restoration and removed its background content from the accessibility tree while open.
+- Exposed text-size and contrast controls on mobile, labeled icon-only controls, and improved secondary-text contrast.
+- Verified the workflow at desktop and mobile sizes, including Spanish copy, conflict resolution, dependent task unlocking, focus behavior, reduced-motion rendering, and a WCAG A/AA automated audit with zero violations.
+
 ## AI assistance disclosure
 
 OpenAI Codex assisted with:
