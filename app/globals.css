@@ -402,7 +402,7 @@ body {
 .fd-state-waiting .fd-task-icon,
 .fd-print-state.fd-state-waiting {
   background: #edf0ee;
-  color: #68746e;
+  color: #56635d;
 }
 
 .fd-state-done {

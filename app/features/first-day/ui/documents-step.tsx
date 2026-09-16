@@ -1,0 +1,308 @@
+import { useRef } from "react";
+
+import {
+  MAX_CASE_BYTES,
+  MAX_DOCUMENT_BYTES,
+  MAX_DOCUMENTS,
+  type UploadQueueItem,
+} from "../domain/upload-queue";
+import type { FirstDayCase } from "../domain/types";
+import { DOCUMENT_ES, translated, type Language } from "./first-day-copy";
+import { Eyebrow, SourceButton, type SourceOpener } from "./first-day-shared";
+import {
+  CircleCheckIcon,
+  ClockIcon,
+  DocumentIcon,
+  WarningIcon,
+} from "./icons";
+
+export type DocumentsStepProps = {
+  caseData: FirstDayCase;
+  language: Language;
+  uploadQueue: UploadQueueItem[];
+  uploadNotice: string | null;
+  onAddFiles: (files: File[]) => void;
+  onRetry: (documentId: string) => void;
+  onRemove: (documentId: string) => void;
+  onOpenSource: SourceOpener;
+};
+
+export function DocumentsStep({
+  caseData,
+  language,
+  uploadQueue,
+  uploadNotice,
+  onAddFiles,
+  onRetry,
+  onRemove,
+  onOpenSource,
+}: DocumentsStepProps) {
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const visibleDocuments = caseData.documents.filter(
+    (document) => document.status !== "removed",
+  );
+  const sourceLabel = translated(language, "Show source", "Ver fuente");
+
+  return (
+    <section className="fd-enter">
+      <Eyebrow>
+        {translated(
+          language,
+          "Step 2 · Documents",
+          "Paso 2 · Documentos",
+        )}
+      </Eyebrow>
+      <h1 className="fd-page-title">
+        {translated(
+          language,
+          "One case, every instruction.",
+          "Un caso, todas las instrucciones.",
+        )}
+      </h1>
+      <p className="fd-page-intro">
+        {translated(
+          language,
+          "Each page keeps its own identity, extracted text, and processing status. A failed page would not erase the others.",
+          "Cada página conserva su identidad, texto extraído y estado. Una página con error no borraría las demás.",
+        )}
+      </p>
+
+      {caseData.mode === "live" ? (
+        <div className="fd-upload-zone mt-8">
+          <input
+            accept=".jpg,.jpeg,.png,image/jpeg,image/png"
+            aria-label={translated(
+              language,
+              "School page images",
+              "Imágenes de páginas escolares",
+            )}
+            className="hidden"
+            multiple
+            onChange={(event) => {
+              onAddFiles(Array.from(event.currentTarget.files ?? []));
+              event.currentTarget.value = "";
+            }}
+            ref={fileInputRef}
+            type="file"
+          />
+          <div className="flex flex-col items-start justify-between gap-5 sm:flex-row sm:items-center">
+            <div>
+              <p className="text-lg font-semibold">
+                {translated(
+                  language,
+                  "Add school pages",
+                  "Añada páginas escolares",
+                )}
+              </p>
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-[#59665f]">
+                {translated(
+                  language,
+                  "Choose up to five JPG or PNG pages. Each page can be 10 MB, with a 25 MB case limit. Lantern reads one page at a time so one failure does not erase the others.",
+                  "Elija hasta cinco páginas JPG o PNG. Cada página puede tener 10 MB, con un límite total de 25 MB. Lantern lee una página a la vez para que un error no borre las demás.",
+                )}
+              </p>
+            </div>
+            <button
+              className="fd-primary-button shrink-0"
+              disabled={visibleDocuments.length >= MAX_DOCUMENTS}
+              onClick={() => fileInputRef.current?.click()}
+              type="button"
+            >
+              <DocumentIcon className="h-5 w-5" />
+              {translated(language, "Choose pages", "Elegir páginas")}
+            </button>
+          </div>
+          <div className="mt-5 flex flex-wrap gap-3 text-xs font-semibold text-[#53615a]">
+            <span className="rounded-full bg-white px-3 py-1.5">
+              {visibleDocuments.length} / {MAX_DOCUMENTS}{" "}
+              {translated(language, "pages", "páginas")}
+            </span>
+            <span className="rounded-full bg-white px-3 py-1.5">
+              {Math.round(MAX_DOCUMENT_BYTES / 1024 / 1024)} MB /{` `}
+              {translated(language, "page", "página")}
+            </span>
+            <span className="rounded-full bg-white px-3 py-1.5">
+              {Math.round(MAX_CASE_BYTES / 1024 / 1024)} MB{` `}
+              {translated(language, "total", "en total")}
+            </span>
+          </div>
+          {uploadNotice ? (
+            <p
+              aria-live="polite"
+              className="mt-4 text-sm font-medium text-[#44534c]"
+              role="status"
+            >
+              {uploadNotice}
+            </p>
+          ) : null}
+        </div>
+      ) : null}
+
+      <div className="mt-8 space-y-4">
+        {visibleDocuments.map((document, index) => {
+          const evidence = caseData.evidence.find(
+            (item) => item.documentId === document.id,
+          );
+          const queued = uploadQueue.find(
+            (item) => item.documentId === document.id,
+          );
+          return (
+            <article className="fd-document-card" key={document.id}>
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#e9edff] font-semibold text-[#3556d4]">
+                {index + 1}
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <h2 className="text-lg font-semibold tracking-[-0.02em]">
+                      {language === "Español"
+                        ? DOCUMENT_ES[document.id] ?? document.label
+                        : document.label}
+                    </h2>
+                    <p className="mt-1 text-xs font-semibold uppercase tracking-[0.15em] text-[#5f6d66]">
+                      {translated(
+                        language,
+                        `Page ${document.pageIndex}`,
+                        `Página ${document.pageIndex}`,
+                      )}{" "}
+                      ·{` `}
+                      {caseData.mode === "live" && queued
+                        ? `${(queued.size / 1024 / 1024).toFixed(1)} MB`
+                        : document.sourceVersion}
+                    </p>
+                  </div>
+                  <span
+                    aria-live="polite"
+                    className={`fd-ready-pill ${
+                      document.status === "error" ? "is-error" : ""
+                    }`}
+                  >
+                    {document.status === "ready" ? (
+                      <CircleCheckIcon className="h-4 w-4" />
+                    ) : document.status === "error" ? (
+                      <WarningIcon className="h-4 w-4" />
+                    ) : (
+                      <ClockIcon className="h-4 w-4" />
+                    )}
+                    {document.status === "ready"
+                      ? translated(language, "Text ready", "Texto listo")
+                      : document.status === "error"
+                        ? translated(language, "Needs retry", "Reintentar")
+                        : queued?.status === "processing"
+                          ? translated(
+                              language,
+                              "Reading page",
+                              "Leyendo página",
+                            )
+                          : translated(language, "Waiting", "En espera")}
+                  </span>
+                </div>
+                {document.extractedText ? (
+                  caseData.mode === "live" ? (
+                    <details className="mt-4 rounded-2xl border border-[#e0e5e1] bg-white/70 p-4">
+                      <summary className="cursor-pointer text-sm font-semibold text-[#35453e]">
+                        {translated(
+                          language,
+                          "Read extracted text",
+                          "Leer el texto extraído",
+                        )}
+                      </summary>
+                      <p className="mt-4 whitespace-pre-wrap text-sm leading-6 text-[#5d6963]">
+                        {document.extractedText}
+                      </p>
+                    </details>
+                  ) : (
+                    <p className="mt-4 line-clamp-2 text-sm leading-6 text-[#5d6963]">
+                      {document.extractedText}
+                    </p>
+                  )
+                ) : null}
+                {queued?.error ? (
+                  <p
+                    className="mt-4 text-sm font-medium text-[#8a3f31]"
+                    role="alert"
+                  >
+                    {queued.error}
+                  </p>
+                ) : null}
+                {evidence ? (
+                  <div className="mt-4">
+                    <SourceButton
+                      label={sourceLabel}
+                      onClick={(button) => onOpenSource(evidence.id, button)}
+                    />
+                  </div>
+                ) : null}
+                {caseData.mode === "live" ? (
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {document.status === "error" ? (
+                      <button
+                        className="fd-secondary-button"
+                        onClick={() => onRetry(document.id)}
+                        type="button"
+                      >
+                        {translated(
+                          language,
+                          "Retry page",
+                          "Reintentar página",
+                        )}
+                      </button>
+                    ) : null}
+                    <button
+                      className="fd-remove-button"
+                      onClick={() => onRemove(document.id)}
+                      type="button"
+                    >
+                      {translated(
+                        language,
+                        "Remove page",
+                        "Eliminar página",
+                      )}
+                    </button>
+                  </div>
+                ) : null}
+              </div>
+            </article>
+          );
+        })}
+      </div>
+
+      {caseData.mode === "live" && visibleDocuments.length === 0 ? (
+        <div className="mt-5 rounded-3xl border border-dashed border-[#bfc9c2] bg-white/50 p-6 text-center">
+          <p className="font-semibold">
+            {translated(
+              language,
+              "No pages added yet",
+              "Todavía no hay páginas",
+            )}
+          </p>
+          <p className="mt-1 text-sm text-[#68756e]">
+            {translated(
+              language,
+              "Your pages appear here with separate progress and retry controls.",
+              "Sus páginas aparecerán aquí con progreso y opciones para reintentar por separado.",
+            )}
+          </p>
+        </div>
+      ) : null}
+
+      {caseData.mode === "live" &&
+      visibleDocuments.some((document) => document.status === "ready") ? (
+        <div className="mt-5 rounded-3xl border border-[#cbd6ff] bg-[#eef2ff] p-5 text-sm leading-6 text-[#34487f]">
+          <strong className="block">
+            {translated(
+              language,
+              "Source text is ready",
+              "El texto de la fuente está listo",
+            )}
+          </strong>
+          {translated(
+            language,
+            "Lantern has kept each page separate. Fact proposals and evidence review are the next build step; use the fictional sample to explore the complete planning workflow now.",
+            "Lantern ha mantenido cada página separada. Las propuestas de datos y la revisión de evidencia son el siguiente paso; use el ejemplo ficticio para explorar ahora el flujo completo.",
+          )}
+        </div>
+      ) : null}
+    </section>
+  );
+}
