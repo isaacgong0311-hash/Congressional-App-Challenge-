@@ -28,7 +28,7 @@ The imported source applied per-IP, per-route rate limits in process memory. The
 - Application code does not write the uploaded image, extracted text, case, or assistant transcript to a database or file.
 - Groq, ElevenLabs, and Perplexity are external processors when their respective features are used. Provider-side retention is governed by the provider account and terms, not by this codebase.
 - Accessibility preferences for high contrast and large text use browser `localStorage` keys `ttf-hc` and `ttf-lt`.
-- The server logs provider errors. The explain route also logs up to 2,000 characters of malformed raw model output on schema failure; this output can contain extracted letter text and must be considered when making privacy claims.
+- Provider failures log a request ID, route, failure kind, duration, and schema issue count when available. Raw model output, extracted document text, and image bytes are not intentionally written to application logs.
 - The application does not intentionally log image bytes.
 
 ## Baseline verification

@@ -2,6 +2,9 @@ import { groq } from "@ai-sdk/groq";
 import { generateText } from "ai";
 import { z } from "zod";
 
+import { extractOuterJson } from "../../lib/extract-json";
+import { providerErrorSummary } from "../../lib/provider-error";
+
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
@@ -186,34 +189,9 @@ const JSON_SHAPE = `{
   "originalText": string  // verbatim text copied exactly from the letter, preserving all jargon and structure
 }`;
 
-// Strip code fences then use bracket-counting to find the outermost {...}.
-// lastIndexOf("}") is unreliable when the model appends prose after the JSON.
-function extractJson(text: string): unknown {
-  const fenced = text.match(/```(?:json)?\s*([\s\S]*?)```/i);
-  const candidate = (fenced ? fenced[1] : text).trim();
-
-  let depth = 0;
-  let start = -1;
-  for (let i = 0; i < candidate.length; i++) {
-    const ch = candidate[i];
-    if (ch === "{") {
-      if (depth === 0) start = i;
-      depth++;
-    } else if (ch === "}") {
-      depth--;
-      if (depth === 0 && start !== -1) {
-        try {
-          return JSON.parse(candidate.slice(start, i + 1));
-        } catch {
-          start = -1; // try next object if any
-        }
-      }
-    }
-  }
-  return null;
-}
-
 export async function POST(req: Request) {
+  const requestId = crypto.randomUUID();
+  const startedAt = Date.now();
   let form: FormData;
   try {
     form = await req.formData();
@@ -291,9 +269,18 @@ export async function POST(req: Request) {
       ],
     });
 
-    const parsed = ResultSchema.safeParse(extractJson(text));
+    const parsed = ResultSchema.safeParse(extractOuterJson(text));
     if (!parsed.success) {
-      console.error("explain route schema error:", parsed.error, "\nraw:", text.slice(0, 2000));
+      console.error(
+        "explain route schema error",
+        providerErrorSummary({
+          requestId,
+          route: "/api/explain",
+          kind: "schema",
+          durationMs: Date.now() - startedAt,
+          issueCount: parsed.error.issues.length,
+        }),
+      );
       return Response.json(
         { error: "Could not read this document. Try a clearer, well-lit photo." },
         { status: 502 },
@@ -301,8 +288,16 @@ export async function POST(req: Request) {
     }
 
     return Response.json(parsed.data);
-  } catch (err) {
-    console.error("explain route error:", err);
+  } catch {
+    console.error(
+      "explain route provider error",
+      providerErrorSummary({
+        requestId,
+        route: "/api/explain",
+        kind: "provider",
+        durationMs: Date.now() - startedAt,
+      }),
+    );
     return Response.json(
       { error: "Could not read this document. Try a clearer, well-lit photo." },
       { status: 502 },

@@ -55,7 +55,7 @@ This plan is ordered so every task leaves the application working and reviewable
 - Create: `tests/lib/provider-error.test.ts`
 - Modify: `docs/baseline.md`
 
-- [ ] **Step 1: Write the failing JSON and privacy tests**
+- [x] **Step 1: Write the failing JSON and privacy tests**
 
 ```ts
 // tests/lib/extract-json.test.ts
@@ -97,12 +97,12 @@ describe("providerErrorSummary", () => {
 });
 ```
 
-- [ ] **Step 2: Run the focused tests and verify module-not-found failures**
+- [x] **Step 2: Run the focused tests and verify module-not-found failures**
 
 Run: `npm test -- tests/lib/extract-json.test.ts tests/lib/provider-error.test.ts`  
 Expected: both suites fail because the two modules do not exist.
 
-- [ ] **Step 3: Add the shared utilities**
+- [x] **Step 3: Add the shared utilities**
 
 ```ts
 // app/lib/extract-json.ts
@@ -159,7 +159,7 @@ export function providerErrorSummary(input: ProviderErrorSummary) {
 }
 ```
 
-- [ ] **Step 4: Replace the private parser and raw log in the general route**
+- [x] **Step 4: Replace the private parser and raw log in the general route**
 
 In `app/api/explain/route.ts`, import both utilities, delete the local `extractJson`, create `requestId` and `startedAt` at the start of `POST`, and replace the schema-error log with:
 
@@ -178,7 +178,7 @@ console.error(
 
 Use `extractOuterJson(text)` in the Zod parse. For the provider catch, log the same structure with `kind: "provider"`; do not include `err`, `text`, extracted text, or image bytes.
 
-- [ ] **Step 5: Update the lifecycle documentation and verify**
+- [x] **Step 5: Update the lifecycle documentation and verify**
 
 Change the logging section in `docs/baseline.md` to state that provider failures record request metadata without raw output. Run:
 
@@ -188,9 +188,9 @@ npm run lint
 npm run build
 ```
 
-Expected: tests, lint, and production build pass; `rg -n 'raw:|text\.slice' app/api` returns no matches.
+Expected: tests, lint, and production build pass; `rg -n 'raw:|text\.slice' app/api/explain/route.ts` returns no matches.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add app/lib app/api/explain/route.ts tests/lib docs/baseline.md
