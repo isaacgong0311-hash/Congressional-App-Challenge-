@@ -1,0 +1,203 @@
+@import "tailwindcss";
+
+:root {
+  --background: #eef1f8;
+  --foreground: #0f172a;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-playfair: var(--font-playfair);
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  letter-spacing: -0.011em;
+  background: var(--background);
+}
+
+::selection {
+  background: #c7d7fe;
+}
+
+/* Quiet, modern scrollbars (used in the chat and letter preview). */
+.ttf-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+.ttf-scroll::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.ttf-scroll::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+.ttf-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* ── High contrast mode ───────────────────────────────────────── */
+[data-hc="true"] body,
+[data-hc="true"] {
+  background: #fff !important;
+  color: #000 !important;
+}
+
+[data-hc="true"] .text-slate-400,
+[data-hc="true"] .text-slate-500,
+[data-hc="true"] .text-slate-600 {
+  color: #222 !important;
+}
+
+[data-hc="true"] .border-slate-100,
+[data-hc="true"] .border-slate-200,
+[data-hc="true"] .border-slate-200\/70 {
+  border-color: #555 !important;
+}
+
+[data-hc="true"] .bg-slate-50,
+[data-hc="true"] .bg-slate-100 {
+  background-color: #f0f0f0 !important;
+}
+
+[data-hc="true"] .text-blue-700,
+[data-hc="true"] .text-blue-800,
+[data-hc="true"] .text-blue-900 {
+  color: #003580 !important;
+}
+
+[data-hc="true"] .bg-blue-50 {
+  background-color: #dbe9ff !important;
+}
+
+[data-hc="true"] .text-amber-700,
+[data-hc="true"] .text-amber-800,
+[data-hc="true"] .text-amber-900 {
+  color: #7a4500 !important;
+}
+
+[data-hc="true"] .bg-amber-50 {
+  background-color: #fff0cc !important;
+}
+
+[data-hc="true"] .text-orange-800,
+[data-hc="true"] .text-orange-900 {
+  color: #7a2000 !important;
+}
+
+[data-hc="true"] .bg-orange-50 {
+  background-color: #ffe8d6 !important;
+}
+
+[data-hc="true"] .text-red-700,
+[data-hc="true"] .text-red-800 {
+  color: #8b0000 !important;
+}
+
+/* ── Large text mode ─────────────────────────────────────────── */
+[data-lt="true"] {
+  font-size: 1.125rem;
+}
+
+[data-lt="true"] .text-sm {
+  font-size: 1rem !important;
+  line-height: 1.6 !important;
+}
+
+[data-lt="true"] .text-xs {
+  font-size: 0.875rem !important;
+}
+
+[data-lt="true"] .text-base {
+  font-size: 1.2rem !important;
+  line-height: 1.7 !important;
+}
+
+[data-lt="true"] h1,
+[data-lt="true"] .text-2xl,
+[data-lt="true"] .text-3xl {
+  font-size: 2rem !important;
+}
+
+[data-lt="true"] h2,
+[data-lt="true"] .text-xl {
+  font-size: 1.5rem !important;
+}
+
+/* ── Print / Save as PDF ─────────────────────────────────────── */
+@media print {
+  body {
+    background: white !important;
+    font-size: 12pt;
+    color: #000;
+  }
+
+  header,
+  footer,
+  .print\:hidden {
+    display: none !important;
+  }
+
+  main {
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+
+  .rounded-2xl,
+  .rounded-xl,
+  .rounded-lg {
+    border-radius: 4px !important;
+  }
+
+  .shadow-sm,
+  .shadow-md {
+    box-shadow: none !important;
+  }
+
+  a[href]::after {
+    content: " (" attr(href) ")";
+    font-size: 9pt;
+    color: #555;
+  }
+
+  button {
+    display: none !important;
+  }
+}
+
+/* Respect users who prefer reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+@keyframes ttf-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ttf-fade-in {
+  animation: ttf-fade-in 0.35s ease-out both;
+}
