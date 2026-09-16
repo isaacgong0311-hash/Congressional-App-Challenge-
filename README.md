@@ -6,7 +6,7 @@ This repository builds from the public [`TRANSLATEtheform`](https://github.com/i
 
 ## Current status
 
-The imported Lantern letter explanation tool is the working baseline. The First Day workflow is under active development.
+The imported Lantern letter explanation tool remains available at `/`. A working First Day fictional demo is available at `/first-day`, with source-linked facts, deterministic task states, conflict resolution, English/Spanish interface copy, and printable output.
 
 The initial First Day school and district scenario is **fictional**. It exists to test evidence handling and deterministic plan logic; it is not real district policy or proof of a school partnership.
 
@@ -34,13 +34,14 @@ Do not commit `.env.local` or real family documents.
 
 ```bash
 npm run lint
+npm test
 npm run build
 ```
-
-The First Day domain test command will be added with its domain foundation.
 
 ## Privacy boundary
 
 The application does not intentionally write uploaded images to disk or a database. When document explanation is used, the image is sent to the configured external AI provider for processing. Browser accessibility preferences may be saved in `localStorage`; the first First Day case stays in page memory by default.
 
 Review [the approved design](docs/superpowers/specs/2026-09-15-lantern-first-day-design.md) and [implementation plan](docs/superpowers/plans/2026-09-15-lantern-first-day-foundation.md) for scope and architecture.
+
+Provider pricing and free-tier limits can change. Verify the current provider terms before deployment; First Day's deterministic fictional demo does not require provider keys.

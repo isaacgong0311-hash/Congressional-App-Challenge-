@@ -20,7 +20,7 @@ The home page in `app/page.tsx` contains the general letter workflow, sample-let
 | `POST /api/local-help` | Perplexity Sonar web-grounded resource lookup | Node runtime; 30-second max duration; optional; location inputs are sanitized and truncated to 60 characters |
 | `GET /api/health` | Local environment-key status | Returns degraded/503 when the required Groq key is absent |
 
-The imported `middleware.ts` applies per-IP, per-route rate limits in process memory. These counters are not shared between serverless instances. Next.js 16 builds it successfully but warns that the convention is deprecated in favor of `proxy.ts`.
+The imported source applied per-IP, per-route rate limits in process memory. These counters are not shared between serverless instances. During the foundation milestone, the file and export were migrated from deprecated `middleware.ts` to the supported Next.js 16 `proxy.ts` convention without changing its limits.
 
 ## Data lifecycle
 
@@ -48,3 +48,11 @@ No provider keys or personal documents were used during this audit, so live expl
 3. Add a deterministic test runner for First Day domain behavior.
 4. Replace absolute privacy promises with wording that acknowledges external processing and possible server logs.
 5. Audit dependency advisories before deployment; do not apply a breaking `npm audit fix --force` automatically.
+
+## Foundation status after baseline fixes
+
+- The preference restore now runs from a scheduled browser callback, preserving behavior without the React lint violation.
+- Unused imported state and helper components were removed.
+- `middleware.ts` was migrated to `proxy.ts` and the production warning is gone.
+- Vitest 4.0.18 was added because the newest Vitest major requires Node 22.12 while this project's declared type baseline is Node 20. The install currently reports 16 dependency advisories: 5 low, 3 moderate, 6 high, and 2 critical.
+- `npm test`, `npm run lint`, and `npm run build` all pass after the First Day foundation work.
