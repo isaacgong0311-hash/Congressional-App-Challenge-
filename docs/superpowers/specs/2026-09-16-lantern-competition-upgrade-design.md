@@ -1,7 +1,7 @@
 # Lantern: First Day — Competition Upgrade Design
 
 Date: 2026-09-16  
-Status: Approved direction; written-spec review pending  
+Status: Approved for implementation
 Target repository: `isaacgong0311-hash/Congressional-App-Challenge-`
 
 ## Product decision
