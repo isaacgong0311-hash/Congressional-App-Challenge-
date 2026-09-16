@@ -8,7 +8,7 @@
 
 **Tech Stack:** Next.js 16 App Router, React 19, TypeScript 5, Tailwind CSS 4, Zod 4, Vitest 4, Vercel AI SDK 6, Groq, Vercel
 
-**Plan status:** Approved by Isaac on 2026-09-16. Tasks 1–3 are complete; Task 4 is next.
+**Plan status:** Approved by Isaac on 2026-09-16. Tasks 1–4 are complete; Task 5 is next.
 
 ---
 
@@ -634,7 +634,7 @@ git commit -m "feat: define source-backed extraction contract"
 - Create: `tests/first-day/extraction-route.test.ts`
 - Modify: `.env.local.example`
 
-- [ ] **Step 1: Write request-validation tests against an exported parser**
+- [x] **Step 1: Write request-validation tests against an exported parser**
 
 ```ts
 import { describe, expect, it } from "vitest";
@@ -653,7 +653,7 @@ describe("First Day extraction metadata", () => {
 });
 ```
 
-- [ ] **Step 2: Implement metadata validation and request limits**
+- [x] **Step 2: Implement metadata validation and request limits**
 
 Export this pure helper from the route:
 
@@ -695,7 +695,7 @@ export type CreateExtractionHandler = (
 
 The returned handler parses and validates the request, creates an `AbortController`, clears its timer in `finally`, calls `dependencies.extractPage`, overwrites response IDs from validated metadata, validates with `FirstDayExtractionSchema`, and maps failures to the status contract above. The production `POST` uses `runGroqExtraction` and `timeoutMs: 55_000`; route tests pass a deterministic fake and a short timeout.
 
-- [ ] **Step 3: Add the extraction prompt and validated response**
+- [x] **Step 3: Add the extraction prompt and validated response**
 
 Implement `runGroqExtraction` in `server/extract-page.ts` with Groq `meta-llama/llama-4-scout-17b-16e-instruct`, the shared `extractOuterJson`, and `FirstDayExtractionSchema`. Pass the handler's abort signal to `generateText`. The prompt must state:
 
@@ -710,19 +710,19 @@ Copy names, dates, locations, and contact details exactly as printed.
 
 Overwrite the parsed response's `documentId` and `requestId` with the validated request values before returning so model output cannot redirect records.
 
-- [ ] **Step 4: Test the complete HTTP contract without a live model**
+- [x] **Step 4: Test the complete HTTP contract without a live model**
 
 In `extraction-route.test.ts`, construct multipart requests and a fake provider. Assert: JPEG success is 200; text file and unsafe IDs are 400; unavailable provider is 500; malformed provider output is 502; an abort is 504; response IDs equal request IDs even when the fake returns different IDs; and captured logs do not contain a synthetic student's name or page text.
 
-- [ ] **Step 5: Add route-specific rate limiting**
+- [x] **Step 5: Add route-specific rate limiting**
 
 In `proxy.ts`, add `/api/first-day/extract` to the matcher and use the existing explain-route limit. Do not create a second in-memory limiter implementation.
 
-- [ ] **Step 6: Verify missing-key and malformed-file behavior**
+- [x] **Step 6: Verify missing-key and malformed-file behavior**
 
 Run the test suite and dev server. Submit a text file: expect 400. Submit `public/sample-letter.png` without a key: expect 500 with a user-safe message and no document text in terminal output.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add app/api/first-day app/features/first-day/server/extract-page.ts proxy.ts tests/first-day/extraction-request.test.ts tests/first-day/extraction-route.test.ts .env.local.example
