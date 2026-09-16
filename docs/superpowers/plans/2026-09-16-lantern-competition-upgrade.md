@@ -8,7 +8,143 @@
 
 **Tech Stack:** Next.js 16 App Router, React 19, TypeScript 5, Tailwind CSS 4, Zod 4, Vitest 4, Vercel AI SDK 6, Groq, Vercel
 
+**Plan status:** Approved by Isaac on 2026-09-16. Tasks 1–2 are complete; Task 3 is next.
+
 ---
+
+## Decision summary for approval
+
+### Product outcome
+
+The finished product is not another generic translator. It is an evidence-backed enrollment copilot that turns several school documents into one inspectable plan. Its competition moment is: Lantern exposes two conflicting instructions, shows the exact source passages, helps the family ask the school a clear question, records the answer as family-reported, and recomputes only the affected plan steps.
+
+Two entry paths share the same workflow:
+
+- **Try the fictional demo** — always available, instant, deterministic, safe for judges, and independent of provider uptime.
+- **Use my documents** — accepts up to five JPG/PNG pages, processes one page at a time, proposes source-backed facts, and requires human review before planning.
+
+The critical path is `Start → Documents → Review facts → My plan → Resolve blockers → Take it with me`. English and Spanish must both complete that path on mobile, desktop, and keyboard-only navigation.
+
+### Explicit non-goals for this release
+
+- No accounts, passwords, cloud case database, or family-document retention.
+- No automatic submission to a district, school messaging, appointment booking, or portal automation.
+- No legal, enrollment-eligibility, residency, or special-education decisions.
+- No nationwide policy library; Round Rock ISD is one source-checked pilot.
+- No generated answer, chatbot response, or practice call can confirm a fact or resolve a conflict.
+- No new paid infrastructure. The implementation uses the existing Vercel deployment and Groq provider; all automated testing remains open-source/free.
+
+### Full-stack architecture
+
+```text
+JPG/PNG page
+    │ browser checks type, size, count, and case budget
+    ▼
+POST /api/first-day/extract
+    │ request ID + document ID + timeout + rate limit
+    ▼
+Groq vision model ── untrusted JSON proposal
+    │ Zod shape validation
+    ▼
+Exact-quote evidence validator
+    │ rejects facts whose quote is absent from that page
+    ▼
+In-memory case event log
+    │ confirm / correct / mark unclear / remove source
+    ▼
+Deterministic conflict engine + procedure eligibility + planner
+    │ AI has no write access to task state
+    ▼
+Responsive plan UI + print / JSON / ICS exports
+```
+
+Ownership stays strict:
+
+| Boundary | Owns | Must never own |
+| --- | --- | --- |
+| Provider | OCR-like text and fact proposals | Requirements, task state, conflict resolution |
+| API | File/ID validation, provider call, schema validation, safe errors | Case persistence or policy decisions |
+| Domain | Evidence validation, immutable events, conflicts, procedures, planner, exports | React or provider SDKs |
+| UI | Workflow state, review controls, accessibility, source inspection | Hidden business rules |
+
+### Frontend plan
+
+The current 1,477-line `first-day-workspace.tsx` will become a thin controller. Each workflow screen gets a focused component and typed props; upload orchestration moves to `use-live-case.ts`; pure decisions stay outside React.
+
+The visual direction remains calm, premium, and editorial: warm neutral canvas, deep green typography, cobalt actions, restrained glass surfaces, strong source cards, and motion only as progressive enhancement. This is not a redesign for its own sake; hierarchy must make the evidence trail and next action obvious within seconds.
+
+Frontend requirements:
+
+- Mobile-first at 390 px, polished desktop layout at 1440 px, and no horizontal overflow at 200% zoom.
+- Persistent language choice; every critical English string receives a Spanish equivalent in the same task that introduces it.
+- Live-mode navigation gates: no Facts screen without validated facts and no Plan screen without at least one reviewed fact.
+- A two-pane fact/source review on desktop and stacked review on mobile.
+- Explicit loading, empty, partial-success, retry, removed-source, provider-unavailable, and timeout states.
+- Completed pages remain usable when another page fails; removing a page cannot let a late response restore it.
+- Source dialogs trap focus, close with Escape, restore focus to the opener, and render quotation text without animation.
+- Reduced motion, high contrast, large text, keyboard-only operation, visible focus, and screen-reader live regions are release requirements.
+- The Start screen checks provider availability and explains external processing before the first live file selection; degraded production keeps the fictional demo primary.
+- Print output hides controls and orders unresolved items before ready work. JSON excludes full extracted text and images. ICS includes only confirmed, unambiguous dates.
+
+### Backend and API plan
+
+The general Lantern endpoints remain backward compatible. First Day receives one additive endpoint:
+
+| Endpoint | Input | Success | Expected failures |
+| --- | --- | --- | --- |
+| `POST /api/first-day/extract` | multipart `image`, `language`, `documentId`, `requestId` | `FirstDayExtractionResponse` v1 | `400` invalid input, `429` limit, `500` missing key, `502` provider/schema, `504` timeout |
+| `GET /api/health` | none | provider capability flags | `503` when required live provider is unavailable |
+
+Backend requirements:
+
+- JPEG/PNG only; 10 MB per page, five pages, and 25 MB per browser case.
+- One active page request at a time. Every request has stable document/request IDs and a 55-second abort timeout inside the 60-second function limit.
+- Model output is parsed as untrusted data, validated with Zod, and overwritten with server-validated IDs before response.
+- The response may contain document text and fact proposals only. It may not contain tasks, requirements, eligibility, policy, or conflict decisions.
+- Route tests inject/mock the provider boundary; CI never calls a paid/live model.
+- Logs contain request ID, route, failure kind, duration, status, and schema issue count only—never images, OCR text, prompts containing document text, or raw provider responses.
+- The current per-instance limiter is acceptable for the competition demo and must be described honestly as a demo safeguard, not a globally coordinated quota. A distributed limiter is deferred until real multi-instance traffic justifies its cost.
+- Security headers will deny framing, MIME sniffing, camera/microphone/geolocation access, and cross-origin referrer leakage. The upload path uses same-origin requests only.
+
+### Data, trust, and privacy plan
+
+There is intentionally no database in v1. `FirstDayCase` lives in React memory and is lost on refresh; accessibility preferences alone may live in `localStorage`. Downloads and printouts happen only when the user requests them.
+
+All state-changing actions append immutable events. Original fact values and evidence remain preserved when a user corrects a value. A removed source becomes inactive rather than disappearing from history. Planner output is always derived from the current case, never saved as an independent source of truth.
+
+Every live ready task must be supported by:
+
+1. a confirmed fact whose exact quote validates against its source page; and/or
+2. an eligible, versioned procedure with an official URL, exact quotation, checked date, and review status.
+
+`pending` or stale procedures can only produce `needs_review`. School-reported conflict resolutions must be visibly labeled `Reported confirmed by school`, never `Verified by Lantern`.
+
+### Quality, evaluation, and operations plan
+
+Testing is layered so failures are diagnosable:
+
+- **Vitest unit tests:** schemas, quote matching, events, deduplication, conflict keys, procedure eligibility, dependency evaluation, calendar and JSON exports.
+- **Route tests:** multipart validation, missing key, malformed provider output, timeout, safe logs, and server-controlled IDs.
+- **Playwright journeys:** fictional completion, degraded-provider fallback, partial upload recovery, source dialog keyboard behavior, Spanish path, mobile layout, print view, and late-response protection.
+- **Automated accessibility:** axe WCAG A/AA scans at 390×844 and 1440×900 plus manual keyboard, 200% zoom, reduced-motion, contrast, and screen-reader spot checks.
+- **Held-out evaluation:** at least 20 synthetic/redacted packets with fact precision/recall, quote coverage, conflict errors, date errors, source coverage, latency, failures, and measured cost.
+- **CI:** lint, unit tests, production build, deterministic evaluation, and Playwright fictional/degraded journeys on every push and pull request.
+
+Operational checks use the existing Vercel deployment and structured platform logs—no paid monitoring product. `/api/health` reports capability, not secrets. The release checklist records the exact Git commit, Vercel deployment, evaluation report, and known limitations.
+
+### Approval-level success gates
+
+The build is ready to submit only when all of these are true:
+
+- Fictional demo completion rate is 100% in automated desktop and mobile journeys without any provider key.
+- Every ready live task has valid evidence/procedure source coverage by construction.
+- Quote coverage is 100% for accepted facts in held-out stored responses.
+- Zero known false conflict resolutions or silent date guesses remain in the held-out set.
+- Provider outage, timeout, malformed response, page removal, and late response all preserve already successful work.
+- `npm run lint`, `npm test`, `npm run evaluate:first-day`, `npm run test:e2e`, and `npm run build` pass in CI.
+- Automated axe scans report zero WCAG A/AA violations on the critical path.
+- Production fictional flow works with the provider disabled; live upload works only after `/api/health` confirms the key.
+- README, technical page, three-minute script, AI disclosure, source attribution, and limitations match the deployed behavior exactly.
 
 ## Delivery map
 
@@ -20,7 +156,7 @@ This plan is ordered so every task leaves the application working and reviewable
 | Trustworthy live extraction | 3–6 | Uploaded pages produce validated, source-backed facts that users can review |
 | Explainable decisions | 7–9 | Real conflicts and source-checked local procedures produce deterministic live tasks |
 | Portable results | 10 | Confirmed dates and plans export without losing source context |
-| Competition proof | 11–12 | Held-out metrics, technical explanation, demo script, and verified production release |
+| Competition proof | 11–12 | Held-out metrics, automated full-stack acceptance, CI, technical explanation, demo script, and verified production release |
 
 ## File map
 
@@ -210,7 +346,7 @@ git commit -m "fix: keep provider errors free of document text"
 - Create: `app/features/first-day/ui/blocker-step.tsx`
 - Create: `app/features/first-day/ui/export-step.tsx`
 
-- [ ] **Step 1: Extract copy and shared component contracts**
+- [x] **Step 1: Extract copy and shared component contracts**
 
 Move `STEPS`, `STATE_META`, `TASK_ES`, `FACT_ES`, `DOCUMENT_ES`, `FACT_STATE_META`, and `translated` into `first-day-copy.ts`. Export these public contracts:
 
@@ -246,7 +382,7 @@ export function Eyebrow({ children }: { children: React.ReactNode }) {
 }
 ```
 
-- [ ] **Step 2: Create typed step props before moving JSX**
+- [x] **Step 2: Create typed step props before moving JSX**
 
 Each step receives data and callbacks rather than owning case state. Use these interfaces:
 
@@ -301,7 +437,7 @@ export type ExportStepProps = {
 };
 ```
 
-- [ ] **Step 3: Move each existing screen into its file**
+- [x] **Step 3: Move each existing screen into its file**
 
 Copy each `currentStep === ...` section unchanged into the matching component, replace closed-over variables with props, then replace the workspace blocks with:
 
@@ -325,7 +461,7 @@ Copy each `currentStep === ...` section unchanged into the matching component, r
 
 Use the same composition pattern for Facts, Plan, Blocker, and Export. Do not change labels, state transitions, or CSS classes in this task.
 
-- [ ] **Step 4: Run static and browser regression checks**
+- [x] **Step 4: Run static and browser regression checks**
 
 Run:
 
@@ -337,7 +473,7 @@ npm run build
 
 Then verify `/first-day` at 390×844 and 1440×900: open sample, visit all six steps, open/close a source dialog, resolve the fictional conflict, mark a task done, switch Spanish, and open print preview. Expected: behavior and visible copy match the pre-split deployment.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add app/features/first-day/ui
@@ -492,8 +628,10 @@ git commit -m "feat: define source-backed extraction contract"
 
 **Files:**
 - Create: `app/api/first-day/extract/route.ts`
+- Create: `app/features/first-day/server/extract-page.ts`
 - Modify: `proxy.ts`
 - Create: `tests/first-day/extraction-request.test.ts`
+- Create: `tests/first-day/extraction-route.test.ts`
 - Modify: `.env.local.example`
 
 - [ ] **Step 1: Write request-validation tests against an exported parser**
@@ -534,9 +672,32 @@ export function parseExtractionMetadata(input: unknown) {
 
 In `POST`, accept multipart fields `image`, `language`, `documentId`, and `requestId`; allow only JPEG/PNG and 10 MB. Return 400 for invalid metadata/file, 500 for missing `GROQ_API_KEY`, 502 for schema/provider failure, and 504 for an aborted timeout.
 
+Build the exported route through a dependency-injected factory so tests never call a live provider:
+
+```ts
+type ExtractionDependencies = {
+  providerAvailable(): boolean;
+  extractPage(input: {
+    bytes: Uint8Array;
+    mediaType: "image/jpeg" | "image/png";
+    language: string;
+    documentId: string;
+    requestId: string;
+    signal: AbortSignal;
+  }): Promise<unknown>;
+  timeoutMs: number;
+};
+
+export type CreateExtractionHandler = (
+  dependencies: ExtractionDependencies,
+) => (request: Request) => Promise<Response>;
+```
+
+The returned handler parses and validates the request, creates an `AbortController`, clears its timer in `finally`, calls `dependencies.extractPage`, overwrites response IDs from validated metadata, validates with `FirstDayExtractionSchema`, and maps failures to the status contract above. The production `POST` uses `runGroqExtraction` and `timeoutMs: 55_000`; route tests pass a deterministic fake and a short timeout.
+
 - [ ] **Step 3: Add the extraction prompt and validated response**
 
-Use Groq `meta-llama/llama-4-scout-17b-16e-instruct`, the shared `extractOuterJson`, and `FirstDayExtractionSchema`. The prompt must state:
+Implement `runGroqExtraction` in `server/extract-page.ts` with Groq `meta-llama/llama-4-scout-17b-16e-instruct`, the shared `extractOuterJson`, and `FirstDayExtractionSchema`. Pass the handler's abort signal to `generateText`. The prompt must state:
 
 ```text
 Return verbatim document text and proposed facts only.
@@ -549,18 +710,22 @@ Copy names, dates, locations, and contact details exactly as printed.
 
 Overwrite the parsed response's `documentId` and `requestId` with the validated request values before returning so model output cannot redirect records.
 
-- [ ] **Step 4: Add route-specific rate limiting**
+- [ ] **Step 4: Test the complete HTTP contract without a live model**
+
+In `extraction-route.test.ts`, construct multipart requests and a fake provider. Assert: JPEG success is 200; text file and unsafe IDs are 400; unavailable provider is 500; malformed provider output is 502; an abort is 504; response IDs equal request IDs even when the fake returns different IDs; and captured logs do not contain a synthetic student's name or page text.
+
+- [ ] **Step 5: Add route-specific rate limiting**
 
 In `proxy.ts`, add `/api/first-day/extract` to the matcher and use the existing explain-route limit. Do not create a second in-memory limiter implementation.
 
-- [ ] **Step 5: Verify missing-key and malformed-file behavior**
+- [ ] **Step 6: Verify missing-key and malformed-file behavior**
 
 Run the test suite and dev server. Submit a text file: expect 400. Submit `public/sample-letter.png` without a key: expect 500 with a user-safe message and no document text in terminal output.
 
-- [ ] **Step 6: Commit**
+- [ ] **Step 7: Commit**
 
 ```bash
-git add app/api/first-day proxy.ts tests/first-day/extraction-request.test.ts .env.local.example
+git add app/api/first-day app/features/first-day/server/extract-page.ts proxy.ts tests/first-day/extraction-request.test.ts tests/first-day/extraction-route.test.ts .env.local.example
 git commit -m "feat: add First Day extraction endpoint"
 ```
 
@@ -624,10 +789,13 @@ git commit -m "feat: merge live extraction records safely"
 
 **Files:**
 - Create: `app/features/first-day/ui/use-live-case.ts`
+- Create: `app/features/first-day/ui/use-provider-capability.ts`
 - Modify: `app/features/first-day/ui/first-day-workspace.tsx`
+- Modify: `app/features/first-day/ui/start-step.tsx`
 - Modify: `app/features/first-day/ui/documents-step.tsx`
 - Modify: `app/features/first-day/ui/facts-step.tsx`
 - Create: `tests/first-day/live-case.test.ts`
+- Create: `tests/first-day/provider-capability.test.ts`
 
 - [ ] **Step 1: Move upload orchestration into a hook**
 
@@ -652,7 +820,11 @@ export function useLiveCase(input: {
 
 Use `/api/first-day/extract`, include request/document IDs, parse the JSON as `FirstDayExtractionResponse`, call `adaptLiveExtraction`, then `mergeExtraction`. Keep the existing abort and token guards.
 
-- [ ] **Step 2: Add a pure navigation gate and tests**
+- [ ] **Step 2: Gate live entry on provider capability**
+
+`useProviderCapability` requests `/api/health` once on mount, aborts on unmount, and returns `"checking" | "available" | "unavailable"`. Treat a fetch error, non-200 response, malformed JSON, or `keys.groq !== true` as unavailable. StartStep keeps the fictional action enabled at all times; it disables `Add my documents` until status is available and renders one short explanation for checking or unavailable states. Test the pure response parser with healthy, degraded, malformed, and rejected cases.
+
+- [ ] **Step 3: Add a pure navigation gate and tests**
 
 ```ts
 export function canEnterLiveStep(caseData: FirstDayCase, step: StepId) {
@@ -665,13 +837,13 @@ export function canEnterLiveStep(caseData: FirstDayCase, step: StepId) {
 
 Test that a new live case stops at Documents, a case with proposed facts opens Facts, and a case with one confirmed fact can open Plan but not bypass an unresolved invalid extraction error.
 
-- [ ] **Step 3: Render live facts with existing event helpers**
+- [ ] **Step 4: Render live facts with existing event helpers**
 
 FactsStep must use every fact's `semanticKey`, confidence, original value, and first evidence reference. For proposed facts show Confirm, Correct, and Not clear. Add an immutable `fact_marked_unclear` event to `CaseEvent` and `events.ts`; the planner treats it like base `unclear`.
 
 Correction UI uses a labeled text input initialized from `originalValue` and calls `appendFactCorrection`. It must not mutate the Fact object.
 
-- [ ] **Step 4: Update the live documents screen**
+- [ ] **Step 5: Update the live documents screen**
 
 Replace the “next build step” message with counts:
 
@@ -683,14 +855,14 @@ Replace the “next build step” message with counts:
 
 Continue becomes enabled when at least one validated fact exists. A failed page never disables review for successful pages.
 
-- [ ] **Step 5: Browser acceptance**
+- [ ] **Step 6: Browser acceptance**
 
 With a configured development key, upload two synthetic pages. Verify sequential network requests, separate extracted text, proposed facts, fact confirmation, correction history, source dialog focus, removal, retry, and navigation. Without a key, verify the fictional case remains complete and the live error is recoverable.
 
-- [ ] **Step 6: Commit**
+- [ ] **Step 7: Commit**
 
 ```bash
-git add app/features/first-day/ui app/features/first-day/domain tests/first-day/live-case.test.ts
+git add app/features/first-day/ui app/features/first-day/domain tests/first-day/live-case.test.ts tests/first-day/provider-capability.test.ts
 git commit -m "feat: review source-backed facts from live pages"
 ```
 
@@ -985,13 +1157,20 @@ git add evaluation tests/first-day/evaluation.test.ts package.json package-lock.
 git commit -m "test: add held-out First Day evaluation"
 ```
 
-### Task 12: Finish the competition package and production release
+### Task 12: Finish automated acceptance, competition materials, and production release
 
 **Files:**
 - Create: `app/first-day/how-it-works/page.tsx`
+- Create: `playwright.config.ts`
+- Create: `e2e/first-day-fictional.spec.ts`
+- Create: `e2e/first-day-live.spec.ts`
+- Create: `.github/workflows/ci.yml`
 - Create: `docs/submission/demo-script.md`
 - Create: `docs/submission/ai-disclosure.md`
 - Create: `docs/submission/checklist.md`
+- Modify: `next.config.ts`
+- Modify: `package.json`
+- Modify: `package-lock.json`
 - Modify: `README.md`
 - Modify: `docs/development-log.md`
 
@@ -1005,43 +1184,129 @@ Document → Exact evidence → Confirmed fact → Explicit dependency → Deriv
 
 Use one fictional record at each stage. Explain that AI proposes the first two stages while validation, confirmation, dependencies, and task status are deterministic. Link to this page from the First Day footer, not the critical family path.
 
-- [ ] **Step 2: Write the exact three-minute script**
+- [ ] **Step 2: Add deterministic browser testing**
+
+Install `@playwright/test` and `@axe-core/playwright` as dev dependencies. Add scripts:
+
+```json
+{
+  "test:e2e": "playwright test",
+  "test:e2e:headed": "playwright test --headed"
+}
+```
+
+Use this configuration so tests build and run the production app rather than relying on a developer's existing server:
+
+```ts
+// playwright.config.ts
+import { defineConfig, devices } from "@playwright/test";
+
+export default defineConfig({
+  testDir: "./e2e",
+  fullyParallel: false,
+  retries: process.env.CI ? 2 : 0,
+  reporter: process.env.CI ? [["html", { open: "never" }], ["list"]] : "list",
+  use: { baseURL: "http://127.0.0.1:3100", trace: "retain-on-failure" },
+  webServer: {
+    command: "npm run build && npm run start -- --port 3100",
+    url: "http://127.0.0.1:3100/first-day",
+    reuseExistingServer: !process.env.CI,
+    timeout: 180_000,
+  },
+  projects: [
+    { name: "mobile-chromium", use: { ...devices["Pixel 7"] } },
+    { name: "desktop-chromium", use: { ...devices["Desktop Chrome"] } },
+  ],
+});
+```
+
+The fictional journey uses accessible roles and names, completes all six steps, resolves the conflict, switches to Spanish, and runs axe on each screen. The live journey intercepts `/api/first-day/extract` with stored synthetic responses to prove partial success, retry, source removal, and late-response rejection without calling Groq. Fail the suite on serious or critical axe violations and attach traces/screenshots only for synthetic data.
+
+- [ ] **Step 3: Add free CI and browser security headers**
+
+Create `.github/workflows/ci.yml` with Node 20, `npm ci`, Playwright Chromium installation, lint, unit tests, held-out evaluation, production build, and E2E tests. Do not expose provider secrets to pull-request builds:
+
+```yaml
+name: ci
+on:
+  push:
+  pull_request:
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run lint
+      - run: npm test
+      - run: npm run evaluate:first-day
+      - run: npm run build
+      - run: npm run test:e2e
+```
+
+In `next.config.ts`, apply these headers to every route:
+
+```ts
+const securityHeaders = [
+  { key: "X-Content-Type-Options", value: "nosniff" },
+  { key: "X-Frame-Options", value: "DENY" },
+  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+  { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+];
+
+const nextConfig: NextConfig = {
+  async headers() {
+    return [{ source: "/:path*", headers: securityHeaders }];
+  },
+};
+```
+
+Document that these headers reduce browser attack surface but do not replace input validation, exact-quote checks, or provider privacy controls.
+
+- [ ] **Step 4: Write the exact three-minute script**
 
 Use the timing in the approved design. The script names tools and coding languages, demonstrates functionality, states the target audience and one-sentence purpose, explains one technical challenge, and keeps every factual claim within measured results.
 
-- [ ] **Step 3: Complete AI and contribution disclosure**
+- [ ] **Step 5: Complete AI and contribution disclosure**
 
 List provider-backed runtime features separately from development assistance. Identify student-authored architecture decisions, domain rules, tests, source review, evaluation, and presentation work. Include the upstream `TRANSLATEtheform` revision and all material libraries.
 
-- [ ] **Step 4: Run the full release gate**
+- [ ] **Step 6: Run the full release gate**
 
 ```bash
 npm run lint
 npm test
 npm run evaluate:first-day
 npm run build
+npm run test:e2e
 git diff --check
 ```
 
 Browser acceptance: `/`, `/first-day`, and `/first-day/how-it-works`; 390×844 and 1440×900; keyboard-only; English/Spanish; high contrast; large text; reduced motion; source dialog trap/restore; live missing-key recovery; fictional full flow; print preview; zero axe WCAG A/AA violations.
 
-- [ ] **Step 5: Configure and verify production safely**
+- [ ] **Step 7: Configure and verify production safely**
 
 Add `GROQ_API_KEY` directly through Vercel's encrypted environment UI or authenticated CLI stdin; never place the value in shell history, Git, logs, or chat. Redeploy production and verify:
 
 ```text
-GET /                      200
-GET /first-day             200
+GET /                       200
+GET /first-day              200
 GET /first-day/how-it-works 200
-GET /api/health            200 with groq: true
+GET /api/health             200 with groq: true
 ```
 
 Run one synthetic upload and the complete fictional flow. Inspect build/runtime errors without reading or retaining document content.
 
-- [ ] **Step 6: Commit documentation and tag the candidate**
+- [ ] **Step 8: Commit documentation and tag the candidate**
 
 ```bash
-git add app/first-day/how-it-works README.md docs/development-log.md docs/submission
+git add app/first-day/how-it-works e2e playwright.config.ts .github/workflows/ci.yml next.config.ts package.json package-lock.json README.md docs/development-log.md docs/submission
 git commit -m "docs: prepare Lantern competition submission"
 git tag competition-candidate-v1
 git push origin main competition-candidate-v1
@@ -1062,6 +1327,10 @@ Deploy the tagged commit and record its URL and deployment ID in `docs/submissio
 - [ ] Calendar output contains confirmed unambiguous dates only.
 - [ ] Print and JSON output expose unresolved items and rule versions.
 - [ ] Logs contain no raw image or extracted document text.
+- [ ] Live entry is disabled with a clear explanation when provider health is degraded.
+- [ ] Security headers are present on production HTML and API responses.
+- [ ] Playwright mobile and desktop journeys pass without provider secrets.
+- [ ] CI passes lint, unit, evaluation, build, E2E, and axe gates.
 - [ ] Evaluation reports denominators, failures, latency, and cost honestly.
 - [ ] The deployed demo and repository match submission claims.
 - [ ] AI use and student contribution are fully disclosed.
