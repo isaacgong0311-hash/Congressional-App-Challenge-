@@ -8,7 +8,7 @@
 
 **Tech Stack:** Next.js 16 App Router, React 19, TypeScript 5, Tailwind CSS 4, Zod 4, Vitest 4, Vercel AI SDK 6, Groq, Vercel
 
-**Plan status:** Approved by Isaac on 2026-09-16. Tasks 1–7 are complete; Task 8 is next.
+**Plan status:** Approved by Isaac on 2026-09-16. Tasks 1–8 are complete; Task 9 is next.
 
 ---
 
@@ -938,7 +938,7 @@ git commit -m "feat: detect and resolve cross-document conflicts"
 - Create: `tests/first-day/procedures.test.ts`
 - Modify: `docs/development-log.md`
 
-- [ ] **Step 1: Write procedure eligibility tests**
+- [x] **Step 1: Write procedure eligibility tests**
 
 ```ts
 expect(procedureEligibility(sourceChecked, "2026-09-16")).toBe("eligible");
@@ -947,7 +947,7 @@ expect(procedureEligibility(oneYearOld, "2026-09-16")).toBe("stale");
 expect(validateProcedureQuote(roundRockProcedure)).toBe(true);
 ```
 
-- [ ] **Step 2: Add the pilot records using official quotations**
+- [x] **Step 2: Add the pilot records using official quotations**
 
 Create records for the new-student sequence and document list from:
 
@@ -983,7 +983,7 @@ export const roundRockEnrollmentProcedures: Procedure[] = [
 ];
 ```
 
-- [ ] **Step 3: Implement eligibility**
+- [x] **Step 3: Implement eligibility**
 
 ```ts
 export type ProcedureEligibility = "eligible" | "pending" | "stale";
@@ -998,11 +998,11 @@ export function procedureEligibility(procedure: Procedure, today: string): Proce
 
 `validateProcedureQuote` requires a non-empty exact quote, HTTPS official URL, checked date, and non-pending review state.
 
-- [ ] **Step 4: Document attribution and verify**
+- [x] **Step 4: Document attribution and verify**
 
 Add source URLs, checked date, interpretation limits, and no-endorsement statement to `docs/development-log.md`. Run procedure and fixture tests.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add app/features/first-day/content/procedures app/features/first-day/domain/procedures.ts tests/first-day/procedures.test.ts docs/development-log.md

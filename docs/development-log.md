@@ -59,6 +59,14 @@ Provider pricing and retention terms are external and may change. The project do
 - Kept downstream fact review and planning disabled for live cases until source-backed fact proposals are implemented; the complete fictional case remains available for the end-to-end workflow.
 - Added seven tests for selection limits, sequential processing, retry isolation, late-response handling, and explanation-response adaptation.
 
+## 2026-09-19 — Round Rock ISD source-checked pilot
+
+- Added two narrow enrollment procedures using the official Round Rock ISD [enrollment overview](https://www.roundrockisd.org/page/enroll) and cross-checked the district's [How to Register](https://www.roundrockisd.org/page/how-to-register) page.
+- The stored records cover only the district-wide document list and the three-step online enrollment sequence. They do not treat campus flyers, inferred requirements, or model output as district policy.
+- The quotations and links were checked against the official pages on 2026-09-19; the versioned procedure snapshot remains `rrisd-enrollment-2026-09-16` as specified in the approved implementation plan.
+- `source_checked` means the text matched the published district page. It does not mean Round Rock ISD reviewed, approved, endorsed, or partnered with Lantern.
+- Procedure checks expire after 180 days in the deterministic planner layer. Pending or stale procedures cannot independently make a live task ready.
+
 ## AI assistance disclosure
 
 OpenAI Codex assisted with:
