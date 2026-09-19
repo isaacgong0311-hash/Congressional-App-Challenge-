@@ -1,5 +1,6 @@
 import type {
   ConfirmationState,
+  DerivedTask,
   FirstDayCase,
   PlanState,
 } from "../domain/types";
@@ -96,6 +97,62 @@ export const TASK_ES: Record<
     detail: "Este resumen espera hasta que se terminen los dos pasos anteriores.",
   },
 };
+
+export function localizedTaskCopy(task: DerivedTask, language: Language) {
+  if (language !== "Español") return task;
+  const fictional = TASK_ES[task.id];
+  if (fictional) return { ...task, ...fictional };
+
+  if (task.id === "task-live-gather-documents") {
+    return {
+      ...task,
+      title: "Reunir los documentos de inscripción confirmados",
+      action: task.action.replace(/^Prepare:/, "Prepare:"),
+      detail:
+        "Esta lista usa solo solicitudes de documentos que confirmó con sus fuentes.",
+    };
+  }
+  if (task.id === "task-live-open-enrollment") {
+    return {
+      ...task,
+      title: "Abrir el formulario de inscripción de Round Rock ISD",
+      action:
+        "Cree la cuenta del portal, complete el formulario de estudiante nuevo y configure el acceso del tutor.",
+      detail:
+        "La secuencia proviene de la página de inscripción del distrito revisada con su fuente.",
+    };
+  }
+  if (task.id === "task-live-review-plan") {
+    return {
+      ...task,
+      title: "Revisar el plan final de inscripción",
+      action: "Revise cada paso con fuente antes de confiar en el plan.",
+      detail: "Este resumen espera a que termine cada paso anterior.",
+    };
+  }
+  if (task.id.startsWith("task-live-clarify-")) {
+    return {
+      ...task,
+      title: "Aclarar instrucciones contradictorias",
+      action:
+        "Pregunte a la escuela qué fuente debe seguir su familia y registre lo que le digan.",
+      detail:
+        "Lantern mantiene visibles ambas fuentes y no elige una como correcta.",
+    };
+  }
+  if (task.id.startsWith("task-live-attend-")) {
+    return {
+      ...task,
+      action: task.action.replace(
+        /^Plan around the confirmed date or appointment:/,
+        "Planifique según la fecha o cita confirmada:",
+      ),
+      detail:
+        "Este horario proviene de un dato que revisó con su fuente.",
+    };
+  }
+  return task;
+}
 
 export const FACT_ES: Record<string, string> = {
   "fact-registration-date": "Reunión de inscripción",

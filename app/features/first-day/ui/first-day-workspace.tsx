@@ -291,7 +291,13 @@ export function FirstDayWorkspace({ initialCase }: { initialCase: FirstDayCase }
                       : "text-[#637069] hover:bg-[#f1f3ef]"
                   }`}
                   key={option}
-                  onClick={() => setLanguage(option)}
+                  onClick={() => {
+                    setLanguage(option);
+                    setCaseData((current) => ({
+                      ...current,
+                      language: option,
+                    }));
+                  }}
                   type="button"
                 >
                   {option === "English" ? "EN" : "ES"}

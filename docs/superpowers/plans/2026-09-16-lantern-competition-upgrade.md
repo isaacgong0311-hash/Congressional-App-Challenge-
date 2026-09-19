@@ -8,7 +8,7 @@
 
 **Tech Stack:** Next.js 16 App Router, React 19, TypeScript 5, Tailwind CSS 4, Zod 4, Vitest 4, Vercel AI SDK 6, Groq, Vercel
 
-**Plan status:** Approved by Isaac on 2026-09-16. Tasks 1–9 are complete; Task 10 is next.
+**Plan status:** Approved by Isaac on 2026-09-16. Tasks 1–10 are complete; Task 11 is next.
 
 ---
 
@@ -1064,7 +1064,7 @@ git commit -m "feat: derive explainable plans for live cases"
 - Create: `tests/first-day/calendar.test.ts`
 - Create: `tests/first-day/plan-document.test.ts`
 
-- [ ] **Step 1: Write failing calendar tests**
+- [x] **Step 1: Write failing calendar tests**
 
 ```ts
 expect(calendarEvents(caseWithConfirmedDate)).toHaveLength(1);
@@ -1074,11 +1074,11 @@ expect(calendarEvents(caseWithCorrectedDate)[0]?.uid).toBe("lantern-fact-registr
 expect(calendarEvents(caseWithCorrectedDate)[0]?.date).toBe("2026-08-13");
 ```
 
-- [ ] **Step 2: Implement stable calendar generation**
+- [x] **Step 2: Implement stable calendar generation**
 
 Only include effective confirmed date facts whose normalized value begins with `YYYY-MM-DD`. Use `lantern-${fact.id}` as UID so a corrected date updates the same calendar event. Generate an all-day event without passing the date through the local JavaScript timezone.
 
-- [ ] **Step 3: Write and implement the structured plan document**
+- [x] **Step 3: Write and implement the structured plan document**
 
 Return:
 
@@ -1098,11 +1098,11 @@ export type PortablePlan = {
 
 The JSON download excludes extracted page text and document images; it keeps IDs and human-readable confirmed values.
 
-- [ ] **Step 4: Update export UI and print order**
+- [x] **Step 4: Update export UI and print order**
 
 Show unresolved items before ready tasks, then confirmed facts and procedure review metadata. Add Download plan JSON and Add confirmed dates to calendar. Keep Print/save PDF. Disable calendar when no eligible date exists and explain why.
 
-- [ ] **Step 5: Verify and commit**
+- [x] **Step 5: Verify and commit**
 
 Run export tests. Browser-check print preview at Letter and A4 sizes for clipped quotes or controls.
 
