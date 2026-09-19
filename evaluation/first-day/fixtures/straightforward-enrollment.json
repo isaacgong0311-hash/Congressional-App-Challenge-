@@ -1,0 +1,174 @@
+[
+  {
+    "fixtureId": "straightforward-01",
+    "scenario": "straightforward_enrollment",
+    "pages": [{
+      "pageIndex": 1,
+      "response": {
+        "schemaVersion": "first-day-extraction-v1",
+        "requestId": "eval-straightforward-01",
+        "documentId": "straight-01",
+        "document": {
+          "label": "Synthetic enrollment letter 1",
+          "confidence": 0.99,
+          "originalText": "SYNTHETIC TEST DOCUMENT\nBring a certified birth certificate. Questions: registrar1@example.test.",
+          "photoQualityNote": null
+        },
+        "facts": [
+          {
+            "clientKey": "request",
+            "kind": "requested_item",
+            "semanticKey": "registration.birth_certificate",
+            "label": "Certified birth certificate",
+            "originalValue": "Certified birth certificate",
+            "normalizedValue": null,
+            "quote": "Bring a certified birth certificate.",
+            "location": "Line 2",
+            "confidence": 0.99
+          },
+          {
+            "clientKey": "contact",
+            "kind": "contact",
+            "semanticKey": "registration.contact",
+            "label": "Registrar email",
+            "originalValue": "registrar1@example.test",
+            "normalizedValue": null,
+            "quote": "Questions: registrar1@example.test.",
+            "location": "Line 2",
+            "confidence": 0.99
+          }
+        ]
+      }
+    }],
+    "confirmedFactIds": ["fact-straight-01-request", "fact-straight-01-contact"]
+  },
+  {
+    "fixtureId": "straightforward-02",
+    "scenario": "straightforward_enrollment",
+    "pages": [{
+      "pageIndex": 1,
+      "response": {
+        "schemaVersion": "first-day-extraction-v1",
+        "requestId": "eval-straightforward-02",
+        "documentId": "straight-02",
+        "document": {
+          "label": "Synthetic enrollment letter 2",
+          "confidence": 0.98,
+          "originalText": "SYNTHETIC TEST DOCUMENT\nPlease provide the student's immunization record. Call 512-555-0102 for help.",
+          "photoQualityNote": null
+        },
+        "facts": [
+          {
+            "clientKey": "request",
+            "kind": "requested_item",
+            "semanticKey": "registration.immunization_record",
+            "label": "Immunization record",
+            "originalValue": "Student immunization record",
+            "normalizedValue": null,
+            "quote": "Please provide the student's immunization record.",
+            "location": "Line 2",
+            "confidence": 0.98
+          },
+          {
+            "clientKey": "contact",
+            "kind": "contact",
+            "semanticKey": "registration.contact",
+            "label": "School phone",
+            "originalValue": "512-555-0102",
+            "normalizedValue": null,
+            "quote": "Call 512-555-0102 for help.",
+            "location": "Line 2",
+            "confidence": 0.98
+          }
+        ]
+      }
+    }],
+    "confirmedFactIds": ["fact-straight-02-request", "fact-straight-02-contact"]
+  },
+  {
+    "fixtureId": "straightforward-03",
+    "scenario": "straightforward_enrollment",
+    "pages": [{
+      "pageIndex": 1,
+      "response": {
+        "schemaVersion": "first-day-extraction-v1",
+        "requestId": "eval-straightforward-03",
+        "documentId": "straight-03",
+        "document": {
+          "label": "Synthetic enrollment letter 3",
+          "confidence": 0.97,
+          "originalText": "SYNTHETIC TEST DOCUMENT\nUpload proof of residence. In-person help is available at the Welcome Center.",
+          "photoQualityNote": null
+        },
+        "facts": [
+          {
+            "clientKey": "request",
+            "kind": "requested_item",
+            "semanticKey": "registration.proof_of_residence",
+            "label": "Proof of residence",
+            "originalValue": "Proof of residence",
+            "normalizedValue": null,
+            "quote": "Upload proof of residence.",
+            "location": "Line 2",
+            "confidence": 0.97
+          },
+          {
+            "clientKey": "contact",
+            "kind": "location",
+            "semanticKey": "registration.help_location",
+            "label": "Help location",
+            "originalValue": "Welcome Center",
+            "normalizedValue": null,
+            "quote": "In-person help is available at the Welcome Center.",
+            "location": "Line 2",
+            "confidence": 0.97
+          }
+        ]
+      }
+    }],
+    "confirmedFactIds": ["fact-straight-03-request", "fact-straight-03-contact"]
+  },
+  {
+    "fixtureId": "straightforward-04",
+    "scenario": "straightforward_enrollment",
+    "pages": [{
+      "pageIndex": 1,
+      "response": {
+        "schemaVersion": "first-day-extraction-v1",
+        "requestId": "eval-straightforward-04",
+        "documentId": "straight-04",
+        "document": {
+          "label": "Synthetic enrollment letter 4",
+          "confidence": 0.99,
+          "originalText": "SYNTHETIC TEST DOCUMENT\nBring the latest report card. Email enrollment4@example.test if you need assistance.",
+          "photoQualityNote": null
+        },
+        "facts": [
+          {
+            "clientKey": "request",
+            "kind": "requested_item",
+            "semanticKey": "registration.report_card",
+            "label": "Latest report card",
+            "originalValue": "Latest report card",
+            "normalizedValue": null,
+            "quote": "Bring the latest report card.",
+            "location": "Line 2",
+            "confidence": 0.99
+          },
+          {
+            "clientKey": "contact",
+            "kind": "contact",
+            "semanticKey": "registration.contact",
+            "label": "Enrollment support email",
+            "originalValue": "enrollment4@example.test",
+            "normalizedValue": null,
+            "quote": "Email enrollment4@example.test if you need assistance.",
+            "location": "Line 2",
+            "confidence": 0.99
+          }
+        ]
+      }
+    }],
+    "confirmedFactIds": ["fact-straight-04-request", "fact-straight-04-contact"]
+  }
+]

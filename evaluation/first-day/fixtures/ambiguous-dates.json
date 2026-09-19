@@ -1,0 +1,102 @@
+[
+  {
+    "fixtureId": "ambiguous-date-01",
+    "scenario": "ambiguous_dates",
+    "pages": [{
+      "pageIndex": 1,
+      "response": {
+        "schemaVersion": "first-day-extraction-v1",
+        "requestId": "eval-ambiguous-date-01",
+        "documentId": "ambiguous-01",
+        "document": {"label": "Synthetic date note 1", "confidence": 0.91, "originalText": "SYNTHETIC TEST DOCUMENT\nEnrollment closes next Friday.", "photoQualityNote": null},
+        "facts": [{
+          "clientKey": "date",
+          "kind": "date",
+          "semanticKey": "registration.deadline",
+          "label": "Enrollment deadline",
+          "originalValue": "next Friday",
+          "normalizedValue": null,
+          "quote": "Enrollment closes next Friday.",
+          "location": "Line 2",
+          "confidence": 0.91
+        }]
+      }
+    }],
+    "confirmedFactIds": ["fact-ambiguous-01-date"]
+  },
+  {
+    "fixtureId": "ambiguous-date-02",
+    "scenario": "ambiguous_dates",
+    "pages": [{
+      "pageIndex": 1,
+      "response": {
+        "schemaVersion": "first-day-extraction-v1",
+        "requestId": "eval-ambiguous-date-02",
+        "documentId": "ambiguous-02",
+        "document": {"label": "Synthetic date note 2", "confidence": 0.9, "originalText": "SYNTHETIC TEST DOCUMENT\nOrientation happens during the second week of August.", "photoQualityNote": null},
+        "facts": [{
+          "clientKey": "date",
+          "kind": "date",
+          "semanticKey": "orientation.date",
+          "label": "Orientation date",
+          "originalValue": "the second week of August",
+          "normalizedValue": null,
+          "quote": "Orientation happens during the second week of August.",
+          "location": "Line 2",
+          "confidence": 0.9
+        }]
+      }
+    }],
+    "confirmedFactIds": ["fact-ambiguous-02-date"]
+  },
+  {
+    "fixtureId": "ambiguous-date-03",
+    "scenario": "ambiguous_dates",
+    "pages": [{
+      "pageIndex": 1,
+      "response": {
+        "schemaVersion": "first-day-extraction-v1",
+        "requestId": "eval-ambiguous-date-03",
+        "documentId": "ambiguous-03",
+        "document": {"label": "Synthetic date note 3", "confidence": 0.89, "originalText": "SYNTHETIC TEST DOCUMENT\nMeet the registrar after the fall holiday.", "photoQualityNote": null},
+        "facts": [{
+          "clientKey": "date",
+          "kind": "date",
+          "semanticKey": "registration.appointment_date",
+          "label": "Registrar meeting",
+          "originalValue": "after the fall holiday",
+          "normalizedValue": null,
+          "quote": "Meet the registrar after the fall holiday.",
+          "location": "Line 2",
+          "confidence": 0.89
+        }]
+      }
+    }],
+    "confirmedFactIds": ["fact-ambiguous-03-date"]
+  },
+  {
+    "fixtureId": "ambiguous-date-04",
+    "scenario": "ambiguous_dates",
+    "pages": [{
+      "pageIndex": 1,
+      "response": {
+        "schemaVersion": "first-day-extraction-v1",
+        "requestId": "eval-ambiguous-date-04",
+        "documentId": "ambiguous-04",
+        "document": {"label": "Synthetic date note 4", "confidence": 0.92, "originalText": "SYNTHETIC TEST DOCUMENT\nRecords are due before classes begin.", "photoQualityNote": null},
+        "facts": [{
+          "clientKey": "date",
+          "kind": "date",
+          "semanticKey": "records.deadline",
+          "label": "Records deadline",
+          "originalValue": "before classes begin",
+          "normalizedValue": null,
+          "quote": "Records are due before classes begin.",
+          "location": "Line 2",
+          "confidence": 0.92
+        }]
+      }
+    }],
+    "confirmedFactIds": ["fact-ambiguous-04-date"]
+  }
+]

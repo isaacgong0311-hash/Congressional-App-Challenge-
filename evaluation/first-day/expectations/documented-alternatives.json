@@ -1,0 +1,30 @@
+[
+  {
+    "fixtureId": "documented-alternative-01",
+    "expectedFacts": [{"semanticKey": "registration.proof_of_residence", "originalValue": "Utility bill or signed lease", "quote": "For proof of residence, bring a utility bill or a signed lease."}],
+    "expectedConflicts": [],
+    "expectedReadyTaskIds": ["task-live-gather-documents", "task-live-open-enrollment"],
+    "expectedClarificationTaskIds": []
+  },
+  {
+    "fixtureId": "documented-alternative-02",
+    "expectedFacts": [{"semanticKey": "registration.prior_school_record", "originalValue": "Latest report card or prior-school withdrawal form", "quote": "Provide the latest report card or the prior school's withdrawal form."}],
+    "expectedConflicts": [],
+    "expectedReadyTaskIds": ["task-live-gather-documents", "task-live-open-enrollment"],
+    "expectedClarificationTaskIds": []
+  },
+  {
+    "fixtureId": "documented-alternative-03",
+    "expectedFacts": [{"semanticKey": "registration.guardian_identity", "originalValue": "Passport or state identification card", "quote": "Identity may be shown with a passport or a state identification card."}],
+    "expectedConflicts": [],
+    "expectedReadyTaskIds": ["task-live-gather-documents", "task-live-open-enrollment"],
+    "expectedClarificationTaskIds": []
+  },
+  {
+    "fixtureId": "documented-alternative-04",
+    "expectedFacts": [{"semanticKey": "registration.address_document", "originalValue": "Electric statement or water statement", "quote": "An electric statement or water statement can document the home address."}],
+    "expectedConflicts": [],
+    "expectedReadyTaskIds": ["task-live-gather-documents", "task-live-open-enrollment"],
+    "expectedClarificationTaskIds": []
+  }
+]

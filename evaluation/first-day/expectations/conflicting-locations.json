@@ -1,0 +1,42 @@
+[
+  {
+    "fixtureId": "conflicting-location-01",
+    "expectedFacts": [
+      {"semanticKey": "orientation.location", "originalValue": "Cafeteria", "quote": "Orientation starts in the cafeteria."},
+      {"semanticKey": "orientation.location", "originalValue": "Gym entrance", "quote": "Orientation starts at the gym entrance."}
+    ],
+    "expectedConflicts": [{"semanticKey": "orientation.location", "values": ["Cafeteria", "Gym entrance"]}],
+    "expectedReadyTaskIds": [],
+    "expectedClarificationTaskIds": ["task-live-clarify-orientation-location", "task-live-review-plan"]
+  },
+  {
+    "fixtureId": "conflicting-location-02",
+    "expectedFacts": [
+      {"semanticKey": "registration.check_in_location", "originalValue": "Main office", "quote": "Check in at the main office."},
+      {"semanticKey": "registration.check_in_location", "originalValue": "Library desk", "quote": "Check in at the library desk."}
+    ],
+    "expectedConflicts": [{"semanticKey": "registration.check_in_location", "values": ["Main office", "Library desk"]}],
+    "expectedReadyTaskIds": [],
+    "expectedClarificationTaskIds": ["task-live-clarify-registration-check-in-location", "task-live-review-plan"]
+  },
+  {
+    "fixtureId": "conflicting-location-03",
+    "expectedFacts": [
+      {"semanticKey": "arrival.entrance", "originalValue": "North entrance", "quote": "Families should use the north entrance."},
+      {"semanticKey": "arrival.entrance", "originalValue": "South entrance", "quote": "Families should use the south entrance."}
+    ],
+    "expectedConflicts": [{"semanticKey": "arrival.entrance", "values": ["North entrance", "South entrance"]}],
+    "expectedReadyTaskIds": [],
+    "expectedClarificationTaskIds": ["task-live-clarify-arrival-entrance", "task-live-review-plan"]
+  },
+  {
+    "fixtureId": "conflicting-location-04",
+    "expectedFacts": [
+      {"semanticKey": "registration.meeting_location", "originalValue": "Building A", "quote": "The enrollment meeting is in Building A."},
+      {"semanticKey": "registration.meeting_location", "originalValue": "Building C", "quote": "The enrollment meeting is in Building C."}
+    ],
+    "expectedConflicts": [{"semanticKey": "registration.meeting_location", "values": ["Building A", "Building C"]}],
+    "expectedReadyTaskIds": [],
+    "expectedClarificationTaskIds": ["task-live-clarify-registration-meeting-location", "task-live-review-plan"]
+  }
+]

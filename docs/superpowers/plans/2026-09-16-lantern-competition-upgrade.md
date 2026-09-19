@@ -8,7 +8,7 @@
 
 **Tech Stack:** Next.js 16 App Router, React 19, TypeScript 5, Tailwind CSS 4, Zod 4, Vitest 4, Vercel AI SDK 6, Groq, Vercel
 
-**Plan status:** Approved by Isaac on 2026-09-16. Tasks 1–10 are complete; Task 11 is next.
+**Plan status:** Approved by Isaac on 2026-09-16. Tasks 1–11 are complete; Task 12 is next.
 
 ---
 
@@ -1122,7 +1122,7 @@ git commit -m "feat: export source-aware First Day plans"
 - Create: `tests/first-day/evaluation.test.ts`
 - Modify: `package.json`
 
-- [ ] **Step 1: Define a non-provider evaluation record**
+- [x] **Step 1: Define a non-provider evaluation record**
 
 ```ts
 export type EvaluationExpectation = {
@@ -1136,19 +1136,19 @@ export type EvaluationExpectation = {
 
 Fixtures contain synthetic extracted text and stored provider-shaped responses, never personal documents. Expectations are authored before running the domain pipeline.
 
-- [ ] **Step 2: Add 20 held-out packets across five scenarios**
+- [x] **Step 2: Add 20 held-out packets across five scenarios**
 
 Create four fixtures each for straightforward enrollment, ambiguous dates, conflicting locations, documented alternatives, and follow-up corrections. Each fixture uses invented names, addresses, identifiers, and dates and begins with `SYNTHETIC TEST DOCUMENT`.
 
-- [ ] **Step 3: Implement metric calculations**
+- [x] **Step 3: Implement metric calculations**
 
 `run.ts` computes fact precision/recall, quote coverage, conflict true/false positives and negatives, date errors, ready-task source coverage, and per-fixture failures. Accept optional latency/cost inputs but never fabricate them; report `not measured` when absent.
 
-- [ ] **Step 4: Add a deterministic regression test and script**
+- [x] **Step 4: Add a deterministic regression test and script**
 
 Add `"evaluate:first-day": "tsx evaluation/first-day/run.ts"` and `tsx` as a dev dependency. The test asserts 100% valid quote coverage and task source coverage on stored responses, plus zero false conflicts in the expected no-conflict fixtures.
 
-- [ ] **Step 5: Generate the initial report and commit**
+- [x] **Step 5: Generate the initial report and commit**
 
 Run `npm run evaluate:first-day`, write exact denominators and failures to `report.md`, then:
 

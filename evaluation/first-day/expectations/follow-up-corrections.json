@@ -1,0 +1,50 @@
+[
+  {
+    "fixtureId": "follow-up-correction-01",
+    "expectedFacts": [
+      {"semanticKey": "orientation.date", "originalValue": "August 11, 2026", "quote": "Orientation is August 11, 2026."},
+      {"semanticKey": "orientation.date", "originalValue": "August 13, 2026", "quote": "Correction: orientation is August 13, 2026."}
+    ],
+    "expectedConflicts": [{"semanticKey": "orientation.date", "values": ["August 11, 2026", "August 13, 2026"]}],
+    "expectedReadyTaskIds": ["task-live-open-enrollment", "task-live-attend-orientation-date", "task-live-clarify-orientation-date"],
+    "expectedClarificationTaskIds": [],
+    "expectedDates": [
+      {"semanticKey": "orientation.date", "originalValue": "August 11, 2026", "normalizedValue": "2026-08-11"},
+      {"semanticKey": "orientation.date", "originalValue": "August 13, 2026", "normalizedValue": "2026-08-13"}
+    ]
+  },
+  {
+    "fixtureId": "follow-up-correction-02",
+    "expectedFacts": [
+      {"semanticKey": "health_forms.deadline", "originalValue": "September 2, 2026", "quote": "Health forms are due September 2, 2026."},
+      {"semanticKey": "health_forms.deadline", "originalValue": "September 4, 2026", "quote": "Updated deadline: health forms are due September 4, 2026."}
+    ],
+    "expectedConflicts": [{"semanticKey": "health_forms.deadline", "values": ["September 2, 2026", "September 4, 2026"]}],
+    "expectedReadyTaskIds": ["task-live-open-enrollment", "task-live-attend-health-forms-deadline", "task-live-clarify-health-forms-deadline"],
+    "expectedClarificationTaskIds": [],
+    "expectedDates": [
+      {"semanticKey": "health_forms.deadline", "originalValue": "September 2, 2026", "normalizedValue": "2026-09-02"},
+      {"semanticKey": "health_forms.deadline", "originalValue": "September 4, 2026", "normalizedValue": "2026-09-04"}
+    ]
+  },
+  {
+    "fixtureId": "follow-up-correction-03",
+    "expectedFacts": [
+      {"semanticKey": "family_check_in.location", "originalValue": "Room 104", "quote": "Family check-in is in Room 104."},
+      {"semanticKey": "family_check_in.location", "originalValue": "Room 204", "quote": "Correction: family check-in is in Room 204."}
+    ],
+    "expectedConflicts": [{"semanticKey": "family_check_in.location", "values": ["Room 104", "Room 204"]}],
+    "expectedReadyTaskIds": ["task-live-open-enrollment", "task-live-clarify-family-check-in-location"],
+    "expectedClarificationTaskIds": []
+  },
+  {
+    "fixtureId": "follow-up-correction-04",
+    "expectedFacts": [
+      {"semanticKey": "documents.pickup_location", "originalValue": "East desk", "quote": "Document pickup is at the east desk."},
+      {"semanticKey": "documents.pickup_location", "originalValue": "West desk", "quote": "Updated location: document pickup is at the west desk."}
+    ],
+    "expectedConflicts": [{"semanticKey": "documents.pickup_location", "values": ["East desk", "West desk"]}],
+    "expectedReadyTaskIds": ["task-live-open-enrollment", "task-live-clarify-documents-pickup-location"],
+    "expectedClarificationTaskIds": []
+  }
+]

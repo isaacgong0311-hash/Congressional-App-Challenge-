@@ -1,0 +1,42 @@
+[
+  {
+    "fixtureId": "follow-up-correction-01",
+    "scenario": "follow_up_corrections",
+    "pages": [
+      {"pageIndex": 1, "response": {"schemaVersion": "first-day-extraction-v1", "requestId": "eval-follow-01-a", "documentId": "follow-01-a", "document": {"label": "Synthetic original date notice", "confidence": 0.98, "originalText": "SYNTHETIC TEST DOCUMENT\nOrientation is August 11, 2026.", "photoQualityNote": null}, "facts": [{"clientKey": "date", "kind": "date", "semanticKey": "orientation.date", "label": "Orientation date", "originalValue": "August 11, 2026", "normalizedValue": "2026-08-11", "quote": "Orientation is August 11, 2026.", "location": "Line 2", "confidence": 0.98}]}},
+      {"pageIndex": 2, "response": {"schemaVersion": "first-day-extraction-v1", "requestId": "eval-follow-01-b", "documentId": "follow-01-b", "document": {"label": "Synthetic corrected date notice", "confidence": 0.99, "originalText": "SYNTHETIC TEST DOCUMENT\nCorrection: orientation is August 13, 2026.", "photoQualityNote": null}, "facts": [{"clientKey": "date", "kind": "date", "semanticKey": "orientation.date", "label": "Orientation date", "originalValue": "August 13, 2026", "normalizedValue": "2026-08-13", "quote": "Correction: orientation is August 13, 2026.", "location": "Line 2", "confidence": 0.99}]}}
+    ],
+    "confirmedFactIds": [],
+    "schoolResolutions": [{"conflictId": "conflict-orientation-date", "selectedFactId": "fact-follow-01-b-date", "reportedValue": "August 13, 2026"}]
+  },
+  {
+    "fixtureId": "follow-up-correction-02",
+    "scenario": "follow_up_corrections",
+    "pages": [
+      {"pageIndex": 1, "response": {"schemaVersion": "first-day-extraction-v1", "requestId": "eval-follow-02-a", "documentId": "follow-02-a", "document": {"label": "Synthetic original deadline", "confidence": 0.97, "originalText": "SYNTHETIC TEST DOCUMENT\nHealth forms are due September 2, 2026.", "photoQualityNote": null}, "facts": [{"clientKey": "date", "kind": "date", "semanticKey": "health_forms.deadline", "label": "Health forms deadline", "originalValue": "September 2, 2026", "normalizedValue": "2026-09-02", "quote": "Health forms are due September 2, 2026.", "location": "Line 2", "confidence": 0.97}]}},
+      {"pageIndex": 2, "response": {"schemaVersion": "first-day-extraction-v1", "requestId": "eval-follow-02-b", "documentId": "follow-02-b", "document": {"label": "Synthetic corrected deadline", "confidence": 0.99, "originalText": "SYNTHETIC TEST DOCUMENT\nUpdated deadline: health forms are due September 4, 2026.", "photoQualityNote": null}, "facts": [{"clientKey": "date", "kind": "date", "semanticKey": "health_forms.deadline", "label": "Health forms deadline", "originalValue": "September 4, 2026", "normalizedValue": "2026-09-04", "quote": "Updated deadline: health forms are due September 4, 2026.", "location": "Line 2", "confidence": 0.99}]}}
+    ],
+    "confirmedFactIds": [],
+    "schoolResolutions": [{"conflictId": "conflict-health_forms-deadline", "selectedFactId": "fact-follow-02-b-date", "reportedValue": "September 4, 2026"}]
+  },
+  {
+    "fixtureId": "follow-up-correction-03",
+    "scenario": "follow_up_corrections",
+    "pages": [
+      {"pageIndex": 1, "response": {"schemaVersion": "first-day-extraction-v1", "requestId": "eval-follow-03-a", "documentId": "follow-03-a", "document": {"label": "Synthetic original room notice", "confidence": 0.96, "originalText": "SYNTHETIC TEST DOCUMENT\nFamily check-in is in Room 104.", "photoQualityNote": null}, "facts": [{"clientKey": "location", "kind": "location", "semanticKey": "family_check_in.location", "label": "Family check-in location", "originalValue": "Room 104", "normalizedValue": null, "quote": "Family check-in is in Room 104.", "location": "Line 2", "confidence": 0.96}]}},
+      {"pageIndex": 2, "response": {"schemaVersion": "first-day-extraction-v1", "requestId": "eval-follow-03-b", "documentId": "follow-03-b", "document": {"label": "Synthetic corrected room notice", "confidence": 0.99, "originalText": "SYNTHETIC TEST DOCUMENT\nCorrection: family check-in is in Room 204.", "photoQualityNote": null}, "facts": [{"clientKey": "location", "kind": "location", "semanticKey": "family_check_in.location", "label": "Family check-in location", "originalValue": "Room 204", "normalizedValue": null, "quote": "Correction: family check-in is in Room 204.", "location": "Line 2", "confidence": 0.99}]}}
+    ],
+    "confirmedFactIds": [],
+    "schoolResolutions": [{"conflictId": "conflict-family_check_in-location", "selectedFactId": "fact-follow-03-b-location", "reportedValue": "Room 204"}]
+  },
+  {
+    "fixtureId": "follow-up-correction-04",
+    "scenario": "follow_up_corrections",
+    "pages": [
+      {"pageIndex": 1, "response": {"schemaVersion": "first-day-extraction-v1", "requestId": "eval-follow-04-a", "documentId": "follow-04-a", "document": {"label": "Synthetic original pickup notice", "confidence": 0.97, "originalText": "SYNTHETIC TEST DOCUMENT\nDocument pickup is at the east desk.", "photoQualityNote": null}, "facts": [{"clientKey": "location", "kind": "location", "semanticKey": "documents.pickup_location", "label": "Document pickup location", "originalValue": "East desk", "normalizedValue": null, "quote": "Document pickup is at the east desk.", "location": "Line 2", "confidence": 0.97}]}},
+      {"pageIndex": 2, "response": {"schemaVersion": "first-day-extraction-v1", "requestId": "eval-follow-04-b", "documentId": "follow-04-b", "document": {"label": "Synthetic corrected pickup notice", "confidence": 0.99, "originalText": "SYNTHETIC TEST DOCUMENT\nUpdated location: document pickup is at the west desk.", "photoQualityNote": null}, "facts": [{"clientKey": "location", "kind": "location", "semanticKey": "documents.pickup_location", "label": "Document pickup location", "originalValue": "West desk", "normalizedValue": null, "quote": "Updated location: document pickup is at the west desk.", "location": "Line 2", "confidence": 0.99}]}}
+    ],
+    "confirmedFactIds": [],
+    "schoolResolutions": [{"conflictId": "conflict-documents-pickup_location", "selectedFactId": "fact-follow-04-b-location", "reportedValue": "West desk"}]
+  }
+]

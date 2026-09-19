@@ -1,0 +1,38 @@
+[
+  {
+    "fixtureId": "conflicting-location-01",
+    "scenario": "conflicting_locations",
+    "pages": [
+      {"pageIndex": 1, "response": {"schemaVersion": "first-day-extraction-v1", "requestId": "eval-location-01-a", "documentId": "loc-01-a", "document": {"label": "Synthetic welcome letter", "confidence": 0.98, "originalText": "SYNTHETIC TEST DOCUMENT\nOrientation starts in the cafeteria.", "photoQualityNote": null}, "facts": [{"clientKey": "location", "kind": "location", "semanticKey": "orientation.location", "label": "Orientation location", "originalValue": "Cafeteria", "normalizedValue": null, "quote": "Orientation starts in the cafeteria.", "location": "Line 2", "confidence": 0.98}]}},
+      {"pageIndex": 2, "response": {"schemaVersion": "first-day-extraction-v1", "requestId": "eval-location-01-b", "documentId": "loc-01-b", "document": {"label": "Synthetic follow-up", "confidence": 0.99, "originalText": "SYNTHETIC TEST DOCUMENT\nOrientation starts at the gym entrance.", "photoQualityNote": null}, "facts": [{"clientKey": "location", "kind": "location", "semanticKey": "orientation.location", "label": "Orientation location", "originalValue": "Gym entrance", "normalizedValue": null, "quote": "Orientation starts at the gym entrance.", "location": "Line 2", "confidence": 0.99}]}}
+    ],
+    "confirmedFactIds": []
+  },
+  {
+    "fixtureId": "conflicting-location-02",
+    "scenario": "conflicting_locations",
+    "pages": [
+      {"pageIndex": 1, "response": {"schemaVersion": "first-day-extraction-v1", "requestId": "eval-location-02-a", "documentId": "loc-02-a", "document": {"label": "Synthetic appointment card", "confidence": 0.97, "originalText": "SYNTHETIC TEST DOCUMENT\nCheck in at the main office.", "photoQualityNote": null}, "facts": [{"clientKey": "location", "kind": "location", "semanticKey": "registration.check_in_location", "label": "Check-in location", "originalValue": "Main office", "normalizedValue": null, "quote": "Check in at the main office.", "location": "Line 2", "confidence": 0.97}]}},
+      {"pageIndex": 2, "response": {"schemaVersion": "first-day-extraction-v1", "requestId": "eval-location-02-b", "documentId": "loc-02-b", "document": {"label": "Synthetic text update", "confidence": 0.96, "originalText": "SYNTHETIC TEST DOCUMENT\nCheck in at the library desk.", "photoQualityNote": null}, "facts": [{"clientKey": "location", "kind": "location", "semanticKey": "registration.check_in_location", "label": "Check-in location", "originalValue": "Library desk", "normalizedValue": null, "quote": "Check in at the library desk.", "location": "Line 2", "confidence": 0.96}]}}
+    ],
+    "confirmedFactIds": []
+  },
+  {
+    "fixtureId": "conflicting-location-03",
+    "scenario": "conflicting_locations",
+    "pages": [
+      {"pageIndex": 1, "response": {"schemaVersion": "first-day-extraction-v1", "requestId": "eval-location-03-a", "documentId": "loc-03-a", "document": {"label": "Synthetic map note", "confidence": 0.95, "originalText": "SYNTHETIC TEST DOCUMENT\nFamilies should use the north entrance.", "photoQualityNote": null}, "facts": [{"clientKey": "location", "kind": "location", "semanticKey": "arrival.entrance", "label": "Arrival entrance", "originalValue": "North entrance", "normalizedValue": null, "quote": "Families should use the north entrance.", "location": "Line 2", "confidence": 0.95}]}},
+      {"pageIndex": 2, "response": {"schemaVersion": "first-day-extraction-v1", "requestId": "eval-location-03-b", "documentId": "loc-03-b", "document": {"label": "Synthetic reminder", "confidence": 0.95, "originalText": "SYNTHETIC TEST DOCUMENT\nFamilies should use the south entrance.", "photoQualityNote": null}, "facts": [{"clientKey": "location", "kind": "location", "semanticKey": "arrival.entrance", "label": "Arrival entrance", "originalValue": "South entrance", "normalizedValue": null, "quote": "Families should use the south entrance.", "location": "Line 2", "confidence": 0.95}]}}
+    ],
+    "confirmedFactIds": []
+  },
+  {
+    "fixtureId": "conflicting-location-04",
+    "scenario": "conflicting_locations",
+    "pages": [
+      {"pageIndex": 1, "response": {"schemaVersion": "first-day-extraction-v1", "requestId": "eval-location-04-a", "documentId": "loc-04-a", "document": {"label": "Synthetic campus letter", "confidence": 0.98, "originalText": "SYNTHETIC TEST DOCUMENT\nThe enrollment meeting is in Building A.", "photoQualityNote": null}, "facts": [{"clientKey": "location", "kind": "location", "semanticKey": "registration.meeting_location", "label": "Enrollment meeting location", "originalValue": "Building A", "normalizedValue": null, "quote": "The enrollment meeting is in Building A.", "location": "Line 2", "confidence": 0.98}]}},
+      {"pageIndex": 2, "response": {"schemaVersion": "first-day-extraction-v1", "requestId": "eval-location-04-b", "documentId": "loc-04-b", "document": {"label": "Synthetic correction slip", "confidence": 0.98, "originalText": "SYNTHETIC TEST DOCUMENT\nThe enrollment meeting is in Building C.", "photoQualityNote": null}, "facts": [{"clientKey": "location", "kind": "location", "semanticKey": "registration.meeting_location", "label": "Enrollment meeting location", "originalValue": "Building C", "normalizedValue": null, "quote": "The enrollment meeting is in Building C.", "location": "Line 2", "confidence": 0.98}]}}
+    ],
+    "confirmedFactIds": []
+  }
+]

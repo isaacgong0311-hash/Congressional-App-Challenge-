@@ -1,0 +1,42 @@
+[
+  {
+    "fixtureId": "straightforward-01",
+    "expectedFacts": [
+      {"semanticKey": "registration.birth_certificate", "originalValue": "Certified birth certificate", "quote": "Bring a certified birth certificate."},
+      {"semanticKey": "registration.contact", "originalValue": "registrar1@example.test", "quote": "Questions: registrar1@example.test."}
+    ],
+    "expectedConflicts": [],
+    "expectedReadyTaskIds": ["task-live-gather-documents", "task-live-open-enrollment"],
+    "expectedClarificationTaskIds": []
+  },
+  {
+    "fixtureId": "straightforward-02",
+    "expectedFacts": [
+      {"semanticKey": "registration.immunization_record", "originalValue": "Student immunization record", "quote": "Please provide the student's immunization record."},
+      {"semanticKey": "registration.contact", "originalValue": "512-555-0102", "quote": "Call 512-555-0102 for help."}
+    ],
+    "expectedConflicts": [],
+    "expectedReadyTaskIds": ["task-live-gather-documents", "task-live-open-enrollment"],
+    "expectedClarificationTaskIds": []
+  },
+  {
+    "fixtureId": "straightforward-03",
+    "expectedFacts": [
+      {"semanticKey": "registration.proof_of_residence", "originalValue": "Proof of residence", "quote": "Upload proof of residence."},
+      {"semanticKey": "registration.help_location", "originalValue": "Welcome Center", "quote": "In-person help is available at the Welcome Center."}
+    ],
+    "expectedConflicts": [],
+    "expectedReadyTaskIds": ["task-live-gather-documents", "task-live-open-enrollment"],
+    "expectedClarificationTaskIds": []
+  },
+  {
+    "fixtureId": "straightforward-04",
+    "expectedFacts": [
+      {"semanticKey": "registration.report_card", "originalValue": "Latest report card", "quote": "Bring the latest report card."},
+      {"semanticKey": "registration.contact", "originalValue": "enrollment4@example.test", "quote": "Email enrollment4@example.test if you need assistance."}
+    ],
+    "expectedConflicts": [],
+    "expectedReadyTaskIds": ["task-live-gather-documents", "task-live-open-enrollment"],
+    "expectedClarificationTaskIds": []
+  }
+]

@@ -1,0 +1,50 @@
+[
+  {
+    "fixtureId": "documented-alternative-01",
+    "scenario": "documented_alternatives",
+    "pages": [{"pageIndex": 1, "response": {
+      "schemaVersion": "first-day-extraction-v1",
+      "requestId": "eval-alternative-01",
+      "documentId": "alternative-01",
+      "document": {"label": "Synthetic residence checklist", "confidence": 0.98, "originalText": "SYNTHETIC TEST DOCUMENT\nFor proof of residence, bring a utility bill or a signed lease.", "photoQualityNote": null},
+      "facts": [{"clientKey": "request", "kind": "requested_item", "semanticKey": "registration.proof_of_residence", "label": "Utility bill or signed lease", "originalValue": "Utility bill or signed lease", "normalizedValue": null, "quote": "For proof of residence, bring a utility bill or a signed lease.", "location": "Line 2", "confidence": 0.98}]
+    }}],
+    "confirmedFactIds": ["fact-alternative-01-request"]
+  },
+  {
+    "fixtureId": "documented-alternative-02",
+    "scenario": "documented_alternatives",
+    "pages": [{"pageIndex": 1, "response": {
+      "schemaVersion": "first-day-extraction-v1",
+      "requestId": "eval-alternative-02",
+      "documentId": "alternative-02",
+      "document": {"label": "Synthetic prior-school checklist", "confidence": 0.99, "originalText": "SYNTHETIC TEST DOCUMENT\nProvide the latest report card or the prior school's withdrawal form.", "photoQualityNote": null},
+      "facts": [{"clientKey": "request", "kind": "requested_item", "semanticKey": "registration.prior_school_record", "label": "Report card or withdrawal form", "originalValue": "Latest report card or prior-school withdrawal form", "normalizedValue": null, "quote": "Provide the latest report card or the prior school's withdrawal form.", "location": "Line 2", "confidence": 0.99}]
+    }}],
+    "confirmedFactIds": ["fact-alternative-02-request"]
+  },
+  {
+    "fixtureId": "documented-alternative-03",
+    "scenario": "documented_alternatives",
+    "pages": [{"pageIndex": 1, "response": {
+      "schemaVersion": "first-day-extraction-v1",
+      "requestId": "eval-alternative-03",
+      "documentId": "alternative-03",
+      "document": {"label": "Synthetic identity checklist", "confidence": 0.96, "originalText": "SYNTHETIC TEST DOCUMENT\nIdentity may be shown with a passport or a state identification card.", "photoQualityNote": null},
+      "facts": [{"clientKey": "request", "kind": "requested_item", "semanticKey": "registration.guardian_identity", "label": "Passport or state identification card", "originalValue": "Passport or state identification card", "normalizedValue": null, "quote": "Identity may be shown with a passport or a state identification card.", "location": "Line 2", "confidence": 0.96}]
+    }}],
+    "confirmedFactIds": ["fact-alternative-03-request"]
+  },
+  {
+    "fixtureId": "documented-alternative-04",
+    "scenario": "documented_alternatives",
+    "pages": [{"pageIndex": 1, "response": {
+      "schemaVersion": "first-day-extraction-v1",
+      "requestId": "eval-alternative-04",
+      "documentId": "alternative-04",
+      "document": {"label": "Synthetic address checklist", "confidence": 0.97, "originalText": "SYNTHETIC TEST DOCUMENT\nAn electric statement or water statement can document the home address.", "photoQualityNote": null},
+      "facts": [{"clientKey": "request", "kind": "requested_item", "semanticKey": "registration.address_document", "label": "Electric or water statement", "originalValue": "Electric statement or water statement", "normalizedValue": null, "quote": "An electric statement or water statement can document the home address.", "location": "Line 2", "confidence": 0.97}]
+    }}],
+    "confirmedFactIds": ["fact-alternative-04-request"]
+  }
+]
