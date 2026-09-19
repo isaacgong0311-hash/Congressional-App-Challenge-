@@ -8,7 +8,7 @@
 
 **Tech Stack:** Next.js 16 App Router, React 19, TypeScript 5, Tailwind CSS 4, Zod 4, Vitest 4, Vercel AI SDK 6, Groq, Vercel
 
-**Plan status:** Approved by Isaac on 2026-09-16. Tasks 1–8 are complete; Task 9 is next.
+**Plan status:** Approved by Isaac on 2026-09-16. Tasks 1–9 are complete; Task 10 is next.
 
 ---
 
@@ -1018,7 +1018,7 @@ git commit -m "feat: add source-checked Round Rock enrollment pilot"
 - Modify: `app/features/first-day/ui/blocker-step.tsx`
 - Create: `tests/first-day/live-tasks.test.ts`
 
-- [ ] **Step 1: Write live planning tests**
+- [x] **Step 1: Write live planning tests**
 
 Assert that:
 
@@ -1032,21 +1032,21 @@ expect(byId(planCase(caseWithOpenConflict), "task-live-clarify-orientation-locat
 expect(unrelatedTaskAfterResolution.state).toBe(unrelatedTaskBeforeResolution.state);
 ```
 
-- [ ] **Step 2: Build tasks from explicit templates only**
+- [x] **Step 2: Build tasks from explicit templates only**
 
 `buildLiveTasks` may create only the five task families named in the design. Use stable IDs and dependencies that reference existing confirmed facts. A requested-item task uses `anyOf` only when an eligible procedure explicitly names an alternative. Do not turn arbitrary model next steps into tasks.
 
-- [ ] **Step 3: Enforce live procedure eligibility in the planner**
+- [x] **Step 3: Enforce live procedure eligibility in the planner**
 
 Before dependency evaluation, inspect each live task's `procedureIds`. A missing, pending, or stale procedure produces `needs_review` with reason `A supporting procedure needs review before this step can be relied on.` Fictional cases keep their current behavior.
 
-- [ ] **Step 4: Render live states and resolution**
+- [x] **Step 4: Render live states and resolution**
 
 PlanStep groups the derived tasks into Ready, Needs clarification, Waiting, Done, and Needs review. BlockerStep reads actual conflicts, shows both source quotes, and records `school_confirmation_recorded`. Label the action `Record what the school told me`; display `Reported confirmed by school` afterward.
 
 Practice calls and drafted replies receive confirmed context and the prepared question, but their results have no callback capable of changing case facts or events.
 
-- [ ] **Step 5: Verify and commit**
+- [x] **Step 5: Verify and commit**
 
 Run all First Day tests and browser-test that resolving one live conflict changes only its related task.
 

@@ -114,8 +114,8 @@ export function DocumentsStep({
               <p className="mt-2 max-w-2xl text-sm leading-6 text-[#59665f]">
                 {translated(
                   language,
-                  "Choose up to five JPG or PNG pages. Each page can be 10 MB, with a 25 MB case limit. Lantern reads one page at a time so one failure does not erase the others.",
-                  "Elija hasta cinco páginas JPG o PNG. Cada página puede tener 10 MB, con un límite total de 25 MB. Lantern lee una página a la vez para que un error no borre las demás.",
+                  "For this pilot, use Round Rock ISD enrollment pages. Choose up to five JPG or PNG pages. Each page can be 10 MB, with a 25 MB case limit. Lantern reads one page at a time so one failure does not erase the others.",
+                  "Para este piloto, use páginas de inscripción de Round Rock ISD. Elija hasta cinco páginas JPG o PNG. Cada página puede tener 10 MB, con un límite total de 25 MB. Lantern lee una página a la vez para que un error no borre las demás.",
                 )}
               </p>
             </div>

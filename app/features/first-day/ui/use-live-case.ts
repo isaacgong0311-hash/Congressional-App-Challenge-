@@ -12,6 +12,7 @@ import {
 import { adaptLiveExtraction } from "../adapters/live-extraction";
 import { appendSourceRemoval } from "../domain/events";
 import { mergeExtraction } from "../domain/extraction";
+import { deriveLiveCase } from "../domain/live-tasks";
 import {
   reduceUploadQueue,
   validateUploadSelection,
@@ -168,7 +169,7 @@ export function useLiveCase({
         }
         setCaseData((current) => {
           try {
-            return mergeExtraction(current, extraction);
+            return deriveLiveCase(mergeExtraction(current, extraction));
           } catch {
             return current;
           }
@@ -349,14 +350,14 @@ export function useLiveCase({
         documentId,
         timestamp: new Date().toISOString(),
       });
-      return {
+      return deriveLiveCase({
         ...withRemoval,
         documents: withRemoval.documents.map((document) =>
           document.id === documentId
             ? { ...document, status: "removed" }
             : document,
         ),
-      };
+      });
     });
   }
 

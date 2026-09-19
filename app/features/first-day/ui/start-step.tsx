@@ -79,8 +79,8 @@ export function StartStep({
                 <DocumentIcon className="h-4 w-4" />
                 {translated(
                   language,
-                  "Add my documents",
-                  "Añadir mis documentos",
+                  "Add Round Rock ISD documents",
+                  "Añadir documentos de Round Rock ISD",
                 )}
               </button>
             </div>

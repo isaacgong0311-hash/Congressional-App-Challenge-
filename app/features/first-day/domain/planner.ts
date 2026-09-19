@@ -7,6 +7,7 @@ import type {
   PlannerResult,
   PlanState,
 } from "./types";
+import { procedureEligibility } from "./procedures";
 
 type DependencyState = "satisfied" | "clarify" | "waiting" | "review";
 
@@ -25,7 +26,13 @@ const STATE_REASON: Record<PlanState, string> = {
     "A supporting source changed or was removed. Review this task before relying on it.",
 };
 
-export function planCase(caseData: FirstDayCase): PlannerResult {
+const PROCEDURE_REVIEW_REASON =
+  "A supporting procedure needs review before this step can be relied on.";
+
+export function planCase(
+  caseData: FirstDayCase,
+  today = new Date().toISOString().slice(0, 10),
+): PlannerResult {
   const tasksById = new Map(caseData.tasks.map((task) => [task.id, task]));
   const factsById = new Map(caseData.facts.map((fact) => [fact.id, fact]));
   const evidenceById = new Map(
@@ -49,7 +56,6 @@ export function planCase(caseData: FirstDayCase): PlannerResult {
     if (event.type === "fact_confirmed") {
       const current = effectiveFacts.get(event.factId);
       if (current) effectiveFacts.set(event.factId, { ...current, state: "confirmed" });
-      resolutionEventIndex.set(event.factId, index);
     }
     if (event.type === "fact_corrected") {
       const current = effectiveFacts.get(event.factId);
@@ -59,7 +65,6 @@ export function planCase(caseData: FirstDayCase): PlannerResult {
           value: event.value,
         });
       }
-      resolutionEventIndex.set(event.factId, index);
     }
     if (event.type === "fact_marked_unclear") {
       const current = effectiveFacts.get(event.factId);
@@ -93,7 +98,17 @@ export function planCase(caseData: FirstDayCase): PlannerResult {
           (resolutionEventIndex.get(left) ?? -1),
       )[0];
 
-    if (!resolvedFact) continue;
+    if (!resolvedFact) {
+      if (conflict.status === "open") {
+        for (const factId of conflict.factIds) {
+          const current = effectiveFacts.get(factId);
+          if (current) {
+            effectiveFacts.set(factId, { ...current, state: "conflicted" });
+          }
+        }
+      }
+      continue;
+    }
     for (const factId of conflict.factIds) {
       const current = effectiveFacts.get(factId);
       if (!current) continue;
@@ -207,10 +222,24 @@ export function planCase(caseData: FirstDayCase): PlannerResult {
 
     const nextTrail = [...trail, taskId];
     const directSourceRemoved = task.evidenceIds.some(evidenceWasRemoved);
+    const procedureNeedsReview =
+      caseData.mode === "live" &&
+      task.procedureIds.some((procedureId) => {
+        const procedure = caseData.procedures.find(
+          (item) => item.id === procedureId,
+        );
+        return (
+          !procedure || procedureEligibility(procedure, today) !== "eligible"
+        );
+      });
     let state: PlanState;
+    let reason: string | undefined;
 
     if (directSourceRemoved) {
       state = "needs_review";
+    } else if (procedureNeedsReview) {
+      state = "needs_review";
+      reason = PROCEDURE_REVIEW_REASON;
     } else if (completedTasks.has(taskId)) {
       state = "done";
     } else {
@@ -229,7 +258,7 @@ export function planCase(caseData: FirstDayCase): PlannerResult {
               : "waiting";
     }
 
-    const derived = { ...task, state, reason: STATE_REASON[state] };
+    const derived = { ...task, state, reason: reason ?? STATE_REASON[state] };
     cache.set(taskId, derived);
     return derived;
   }

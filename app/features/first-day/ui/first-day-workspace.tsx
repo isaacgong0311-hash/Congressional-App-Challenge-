@@ -3,12 +3,15 @@
 import Link from "next/link";
 import { useCallback, useMemo, useRef, useState } from "react";
 
+import { roundRockEnrollmentProcedures } from "../content/procedures/round-rock-isd";
+import { resolveConflict as recordConflictResolution } from "../domain/conflicts";
 import {
   appendFactConfirmation,
   appendFactCorrection,
   appendFactUnclear,
   appendTaskCompletion,
 } from "../domain/events";
+import { deriveLiveCase } from "../domain/live-tasks";
 import { planCase } from "../domain/planner";
 import type { FirstDayCase } from "../domain/types";
 import { BlockerStep } from "./blocker-step";
@@ -41,6 +44,7 @@ export function FirstDayWorkspace({ initialCase }: { initialCase: FirstDayCase }
   const [largeText, setLargeText] = useState(false);
   const [highContrast, setHighContrast] = useState(false);
   const [sourceId, setSourceId] = useState<string | null>(null);
+  const [activeConflictId, setActiveConflictId] = useState<string | null>(null);
   const sourceTriggerRef = useRef<HTMLButtonElement | null>(null);
   const eventSequence = useRef(0);
   const providerCapability = useProviderCapability();
@@ -73,27 +77,25 @@ export function FirstDayWorkspace({ initialCase }: { initialCase: FirstDayCase }
       id: `case-live-${Date.now()}`,
       mode: "live",
       language,
-      district: translated(
-        language,
-        "School enrollment case",
-        "Caso de inscripción escolar",
-      ),
+      district: "Round Rock ISD",
       childFirstName: "",
       ruleVersion: "live-intake-v1",
       documents: [],
       evidence: [],
       facts: [],
-      procedures: [],
+      procedures: structuredClone(roundRockEnrollmentProcedures),
       tasks: [],
       conflicts: [],
       events: [],
     });
+    setActiveConflictId(null);
     setCurrentStep("documents");
   }
 
   function openSampleCase() {
     liveCase.reset();
     setCaseData(initialCase);
+    setActiveConflictId(null);
     setCurrentStep("documents");
   }
 
@@ -109,32 +111,38 @@ export function FirstDayWorkspace({ initialCase }: { initialCase: FirstDayCase }
 
   function confirmFact(factId: string) {
     setCaseData((current) =>
-      appendFactConfirmation(current, {
-        id: nextEventId("fact"),
-        factId,
-        timestamp: new Date().toISOString(),
-      }),
+      deriveLiveCase(
+        appendFactConfirmation(current, {
+          id: nextEventId("fact"),
+          factId,
+          timestamp: new Date().toISOString(),
+        }),
+      ),
     );
   }
 
   function correctFact(factId: string, value: string) {
     setCaseData((current) =>
-      appendFactCorrection(current, {
-        id: nextEventId("fact-correction"),
-        factId,
-        value,
-        timestamp: new Date().toISOString(),
-      }),
+      deriveLiveCase(
+        appendFactCorrection(current, {
+          id: nextEventId("fact-correction"),
+          factId,
+          value,
+          timestamp: new Date().toISOString(),
+        }),
+      ),
     );
   }
 
   function markFactUnclear(factId: string) {
     setCaseData((current) =>
-      appendFactUnclear(current, {
-        id: nextEventId("fact-unclear"),
-        factId,
-        timestamp: new Date().toISOString(),
-      }),
+      deriveLiveCase(
+        appendFactUnclear(current, {
+          id: nextEventId("fact-unclear"),
+          factId,
+          timestamp: new Date().toISOString(),
+        }),
+      ),
     );
   }
 
@@ -148,19 +156,33 @@ export function FirstDayWorkspace({ initialCase }: { initialCase: FirstDayCase }
     );
   }
 
-  function resolveOrientation() {
+  function resolveCaseConflict(
+    conflictId: string,
+    selectedFactId: string,
+    reportedValue: string,
+  ) {
     setCaseData((current) =>
-      appendFactCorrection(current, {
-        id: nextEventId("orientation"),
-        factId: "fact-orientation-gym",
-        value:
-          language === "Español"
-            ? "Entrada del gimnasio — confirmada por la oficina escolar"
-            : "Gym entrance — confirmed by the school office",
-        timestamp: new Date().toISOString(),
-      }),
+      deriveLiveCase(
+        recordConflictResolution(current, {
+          id: nextEventId("school-confirmation"),
+          type: "school_confirmation_recorded",
+          conflictId,
+          selectedFactId,
+          reportedValue,
+          timestamp: new Date().toISOString(),
+        }),
+      ),
     );
     setCurrentStep("plan");
+  }
+
+  function openTaskConflict(taskId: string) {
+    const conflict =
+      caseData.conflicts.find((item) =>
+        item.relatedTaskIds.includes(taskId),
+      ) ?? caseData.conflicts.find((item) => item.status === "open");
+    setActiveConflictId(conflict?.id ?? null);
+    setCurrentStep("blocker");
   }
 
   function showTaskSource(taskId: string, trigger: HTMLButtonElement) {
@@ -321,8 +343,8 @@ export function FirstDayWorkspace({ initialCase }: { initialCase: FirstDayCase }
             )
           : translated(
               language,
-              "Live document intake · images are sent to Lantern’s external AI provider and are not saved as a case",
-              "Carga de documentos · las imágenes se envían al proveedor externo de IA de Lantern y no se guardan como caso",
+              "Round Rock ISD pilot · images are sent to Lantern’s external AI provider and are not saved as a case",
+              "Piloto de Round Rock ISD · las imágenes se envían al proveedor externo de IA de Lantern y no se guardan como caso",
             )}
       </div>
 
@@ -438,16 +460,18 @@ export function FirstDayWorkspace({ initialCase }: { initialCase: FirstDayCase }
             <PlanStep
               language={language}
               onCompleteTask={completeTask}
-              onResolveTask={() => setCurrentStep("blocker")}
+              onResolveTask={openTaskConflict}
               onShowTaskSource={showTaskSource}
               plan={plan}
             />
           ) : null}
           {currentStep === "blocker" ? (
             <BlockerStep
+              caseData={caseData}
+              conflictId={activeConflictId}
               language={language}
               onOpenSource={openSource}
-              onResolveConflict={resolveOrientation}
+              onResolveConflict={resolveCaseConflict}
             />
           ) : null}
           {currentStep === "export" ? (

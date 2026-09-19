@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { fictionalCase } from "../../app/features/first-day/content/fictional-case";
+import { resolveConflict } from "../../app/features/first-day/domain/conflicts";
 import { planCase } from "../../app/features/first-day/domain/planner";
 import type {
   DerivedTask,
@@ -92,17 +93,18 @@ describe("First Day deterministic planner", () => {
     expect(byId(result, "task-health-records").state).toBe("ready");
   });
 
-  it("uses a user correction to resolve the supported conflict path", () => {
+  it("uses an explicit school report to resolve the supported conflict path", () => {
     const changed = copyCase();
-    changed.events.push({
+    const resolved = resolveConflict(changed, {
       id: "event-location-confirmed",
-      type: "fact_corrected",
-      factId: "fact-orientation-gym",
-      value: "Gym entrance — confirmed by the school office",
+      type: "school_confirmation_recorded",
+      conflictId: "conflict-orientation-location",
+      selectedFactId: "fact-orientation-gym",
+      reportedValue: "Gym entrance",
       timestamp: "2026-09-15T12:00:00.000Z",
     });
 
-    expect(byId(planCase(changed), "task-orientation").state).toBe("ready");
+    expect(byId(planCase(resolved), "task-orientation").state).toBe("ready");
   });
 
   it("returns identical output for identical input", () => {
