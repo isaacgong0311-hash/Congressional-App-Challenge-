@@ -8,7 +8,7 @@
 
 **Tech Stack:** Next.js 16 App Router, React 19, TypeScript 5, Tailwind CSS 4, Zod 4, Vitest 4, Vercel AI SDK 6, Groq, Vercel
 
-**Plan status:** Approved by Isaac on 2026-09-16. Tasks 1–6 are complete; Task 7 is next.
+**Plan status:** Approved by Isaac on 2026-09-16. Tasks 1–7 are complete; Task 8 is next.
 
 ---
 
@@ -874,7 +874,7 @@ git commit -m "feat: review source-backed facts from live pages"
 - Modify: `app/features/first-day/domain/events.ts`
 - Create: `tests/first-day/conflicts.test.ts`
 
-- [ ] **Step 1: Write failing conflict tests**
+- [x] **Step 1: Write failing conflict tests**
 
 Cover:
 
@@ -888,7 +888,7 @@ expect(resolveConflict(caseData, schoolReportEvent).events.at(-1)?.type)
   .toBe("school_confirmation_recorded");
 ```
 
-- [ ] **Step 2: Extend conflict and event contracts**
+- [x] **Step 2: Extend conflict and event contracts**
 
 ```ts
 export type Conflict = {
@@ -913,15 +913,15 @@ export type SchoolConfirmationEvent = {
 
 Add `SchoolConfirmationEvent` to `CaseEvent`.
 
-- [ ] **Step 3: Implement comparison and stable conflict IDs**
+- [x] **Step 3: Implement comparison and stable conflict IDs**
 
 Group active, non-superseded facts by `semanticKey`. Compare trimmed `normalizedValue ?? originalValue` values. Create a conflict only when a group has at least two distinct values. Use `conflict-${semanticKey.replaceAll(".", "-")}` as its stable ID and preserve an existing resolved conflict when recomputing unrelated facts.
 
-- [ ] **Step 4: Apply explicit resolutions**
+- [x] **Step 4: Apply explicit resolutions**
 
 `resolveConflict` must validate the conflict and selected fact, append the school-confirmation event, mark the selected fact effectively confirmed, and treat competing facts as superseded during planning. It must not rewrite evidence or fact records.
 
-- [ ] **Step 5: Verify and commit**
+- [x] **Step 5: Verify and commit**
 
 Run `npm test -- tests/first-day/conflicts.test.ts tests/first-day/planner.test.ts tests/first-day/events.test.ts`.
 

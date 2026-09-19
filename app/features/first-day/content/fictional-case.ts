@@ -166,6 +166,7 @@ export const fictionalCase: FirstDayCase = {
     {
       id: "fact-orientation-cafeteria",
       kind: "location",
+      semanticKey: "orientation.location",
       label: "Orientation location",
       originalValue: "School cafeteria",
       evidenceIds: ["evidence-orientation-cafeteria"],
@@ -174,6 +175,7 @@ export const fictionalCase: FirstDayCase = {
     {
       id: "fact-orientation-gym",
       kind: "location",
+      semanticKey: "orientation.location",
       label: "Orientation location",
       originalValue: "Gym entrance",
       evidenceIds: ["evidence-orientation-gym"],
@@ -274,6 +276,7 @@ export const fictionalCase: FirstDayCase = {
   conflicts: [
     {
       id: "conflict-orientation-location",
+      semanticKey: "orientation.location",
       label: "Orientation location",
       factIds: ["fact-orientation-cafeteria", "fact-orientation-gym"],
       relatedTaskIds: ["task-orientation"],

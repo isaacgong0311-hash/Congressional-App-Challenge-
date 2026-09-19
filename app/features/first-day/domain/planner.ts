@@ -65,6 +65,23 @@ export function planCase(caseData: FirstDayCase): PlannerResult {
       const current = effectiveFacts.get(event.factId);
       if (current) effectiveFacts.set(event.factId, { ...current, state: "unclear" });
     }
+    if (event.type === "school_confirmation_recorded") {
+      const conflict = caseData.conflicts.find(
+        (item) => item.id === event.conflictId,
+      );
+      if (!conflict) return;
+      for (const factId of conflict.factIds) {
+        const current = effectiveFacts.get(factId);
+        if (!current) continue;
+        effectiveFacts.set(
+          factId,
+          factId === event.selectedFactId
+            ? { state: "confirmed", value: event.reportedValue }
+            : { ...current, state: "superseded" },
+        );
+      }
+      resolutionEventIndex.set(event.selectedFactId, index);
+    }
   });
 
   for (const conflict of caseData.conflicts) {

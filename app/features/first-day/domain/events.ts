@@ -68,3 +68,13 @@ export function appendSourceRemoval(
   }
   return appendEvent(caseData, { ...input, type: "source_removed" });
 }
+
+export function appendSchoolConfirmation(
+  caseData: FirstDayCase,
+  input: EventInput<"school_confirmation_recorded">,
+): FirstDayCase {
+  return appendEvent(caseData, {
+    ...input,
+    type: "school_confirmation_recorded",
+  });
+}

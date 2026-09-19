@@ -12,9 +12,18 @@ function isFactChangeEvent(
   event: CaseEvent,
 ): event is Extract<
   CaseEvent,
-  { type: "fact_confirmed" | "fact_corrected" }
+  {
+    type:
+      | "fact_confirmed"
+      | "fact_corrected"
+      | "school_confirmation_recorded";
+  }
 > {
-  return event.type === "fact_confirmed" || event.type === "fact_corrected";
+  return (
+    event.type === "fact_confirmed" ||
+    event.type === "fact_corrected" ||
+    event.type === "school_confirmation_recorded"
+  );
 }
 
 export function currentFactView(caseData: FirstDayCase, fact: Fact) {
@@ -41,8 +50,23 @@ export function currentFactView(caseData: FirstDayCase, fact: Fact) {
     const selected = [...caseData.events]
       .reverse()
       .filter(isFactChangeEvent)
-      .find((event) => conflict.factIds.includes(event.factId));
-    if (selected && selected.factId !== fact.id) state = "superseded";
+      .find((event) =>
+        event.type === "school_confirmation_recorded"
+          ? event.conflictId === conflict.id
+          : conflict.factIds.includes(event.factId),
+      );
+    const selectedFactId =
+      selected?.type === "school_confirmation_recorded"
+        ? selected.selectedFactId
+        : selected?.factId;
+    if (selectedFactId && selectedFactId !== fact.id) state = "superseded";
+    if (
+      selected?.type === "school_confirmation_recorded" &&
+      selectedFactId === fact.id
+    ) {
+      state = "confirmed";
+      value = selected.reportedValue;
+    }
   }
 
   return { state, value };

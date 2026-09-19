@@ -115,11 +115,21 @@ export type PlanTask = {
 
 export type Conflict = {
   id: string;
+  semanticKey: string;
   label: string;
   factIds: string[];
   relatedTaskIds: string[];
   status: "open" | "resolved";
   resolutionEventId?: string;
+};
+
+export type SchoolConfirmationEvent = {
+  id: string;
+  type: "school_confirmation_recorded";
+  conflictId: string;
+  selectedFactId: string;
+  reportedValue: string;
+  timestamp: string;
 };
 
 export type CaseEvent =
@@ -153,7 +163,8 @@ export type CaseEvent =
       type: "source_removed";
       documentId: string;
       timestamp: string;
-    };
+    }
+  | SchoolConfirmationEvent;
 
 export type FirstDayCase = {
   id: string;

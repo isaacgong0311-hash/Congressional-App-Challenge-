@@ -5,6 +5,7 @@ import {
   appendFactConfirmation,
   appendFactCorrection,
   appendFactUnclear,
+  appendSchoolConfirmation,
   appendSourceRemoval,
   appendTaskCompletion,
 } from "../../app/features/first-day/domain/events";
@@ -63,6 +64,24 @@ describe("First Day case events", () => {
       next.facts.find((fact) => fact.id === "fact-interpreter-preference")
         ?.confirmationState,
     ).toBe("proposed");
+  });
+
+  it("appends a school report as an immutable event", () => {
+    const next = appendSchoolConfirmation(fictionalCase, {
+      id: "event-school-report",
+      conflictId: "conflict-orientation-location",
+      selectedFactId: "fact-orientation-gym",
+      reportedValue: "Gym entrance",
+      timestamp: "2026-09-19T12:00:00.000Z",
+    });
+
+    expect(next.events.at(-1)).toEqual(
+      expect.objectContaining({
+        type: "school_confirmation_recorded",
+        conflictId: "conflict-orientation-location",
+      }),
+    );
+    expect(fictionalCase.events).toHaveLength(0);
   });
 
   it("rejects unknown record IDs", () => {
