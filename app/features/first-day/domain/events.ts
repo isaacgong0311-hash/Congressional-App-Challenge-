@@ -39,6 +39,16 @@ export function appendFactCorrection(
   return appendEvent(caseData, { ...input, type: "fact_corrected" });
 }
 
+export function appendFactUnclear(
+  caseData: FirstDayCase,
+  input: EventInput<"fact_marked_unclear">,
+): FirstDayCase {
+  if (!caseData.facts.some((fact) => fact.id === input.factId)) {
+    throw new Error(`Unknown fact ID: ${input.factId}`);
+  }
+  return appendEvent(caseData, { ...input, type: "fact_marked_unclear" });
+}
+
 export function appendTaskCompletion(
   caseData: FirstDayCase,
   input: EventInput<"task_completed">,

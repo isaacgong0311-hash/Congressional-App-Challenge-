@@ -61,6 +61,10 @@ export function planCase(caseData: FirstDayCase): PlannerResult {
       }
       resolutionEventIndex.set(event.factId, index);
     }
+    if (event.type === "fact_marked_unclear") {
+      const current = effectiveFacts.get(event.factId);
+      if (current) effectiveFacts.set(event.factId, { ...current, state: "unclear" });
+    }
   });
 
   for (const conflict of caseData.conflicts) {

@@ -138,6 +138,12 @@ export type CaseEvent =
     }
   | {
       id: string;
+      type: "fact_marked_unclear";
+      factId: string;
+      timestamp: string;
+    }
+  | {
+      id: string;
       type: "task_completed";
       taskId: string;
       timestamp: string;

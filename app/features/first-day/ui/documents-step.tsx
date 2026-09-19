@@ -8,13 +8,19 @@ import {
 } from "../domain/upload-queue";
 import type { FirstDayCase } from "../domain/types";
 import { DOCUMENT_ES, translated, type Language } from "./first-day-copy";
-import { Eyebrow, SourceButton, type SourceOpener } from "./first-day-shared";
+import {
+  currentFactView,
+  Eyebrow,
+  SourceButton,
+  type SourceOpener,
+} from "./first-day-shared";
 import {
   CircleCheckIcon,
   ClockIcon,
   DocumentIcon,
   WarningIcon,
 } from "./icons";
+import { factHasActiveSource } from "./use-live-case";
 
 export type DocumentsStepProps = {
   caseData: FirstDayCase;
@@ -42,6 +48,17 @@ export function DocumentsStep({
     (document) => document.status !== "removed",
   );
   const sourceLabel = translated(language, "Show source", "Ver fuente");
+  const readyPages = visibleDocuments.filter(
+    (document) => document.status === "ready",
+  ).length;
+  const failedPages = visibleDocuments.filter(
+    (document) => document.status === "error",
+  ).length;
+  const proposedFacts = caseData.facts.filter(
+    (fact) =>
+      factHasActiveSource(caseData, fact) &&
+      currentFactView(caseData, fact).state === "proposed",
+  ).length;
 
   return (
     <section className="fd-enter">
@@ -169,6 +186,13 @@ export function DocumentsStep({
                       {caseData.mode === "live" && queued
                         ? `${(queued.size / 1024 / 1024).toFixed(1)} MB`
                         : document.sourceVersion}
+                      {typeof document.confidence === "number"
+                        ? translated(
+                            language,
+                            ` · ${document.confidence}% confidence`,
+                            ` · ${document.confidence}% de confianza`,
+                          )
+                        : ""}
                     </p>
                   </div>
                   <span
@@ -223,6 +247,11 @@ export function DocumentsStep({
                     role="alert"
                   >
                     {queued.error}
+                  </p>
+                ) : null}
+                {document.photoQualityNote ? (
+                  <p className="mt-4 rounded-2xl bg-[#fff1cf] p-3 text-sm font-medium text-[#6f5218]">
+                    {document.photoQualityNote}
                   </p>
                 ) : null}
                 {evidence ? (
@@ -286,21 +315,24 @@ export function DocumentsStep({
         </div>
       ) : null}
 
-      {caseData.mode === "live" &&
-      visibleDocuments.some((document) => document.status === "ready") ? (
+      {caseData.mode === "live" && visibleDocuments.length > 0 ? (
         <div className="mt-5 rounded-3xl border border-[#cbd6ff] bg-[#eef2ff] p-5 text-sm leading-6 text-[#34487f]">
-          <strong className="block">
+          <p aria-live="polite" className="font-semibold">
             {translated(
               language,
-              "Source text is ready",
-              "El texto de la fuente está listo",
+              `${readyPages} pages ready · ${proposedFacts} facts to review · ${failedPages} pages need attention`,
+              `${readyPages} páginas listas · ${proposedFacts} datos por revisar · ${failedPages} páginas necesitan atención`,
             )}
-          </strong>
-          {translated(
-            language,
-            "Lantern has kept each page separate. Fact proposals and evidence review are the next build step; use the fictional sample to explore the complete planning workflow now.",
-            "Lantern ha mantenido cada página separada. Las propuestas de datos y la revisión de evidencia son el siguiente paso; use el ejemplo ficticio para explorar ahora el flujo completo.",
-          )}
+          </p>
+          {readyPages > 0 ? (
+            <p className="mt-1">
+              {translated(
+                language,
+                "Continue to compare each proposed fact with its exact source.",
+                "Continúe para comparar cada dato propuesto con su fuente exacta.",
+              )}
+            </p>
+          ) : null}
         </div>
       ) : null}
     </section>

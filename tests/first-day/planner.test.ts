@@ -44,6 +44,20 @@ describe("First Day deterministic planner", () => {
     );
   });
 
+  it("treats an explicit unclear event as needing clarification", () => {
+    const changed = copyCase();
+    changed.events.push({
+      id: "event-interpreter-unclear",
+      type: "fact_marked_unclear",
+      factId: "fact-interpreter-preference",
+      timestamp: "2026-09-15T12:00:00.000Z",
+    });
+
+    expect(byId(planCase(changed), "task-interpreter").state).toBe(
+      "needs_clarification",
+    );
+  });
+
   it("marks a task done only from an explicit completion event", () => {
     const changed = copyCase();
     changed.events.push({

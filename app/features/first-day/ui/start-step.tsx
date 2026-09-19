@@ -1,6 +1,7 @@
 import type { Language } from "./first-day-copy";
 import { translated } from "./first-day-copy";
 import { Eyebrow } from "./first-day-shared";
+import type { ProviderCapability } from "./use-provider-capability";
 import {
   ArrowRightIcon,
   DocumentIcon,
@@ -11,12 +12,14 @@ import {
 
 export type StartStepProps = {
   language: Language;
+  providerCapability: ProviderCapability;
   onOpenSample: () => void;
   onStartLive: () => void;
 };
 
 export function StartStep({
   language,
+  providerCapability,
   onOpenSample,
   onStartLive,
 }: StartStepProps) {
@@ -69,6 +72,7 @@ export function StartStep({
               </button>
               <button
                 className="fd-secondary-button"
+                disabled={providerCapability !== "available"}
                 onClick={onStartLive}
                 type="button"
               >
@@ -80,6 +84,21 @@ export function StartStep({
                 )}
               </button>
             </div>
+            {providerCapability !== "available" ? (
+              <p aria-live="polite" className="mt-4 text-sm text-[#65716b]">
+                {providerCapability === "checking"
+                  ? translated(
+                      language,
+                      "Checking live document availability…",
+                      "Comprobando la disponibilidad de documentos…",
+                    )
+                  : translated(
+                      language,
+                      "Live document reading is unavailable right now. The complete sample still works.",
+                      "La lectura de documentos no está disponible ahora. El ejemplo completo sigue funcionando.",
+                    )}
+              </p>
+            ) : null}
           </div>
 
           <div className="fd-hero-visual relative min-h-[390px] overflow-hidden border-t border-[#dce2dc] bg-[#182c24] p-7 text-white lg:border-l lg:border-t-0 lg:p-10">

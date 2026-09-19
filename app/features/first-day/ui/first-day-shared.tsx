@@ -29,6 +29,9 @@ export function currentFactView(caseData: FirstDayCase, fact: Fact) {
       state = "confirmed";
       value = event.value;
     }
+    if (event.type === "fact_marked_unclear" && event.factId === fact.id) {
+      state = "unclear";
+    }
   }
 
   const conflict = caseData.conflicts.find((item) =>

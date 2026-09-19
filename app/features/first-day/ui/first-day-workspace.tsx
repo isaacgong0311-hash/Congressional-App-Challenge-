@@ -1,28 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useReducer,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 
-import { explanationToDocument } from "../adapters/explanation";
 import {
   appendFactConfirmation,
   appendFactCorrection,
-  appendSourceRemoval,
+  appendFactUnclear,
   appendTaskCompletion,
 } from "../domain/events";
 import { planCase } from "../domain/planner";
-import {
-  reduceUploadQueue,
-  validateUploadSelection,
-  type UploadRejectionCode,
-} from "../domain/upload-queue";
 import type { FirstDayCase } from "../domain/types";
 import { BlockerStep } from "./blocker-step";
 import { DocumentsStep } from "./documents-step";
@@ -44,6 +31,8 @@ import {
 import { PlanStep } from "./plan-step";
 import { SourcePanel } from "./source-panel";
 import { StartStep } from "./start-step";
+import { canEnterLiveStep, useLiveCase } from "./use-live-case";
+import { useProviderCapability } from "./use-provider-capability";
 
 export function FirstDayWorkspace({ initialCase }: { initialCase: FirstDayCase }) {
   const [caseData, setCaseData] = useState(initialCase);
@@ -52,15 +41,10 @@ export function FirstDayWorkspace({ initialCase }: { initialCase: FirstDayCase }
   const [largeText, setLargeText] = useState(false);
   const [highContrast, setHighContrast] = useState(false);
   const [sourceId, setSourceId] = useState<string | null>(null);
-  const [uploadQueue, dispatchUpload] = useReducer(reduceUploadQueue, []);
-  const [uploadNotice, setUploadNotice] = useState<string | null>(null);
   const sourceTriggerRef = useRef<HTMLButtonElement | null>(null);
-  const uploadFilesRef = useRef(new Map<string, File>());
-  const requestTokensRef = useRef(new Map<string, string>());
-  const abortControllersRef = useRef(new Map<string, AbortController>());
-  const processingDocumentRef = useRef<string | null>(null);
-  const uploadSequence = useRef(0);
   const eventSequence = useRef(0);
+  const providerCapability = useProviderCapability();
+  const liveCase = useLiveCase({ caseData, language, setCaseData });
 
   const plan = useMemo(() => planCase(caseData), [caseData]);
   const activeStepIndex = STEPS.findIndex((step) => step.id === currentStep);
@@ -78,142 +62,13 @@ export function FirstDayWorkspace({ initialCase }: { initialCase: FirstDayCase }
       )
     : undefined;
 
-  useEffect(() => {
-    if (caseData.mode !== "live" || processingDocumentRef.current) return;
-    const next = uploadQueue.find((item) => item.status === "queued");
-    if (!next) return;
-    const queuedPage = next;
-
-    const file = uploadFilesRef.current.get(queuedPage.documentId);
-    if (!file) return;
-    const selectedFile = file;
-
-    const requestId = `${queuedPage.documentId}-request-${Date.now()}`;
-    const controller = new AbortController();
-    processingDocumentRef.current = queuedPage.documentId;
-    requestTokensRef.current.set(queuedPage.documentId, requestId);
-    abortControllersRef.current.set(queuedPage.documentId, controller);
-    dispatchUpload({
-      type: "start",
-      documentId: queuedPage.documentId,
-      requestId,
-    });
-
-    async function processPage() {
-      try {
-        const form = new FormData();
-        form.append("image", selectedFile);
-        form.append("language", language === "Español" ? "Spanish" : "English");
-        form.append("readingLevel", "normal");
-
-        const response = await fetch("/api/explain", {
-          method: "POST",
-          body: form,
-          signal: controller.signal,
-        });
-        const payload: unknown = await response.json();
-        if (!response.ok) {
-          const message =
-            payload &&
-            typeof payload === "object" &&
-            "error" in payload &&
-            typeof payload.error === "string"
-              ? payload.error
-              : "Could not read this page.";
-          throw new Error(message);
-        }
-        if (!payload || typeof payload !== "object") {
-          throw new Error("The document service returned an invalid response.");
-        }
-
-        const currentPage = caseData.documents.find(
-          (document) => document.id === queuedPage.documentId,
-        );
-        const readyDocument = explanationToDocument({
-          documentId: queuedPage.documentId,
-          fallbackLabel: queuedPage.fileName,
-          pageIndex: currentPage?.pageIndex ?? 1,
-          response: payload,
-        });
-
-        if (
-          requestTokensRef.current.get(queuedPage.documentId) !== requestId
-        ) {
-          return;
-        }
-        setCaseData((current) => ({
-          ...current,
-          documents: current.documents.map((document) =>
-            document.id === queuedPage.documentId &&
-            document.status !== "removed"
-              ? readyDocument
-              : document,
-          ),
-        }));
-        dispatchUpload({
-          type: "succeed",
-          documentId: queuedPage.documentId,
-          requestId,
-        });
-      } catch (error) {
-        if (controller.signal.aborted) return;
-        const message =
-          error instanceof Error ? error.message : "Could not read this page.";
-        if (
-          requestTokensRef.current.get(queuedPage.documentId) !== requestId
-        ) {
-          return;
-        }
-        setCaseData((current) => ({
-          ...current,
-          documents: current.documents.map((document) =>
-            document.id === queuedPage.documentId &&
-            document.status !== "removed"
-              ? { ...document, status: "error" }
-              : document,
-          ),
-        }));
-        dispatchUpload({
-          type: "fail",
-          documentId: queuedPage.documentId,
-          requestId,
-          error: message,
-        });
-      } finally {
-        abortControllersRef.current.delete(queuedPage.documentId);
-        if (processingDocumentRef.current === queuedPage.documentId) {
-          processingDocumentRef.current = null;
-        }
-      }
-    }
-
-    void processPage();
-  }, [caseData.documents, caseData.mode, language, uploadQueue]);
-
-  useEffect(
-    () => () => {
-      for (const controller of abortControllersRef.current.values()) {
-        controller.abort();
-      }
-    },
-    [],
-  );
-
   function nextEventId(label: string) {
     eventSequence.current += 1;
     return `event-ui-${label}-${eventSequence.current}`;
   }
 
   function startLiveCase() {
-    for (const controller of abortControllersRef.current.values()) {
-      controller.abort();
-    }
-    uploadFilesRef.current.clear();
-    requestTokensRef.current.clear();
-    abortControllersRef.current.clear();
-    processingDocumentRef.current = null;
-    dispatchUpload({ type: "reset" });
-    setUploadNotice(null);
+    liveCase.reset();
     setCaseData({
       id: `case-live-${Date.now()}`,
       mode: "live",
@@ -237,155 +92,9 @@ export function FirstDayWorkspace({ initialCase }: { initialCase: FirstDayCase }
   }
 
   function openSampleCase() {
-    for (const controller of abortControllersRef.current.values()) {
-      controller.abort();
-    }
-    uploadFilesRef.current.clear();
-    requestTokensRef.current.clear();
-    abortControllersRef.current.clear();
-    processingDocumentRef.current = null;
-    dispatchUpload({ type: "reset" });
-    setUploadNotice(null);
+    liveCase.reset();
     setCaseData(initialCase);
     setCurrentStep("documents");
-  }
-
-  function rejectionMessage(code: UploadRejectionCode) {
-    const messages: Record<UploadRejectionCode, [string, string]> = {
-      unsupported_type: [
-        "Use a JPG or PNG image.",
-        "Use una imagen JPG o PNG.",
-      ],
-      file_too_large: [
-        "Each page must be 10 MB or smaller.",
-        "Cada página debe tener 10 MB o menos.",
-      ],
-      case_too_large: [
-        "This case can contain up to 25 MB total.",
-        "Este caso puede contener hasta 25 MB en total.",
-      ],
-      too_many: [
-        "A case can contain up to five pages.",
-        "Un caso puede contener hasta cinco páginas.",
-      ],
-    };
-    const [english, spanish] = messages[code];
-    return translated(language, english, spanish);
-  }
-
-  function addUploadFiles(files: File[]) {
-    const { accepted, rejected } = validateUploadSelection(uploadQueue, files);
-    if (rejected.length) {
-      setUploadNotice(
-        rejected
-          .map((item) => `${item.fileName}: ${rejectionMessage(item.code)}`)
-          .join(" "),
-      );
-    } else {
-      setUploadNotice(
-        accepted.length
-          ? translated(
-              language,
-              `${accepted.length} page${
-                accepted.length === 1 ? "" : "s"
-              } added. Lantern will read them one at a time.`,
-              `${accepted.length} página${
-                accepted.length === 1 ? "" : "s"
-              } añadida${
-                accepted.length === 1 ? "" : "s"
-              }. Lantern las leerá una por una.`,
-            )
-          : null,
-      );
-    }
-    if (!accepted.length) return;
-
-    const pageStart =
-      caseData.documents.filter((document) => document.status !== "removed")
-        .length + 1;
-    const queueItems = accepted.map((file, index) => {
-      uploadSequence.current += 1;
-      const documentId = `doc-live-${Date.now()}-${uploadSequence.current}`;
-      uploadFilesRef.current.set(documentId, file);
-      return {
-        documentId,
-        fileName: file.name,
-        mimeType: file.type,
-        size: file.size,
-        status: "queued" as const,
-        pageIndex: pageStart + index,
-      };
-    });
-
-    dispatchUpload({
-      type: "enqueue",
-      items: queueItems.map((item) => ({
-        documentId: item.documentId,
-        fileName: item.fileName,
-        mimeType: item.mimeType,
-        size: item.size,
-        status: item.status,
-      })),
-    });
-    setCaseData((current) => ({
-      ...current,
-      documents: [
-        ...current.documents,
-        ...queueItems.map((item) => ({
-          id: item.documentId,
-          label: item.fileName,
-          pageIndex: item.pageIndex,
-          status: "processing" as const,
-          extractedText: "",
-          sourceVersion: "waiting-for-extraction",
-        })),
-      ],
-    }));
-  }
-
-  function retryUpload(documentId: string) {
-    requestTokensRef.current.delete(documentId);
-    setCaseData((current) => ({
-      ...current,
-      documents: current.documents.map((document) =>
-        document.id === documentId
-          ? {
-              ...document,
-              status: "processing",
-              extractedText: "",
-              sourceVersion: "waiting-for-extraction",
-            }
-          : document,
-      ),
-    }));
-    dispatchUpload({ type: "retry", documentId });
-  }
-
-  function removeUpload(documentId: string) {
-    abortControllersRef.current.get(documentId)?.abort();
-    abortControllersRef.current.delete(documentId);
-    requestTokensRef.current.delete(documentId);
-    uploadFilesRef.current.delete(documentId);
-    if (processingDocumentRef.current === documentId) {
-      processingDocumentRef.current = null;
-    }
-    dispatchUpload({ type: "remove", documentId });
-    const removalEvent = {
-      id: nextEventId("source"),
-      documentId,
-      timestamp: new Date().toISOString(),
-    };
-    setCaseData((current) => {
-      const withRemoval = appendSourceRemoval(current, removalEvent);
-      return {
-        ...withRemoval,
-        documents: withRemoval.documents.map((document) =>
-          document.id === documentId
-            ? { ...document, status: "removed" }
-            : document,
-        ),
-      };
-    });
   }
 
   function openSource(evidenceId: string, trigger: HTMLButtonElement) {
@@ -402,6 +111,27 @@ export function FirstDayWorkspace({ initialCase }: { initialCase: FirstDayCase }
     setCaseData((current) =>
       appendFactConfirmation(current, {
         id: nextEventId("fact"),
+        factId,
+        timestamp: new Date().toISOString(),
+      }),
+    );
+  }
+
+  function correctFact(factId: string, value: string) {
+    setCaseData((current) =>
+      appendFactCorrection(current, {
+        id: nextEventId("fact-correction"),
+        factId,
+        value,
+        timestamp: new Date().toISOString(),
+      }),
+    );
+  }
+
+  function markFactUnclear(factId: string) {
+    setCaseData((current) =>
+      appendFactUnclear(current, {
+        id: nextEventId("fact-unclear"),
         factId,
         timestamp: new Date().toISOString(),
       }),
@@ -441,6 +171,7 @@ export function FirstDayWorkspace({ initialCase }: { initialCase: FirstDayCase }
 
   function goForward() {
     const next = STEPS[Math.min(activeStepIndex + 1, STEPS.length - 1)];
+    if (!canEnterLiveStep(caseData, next.id)) return;
     setCurrentStep(next.id);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -455,6 +186,10 @@ export function FirstDayWorkspace({ initialCase }: { initialCase: FirstDayCase }
     continue: translated(language, "Continue", "Continuar"),
     back: translated(language, "Back", "Atrás"),
   };
+  const nextStep = STEPS[activeStepIndex + 1];
+  const canGoForward = nextStep
+    ? canEnterLiveStep(caseData, nextStep.id)
+    : false;
 
   return (
     <div
@@ -614,7 +349,7 @@ export function FirstDayWorkspace({ initialCase }: { initialCase: FirstDayCase }
               {STEPS.map((step, index) => {
                 const active = step.id === currentStep;
                 const visited = index < activeStepIndex;
-                const unavailable = caseData.mode === "live" && index > 1;
+                const unavailable = !canEnterLiveStep(caseData, step.id);
                 return (
                   <li className="min-w-max lg:min-w-0" key={step.id}>
                     <button
@@ -674,18 +409,19 @@ export function FirstDayWorkspace({ initialCase }: { initialCase: FirstDayCase }
               language={language}
               onOpenSample={openSampleCase}
               onStartLive={startLiveCase}
+              providerCapability={providerCapability}
             />
           ) : null}
           {currentStep === "documents" ? (
             <DocumentsStep
               caseData={caseData}
               language={language}
-              onAddFiles={addUploadFiles}
+              onAddFiles={liveCase.addFiles}
               onOpenSource={openSource}
-              onRemove={removeUpload}
-              onRetry={retryUpload}
-              uploadNotice={uploadNotice}
-              uploadQueue={uploadQueue}
+              onRemove={liveCase.remove}
+              onRetry={liveCase.retry}
+              uploadNotice={liveCase.uploadNotice}
+              uploadQueue={liveCase.uploadQueue}
             />
           ) : null}
           {currentStep === "facts" ? (
@@ -693,6 +429,8 @@ export function FirstDayWorkspace({ initialCase }: { initialCase: FirstDayCase }
               caseData={caseData}
               language={language}
               onConfirmFact={confirmFact}
+              onCorrectFact={correctFact}
+              onMarkUnclear={markFactUnclear}
               onOpenSource={openSource}
             />
           ) : null}
@@ -732,8 +470,7 @@ export function FirstDayWorkspace({ initialCase }: { initialCase: FirstDayCase }
                 <ArrowLeftIcon className="h-4 w-4" />
                 {copy.back}
               </button>
-              {currentStep !== "export" &&
-              !(caseData.mode === "live" && currentStep === "documents") ? (
+              {currentStep !== "export" && canGoForward ? (
                 <button
                   className="fd-primary-button"
                   onClick={goForward}

@@ -4,6 +4,7 @@ import { fictionalCase } from "../../app/features/first-day/content/fictional-ca
 import {
   appendFactConfirmation,
   appendFactCorrection,
+  appendFactUnclear,
   appendSourceRemoval,
   appendTaskCompletion,
 } from "../../app/features/first-day/domain/events";
@@ -48,6 +49,20 @@ describe("First Day case events", () => {
       "task_completed",
       "source_removed",
     ]);
+  });
+
+  it("records an unclear review without changing the source fact", () => {
+    const next = appendFactUnclear(fictionalCase, {
+      id: "event-fact-unclear",
+      factId: "fact-interpreter-preference",
+      timestamp: "2026-09-15T12:03:00.000Z",
+    });
+
+    expect(next.events.at(-1)?.type).toBe("fact_marked_unclear");
+    expect(
+      next.facts.find((fact) => fact.id === "fact-interpreter-preference")
+        ?.confirmationState,
+    ).toBe("proposed");
   });
 
   it("rejects unknown record IDs", () => {

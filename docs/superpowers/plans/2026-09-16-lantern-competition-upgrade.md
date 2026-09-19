@@ -8,7 +8,7 @@
 
 **Tech Stack:** Next.js 16 App Router, React 19, TypeScript 5, Tailwind CSS 4, Zod 4, Vitest 4, Vercel AI SDK 6, Groq, Vercel
 
-**Plan status:** Approved by Isaac on 2026-09-16. Tasks 1–5 are complete; Task 6 is next.
+**Plan status:** Approved by Isaac on 2026-09-16. Tasks 1–6 are complete; Task 7 is next.
 
 ---
 
@@ -797,7 +797,7 @@ git commit -m "feat: merge live extraction records safely"
 - Create: `tests/first-day/live-case.test.ts`
 - Create: `tests/first-day/provider-capability.test.ts`
 
-- [ ] **Step 1: Move upload orchestration into a hook**
+- [x] **Step 1: Move upload orchestration into a hook**
 
 The hook owns queue state, file references, abort controllers, request tokens, and notices:
 
@@ -820,11 +820,11 @@ export function useLiveCase(input: {
 
 Use `/api/first-day/extract`, include request/document IDs, parse the JSON as `FirstDayExtractionResponse`, call `adaptLiveExtraction`, then `mergeExtraction`. Keep the existing abort and token guards.
 
-- [ ] **Step 2: Gate live entry on provider capability**
+- [x] **Step 2: Gate live entry on provider capability**
 
 `useProviderCapability` requests `/api/health` once on mount, aborts on unmount, and returns `"checking" | "available" | "unavailable"`. Treat a fetch error, non-200 response, malformed JSON, or `keys.groq !== true` as unavailable. StartStep keeps the fictional action enabled at all times; it disables `Add my documents` until status is available and renders one short explanation for checking or unavailable states. Test the pure response parser with healthy, degraded, malformed, and rejected cases.
 
-- [ ] **Step 3: Add a pure navigation gate and tests**
+- [x] **Step 3: Add a pure navigation gate and tests**
 
 ```ts
 export function canEnterLiveStep(caseData: FirstDayCase, step: StepId) {
@@ -837,13 +837,13 @@ export function canEnterLiveStep(caseData: FirstDayCase, step: StepId) {
 
 Test that a new live case stops at Documents, a case with proposed facts opens Facts, and a case with one confirmed fact can open Plan but not bypass an unresolved invalid extraction error.
 
-- [ ] **Step 4: Render live facts with existing event helpers**
+- [x] **Step 4: Render live facts with existing event helpers**
 
 FactsStep must use every fact's `semanticKey`, confidence, original value, and first evidence reference. For proposed facts show Confirm, Correct, and Not clear. Add an immutable `fact_marked_unclear` event to `CaseEvent` and `events.ts`; the planner treats it like base `unclear`.
 
 Correction UI uses a labeled text input initialized from `originalValue` and calls `appendFactCorrection`. It must not mutate the Fact object.
 
-- [ ] **Step 5: Update the live documents screen**
+- [x] **Step 5: Update the live documents screen**
 
 Replace the “next build step” message with counts:
 
@@ -855,11 +855,11 @@ Replace the “next build step” message with counts:
 
 Continue becomes enabled when at least one validated fact exists. A failed page never disables review for successful pages.
 
-- [ ] **Step 6: Browser acceptance**
+- [x] **Step 6: Browser acceptance**
 
 With a configured development key, upload two synthetic pages. Verify sequential network requests, separate extracted text, proposed facts, fact confirmation, correction history, source dialog focus, removal, retry, and navigation. Without a key, verify the fictional case remains complete and the live error is recoverable.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add app/features/first-day/ui app/features/first-day/domain tests/first-day/live-case.test.ts tests/first-day/provider-capability.test.ts
