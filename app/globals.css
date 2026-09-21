@@ -1,13 +1,33 @@
 @import "tailwindcss";
 
 :root {
-  --background: #eef1f8;
-  --foreground: #0f172a;
+  --background: #f4f1ea;
+  --foreground: #14241e;
+  --lantern-canvas: #f4f1ea;
+  --lantern-surface: #fffefa;
+  --lantern-ink: #14241e;
+  --lantern-muted: #59675f;
+  --lantern-cobalt: #3556d4;
+  --lantern-cobalt-dark: #2948be;
+  --lantern-amber: #e7b23e;
+  --lantern-confirmed: #287a47;
+  --lantern-review: #a1493b;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-canvas: var(--lantern-canvas);
+  --color-surface: var(--lantern-surface);
+  --color-ink: var(--lantern-ink);
+  --color-muted: var(--lantern-muted);
+  --color-cobalt: var(--lantern-cobalt);
+  --color-cobalt-dark: var(--lantern-cobalt-dark);
+  --color-amber: var(--lantern-amber);
+  --color-confirmed: var(--lantern-confirmed);
+  --color-review: var(--lantern-review);
+  --radius-card: 1.25rem;
+  --radius-feature: 1.75rem;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-playfair: var(--font-playfair);
@@ -28,6 +48,67 @@ body {
 
 ::selection {
   background: #c7d7fe;
+}
+
+.lantern-primary-cta,
+.lantern-secondary-cta {
+  display: inline-flex;
+  min-height: 3.25rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  border-radius: 0.85rem;
+  padding: 0.8rem 1.15rem;
+  font-size: 0.92rem;
+  font-weight: 780;
+  transition: transform 160ms ease, background 160ms ease, box-shadow 160ms ease;
+}
+
+.lantern-primary-cta {
+  background: var(--lantern-cobalt);
+  color: white;
+  box-shadow: 0 14px 32px rgba(53, 86, 212, 0.24);
+}
+
+.lantern-primary-cta:hover {
+  background: var(--lantern-cobalt-dark);
+  transform: translateY(-1px);
+}
+
+.lantern-secondary-cta {
+  border: 1px solid rgba(20, 36, 30, 0.16);
+  background: rgba(255, 254, 250, 0.84);
+  color: var(--lantern-ink);
+}
+
+.lantern-secondary-cta:hover {
+  background: white;
+  transform: translateY(-1px);
+}
+
+.lantern-primary-cta:focus-visible,
+.lantern-secondary-cta:focus-visible {
+  outline: 3px solid var(--lantern-amber);
+  outline-offset: 3px;
+}
+
+.lantern-eyebrow {
+  color: var(--lantern-cobalt);
+  font-size: 0.74rem;
+  font-weight: 850;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.lantern-section-title {
+  margin-top: 0.85rem;
+  max-width: 54rem;
+  text-wrap: balance;
+  color: var(--lantern-ink);
+  font-family: var(--font-playfair), Georgia, serif;
+  font-size: clamp(2.7rem, 5.5vw, 5rem);
+  line-height: 1;
+  letter-spacing: -0.047em;
 }
 
 /* ── First Day workspace ─────────────────────────────────────── */
