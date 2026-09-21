@@ -8,7 +8,7 @@
 
 **Tech Stack:** Next.js 16 App Router, React 19, TypeScript 5, Tailwind CSS 4, Zod 4, Vitest 4, Vercel AI SDK 6, Groq, Vercel
 
-**Plan status:** Approved by Isaac on 2026-09-16. Tasks 1–11 are complete; Task 12 is next.
+**Plan status:** Approved by Isaac on 2026-09-16. Tasks 1–11 are complete; Task 12 release verification is in progress.
 
 ---
 
@@ -1174,7 +1174,7 @@ git commit -m "test: add held-out First Day evaluation"
 - Modify: `README.md`
 - Modify: `docs/development-log.md`
 
-- [ ] **Step 1: Add the technical explanation page**
+- [x] **Step 1: Add the technical explanation page**
 
 Render a static, accessible five-stage explanation:
 
@@ -1184,7 +1184,7 @@ Document → Exact evidence → Confirmed fact → Explicit dependency → Deriv
 
 Use one fictional record at each stage. Explain that AI proposes the first two stages while validation, confirmation, dependencies, and task status are deterministic. Link to this page from the First Day footer, not the critical family path.
 
-- [ ] **Step 2: Add deterministic browser testing**
+- [x] **Step 2: Add deterministic browser testing**
 
 Install `@playwright/test` and `@axe-core/playwright` as dev dependencies. Add scripts:
 
@@ -1222,7 +1222,7 @@ export default defineConfig({
 
 The fictional journey uses accessible roles and names, completes all six steps, resolves the conflict, switches to Spanish, and runs axe on each screen. The live journey intercepts `/api/first-day/extract` with stored synthetic responses to prove partial success, retry, source removal, and late-response rejection without calling Groq. Fail the suite on serious or critical axe violations and attach traces/screenshots only for synthetic data.
 
-- [ ] **Step 3: Add free CI and browser security headers**
+- [x] **Step 3: Add free CI and browser security headers**
 
 Create `.github/workflows/ci.yml` with Node 20, `npm ci`, Playwright Chromium installation, lint, unit tests, held-out evaluation, production build, and E2E tests. Do not expose provider secrets to pull-request builds:
 
@@ -1269,15 +1269,15 @@ const nextConfig: NextConfig = {
 
 Document that these headers reduce browser attack surface but do not replace input validation, exact-quote checks, or provider privacy controls.
 
-- [ ] **Step 4: Write the exact three-minute script**
+- [x] **Step 4: Write the exact three-minute script**
 
 Use the timing in the approved design. The script names tools and coding languages, demonstrates functionality, states the target audience and one-sentence purpose, explains one technical challenge, and keeps every factual claim within measured results.
 
-- [ ] **Step 5: Complete AI and contribution disclosure**
+- [x] **Step 5: Complete AI and contribution disclosure**
 
 List provider-backed runtime features separately from development assistance. Identify student-authored architecture decisions, domain rules, tests, source review, evaluation, and presentation work. Include the upstream `TRANSLATEtheform` revision and all material libraries.
 
-- [ ] **Step 6: Run the full release gate**
+- [x] **Step 6: Run the full release gate**
 
 ```bash
 npm run lint
@@ -1316,21 +1316,21 @@ Deploy the tagged commit and record its URL and deployment ID in `docs/submissio
 
 ## Final acceptance checklist
 
-- [ ] General Lantern remains backward compatible.
-- [ ] Fictional First Day works without provider access.
-- [ ] Live pages process sequentially and independently.
-- [ ] Every proposed fact has a quote from the correct source.
-- [ ] Corrections preserve originals and append history.
-- [ ] Conflict resolution changes affected tasks only.
-- [ ] Pending or stale procedures cannot make a live task ready.
-- [ ] Practice outputs cannot confirm facts.
-- [ ] Calendar output contains confirmed unambiguous dates only.
-- [ ] Print and JSON output expose unresolved items and rule versions.
-- [ ] Logs contain no raw image or extracted document text.
-- [ ] Live entry is disabled with a clear explanation when provider health is degraded.
+- [x] General Lantern remains backward compatible.
+- [x] Fictional First Day works without provider access.
+- [x] Live pages process sequentially and independently.
+- [x] Every proposed fact has a quote from the correct source.
+- [x] Corrections preserve originals and append history.
+- [x] Conflict resolution changes affected tasks only.
+- [x] Pending or stale procedures cannot make a live task ready.
+- [x] Practice outputs cannot confirm facts.
+- [x] Calendar output contains confirmed unambiguous dates only.
+- [x] Print and JSON output expose unresolved items and rule versions.
+- [x] Logs contain no raw image or extracted document text.
+- [x] Live entry is disabled with a clear explanation when provider health is degraded.
 - [ ] Security headers are present on production HTML and API responses.
-- [ ] Playwright mobile and desktop journeys pass without provider secrets.
+- [x] Playwright mobile and desktop journeys pass without provider secrets.
 - [ ] CI passes lint, unit, evaluation, build, E2E, and axe gates.
-- [ ] Evaluation reports denominators, failures, latency, and cost honestly.
+- [x] Evaluation reports denominators, failures, latency, and cost honestly.
 - [ ] The deployed demo and repository match submission claims.
-- [ ] AI use and student contribution are fully disclosed.
+- [x] AI use and student contribution are fully disclosed.

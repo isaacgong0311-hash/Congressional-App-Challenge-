@@ -515,6 +515,23 @@ export function FirstDayWorkspace({ initialCase }: { initialCase: FirstDayCase }
         </main>
       </div>
 
+      <footer
+        aria-hidden={openEvidence ? true : undefined}
+        className="border-t border-[#d9dfda] bg-white/60 px-5 py-7 text-center text-sm text-[#58665f] print:hidden"
+        inert={openEvidence ? true : undefined}
+      >
+        <Link
+          className="font-semibold text-[#3556d4] underline decoration-[#aebbf2] underline-offset-4 hover:text-[#2948be]"
+          href="/first-day/how-it-works"
+        >
+          {translated(
+            language,
+            "See how First Day turns evidence into a plan",
+            "Vea cómo Primer Día convierte la evidencia en un plan",
+          )}
+        </Link>
+      </footer>
+
       {openEvidence ? (
         <SourcePanel
           document={openDocument}

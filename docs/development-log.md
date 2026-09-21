@@ -67,6 +67,21 @@ Provider pricing and retention terms are external and may change. The project do
 - `source_checked` means the text matched the published district page. It does not mean Round Rock ISD reviewed, approved, endorsed, or partnered with Lantern.
 - Procedure checks expire after 180 days in the deterministic planner layer. Pending or stale procedures cannot independently make a live task ready.
 
+## 2026-09-19 — Grounded live planning and portable results
+
+- Added a dedicated `/api/first-day/extract` contract that returns provider proposals only after strict schema validation. Exact quotes must appear in the correct extracted page text before facts enter the case.
+- Added fact-by-fact family review, append-only confirmations/corrections, cross-document conflict detection, school-reported resolution events, and five explicit live task families.
+- Added structured JSON downloads that exclude images and extracted page text, plus stable all-day calendar events for confirmed, complete dates only.
+- Verified Letter and A4 print layouts, responsive export behavior, and automated WCAG A/AA scans. A contrast issue found during the export scan was corrected before commit.
+
+## 2026-09-20 — Competition proof and release preparation
+
+- Added 20 synthetic held-out packets and separately authored expectations across straightforward enrollment, ambiguous dates, conflicting locations, documented alternatives, and follow-up corrections.
+- The initial deterministic report records 32/32 fact precision and recall, 32/32 exact-quote coverage, 8/8 intended conflicts with zero false positives, 0/8 date-normalization errors, and 34/34 ready tasks with source coverage. Provider latency and cost are explicitly not measured.
+- Added Playwright mobile and desktop journeys for the complete fictional case and a mocked live path covering partial success, retry, source removal, late-response rejection, and missing-provider recovery without exposing a provider key.
+- Added a public technical explanation, free GitHub Actions CI, and browser security headers on all routes. The headers reduce browser attack surface but do not replace input validation, evidence checks, or provider privacy controls.
+- Applied Next.js App Router guidance to keep the explanation page static and server-rendered, and React review guidance to keep shared task localization outside the export and plan components.
+
 ## AI assistance disclosure
 
 OpenAI Codex assisted with:
@@ -77,5 +92,7 @@ OpenAI Codex assisted with:
 - React component and CSS implementation;
 - debugging compiler, lint, and dependency-version issues;
 - documentation drafting.
+
+Runtime AI behavior is separate from development assistance. Groq is used only when a configured runtime feature sends a request; the fictional workflow, planner, exports, evaluation, and automated browser journeys do not require a provider call.
 
 The student is responsible for reviewing, understanding, testing, adapting, and presenting the submitted work. Before submission, the student should be able to explain the evidence model, why unknown does not equal false, how all-of/any-of dependencies work, how a source removal affects completed tasks, and why simulated call responses cannot confirm real facts.

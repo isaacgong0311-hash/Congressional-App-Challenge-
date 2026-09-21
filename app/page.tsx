@@ -514,7 +514,7 @@ export default function Home() {
                 <em className="not-italic text-blue-600">We&apos;ll explain it.</em>
               </h1>
 
-              <p className="mx-auto mt-5 max-w-md text-pretty text-base leading-relaxed text-slate-500">
+              <p className="mx-auto mt-5 max-w-md text-pretty text-base leading-relaxed text-slate-600">
                 For immigrants, seniors, and families navigating confusing official letters — take a photo and we&apos;ll explain it in plain language, warn you of scams, and even rehearse the phone call with you.
               </p>
 
@@ -524,10 +524,10 @@ export default function Home() {
                   <span className="rounded-full bg-red-100 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-red-700">
                     {DEMO_ITEMS[demoIdx].label}
                   </span>
-                  <span className="text-xs font-semibold text-emerald-600">✓ Plain language</span>
+                  <span className="text-xs font-semibold text-emerald-700">✓ Plain language</span>
                 </div>
                 <div className="p-5">
-                  <p className="text-sm leading-relaxed text-slate-400 line-through decoration-slate-300">
+                  <p className="text-sm leading-relaxed text-slate-600 line-through decoration-slate-500">
                     {DEMO_ITEMS[demoIdx].original}
                   </p>
                   <div className="my-3 flex justify-center">
@@ -543,7 +543,7 @@ export default function Home() {
                       <button key={i} onClick={() => setDemoIdx(i)} className={`h-1.5 rounded-full transition-all ${i === demoIdx ? "w-5 bg-blue-600" : "w-1.5 bg-slate-300"}`} aria-label={`Demo ${i + 1}`} />
                     ))}
                   </div>
-                  <span className="text-xs font-medium text-emerald-600">✓ No app storage</span>
+                  <span className="text-xs font-medium text-emerald-700">✓ No app storage</span>
                 </div>
               </div>
 
@@ -552,23 +552,23 @@ export default function Home() {
                 {[["10+", "languages"], ["16", "verified programs"], ["0", "accounts needed"]].map(([n, l]) => (
                   <div key={l} className="flex-1 py-4">
                     <p className="text-xl font-bold text-blue-700">{n}</p>
-                    <p className="text-xs text-slate-500">{l}</p>
+                    <p className="text-xs text-slate-600">{l}</p>
                   </div>
                 ))}
               </div>
 
               {/* social proof */}
-              <p className="mt-4 max-w-sm text-center text-xs text-slate-500">
+              <p className="mt-4 max-w-sm text-center text-xs text-slate-600">
                 About 1 in 5 people who qualify for the Earned Income Tax Credit never claim it — often because the paperwork is confusing.{" "}
                 <a href="https://www.irs.gov/credits-deductions/individuals/earned-income-tax-credit-eitc" target="_blank" rel="noopener noreferrer" className="font-medium text-blue-600 underline underline-offset-2">IRS</a>
               </p>
 
               {/* category chips */}
-              <div className="mt-4 flex flex-wrap justify-center gap-x-4 gap-y-1 text-xs text-slate-500">
+              <div className="mt-4 flex flex-wrap justify-center gap-x-4 gap-y-1 text-xs text-slate-600">
                 {["Medical bill", "Benefits letter", "Utility notice", "School form", "Legal notice", "Immigration letter"].map((ex, i, arr) => (
                   <span key={ex} className="flex items-center gap-4">
                     {ex}
-                    {i < arr.length - 1 && <span className="text-slate-300">|</span>}
+                    {i < arr.length - 1 && <span className="text-slate-500">|</span>}
                   </span>
                 ))}
               </div>
@@ -617,14 +617,14 @@ export default function Home() {
                 <div key={title} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                   <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-xl">{icon}</span>
                   <h3 className="mt-3 font-bold text-slate-900">{title}</h3>
-                  <p className="mt-1.5 text-sm leading-relaxed text-slate-500">{desc}</p>
+                  <p className="mt-1.5 text-sm leading-relaxed text-slate-600">{desc}</p>
                 </div>
               ))}
             </div>
 
             {/* How It Works */}
             <div className="mt-8 overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-              <p className="mb-5 text-xs font-bold uppercase tracking-widest text-slate-400">How it works</p>
+              <p className="mb-5 text-xs font-bold uppercase tracking-widest text-slate-600">How it works</p>
               <div className="grid grid-cols-2 gap-5 sm:grid-cols-4">
                 {[
                   { icon: "📸", n: 1, label: "Take a photo", desc: "Snap or upload any letter, bill, or notice — up to 10 MB." },
@@ -638,7 +638,7 @@ export default function Home() {
                       <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-orange-400 text-[10px] font-bold text-white">{n}</span>
                     </div>
                     <p className="mt-2.5 text-sm font-semibold text-slate-800">{label}</p>
-                    <p className="mt-1 text-xs leading-relaxed text-slate-500">{desc}</p>
+                    <p className="mt-1 text-xs leading-relaxed text-slate-600">{desc}</p>
                   </div>
                 ))}
               </div>

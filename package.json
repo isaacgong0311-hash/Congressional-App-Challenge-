@@ -9,24 +9,28 @@
     "lint": "eslint",
     "test": "vitest run",
     "test:watch": "vitest",
-    "evaluate:first-day": "tsx evaluation/first-day/run.ts"
+    "evaluate:first-day": "tsx evaluation/first-day/run.ts",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed"
   },
   "dependencies": {
     "@ai-sdk/google": "^3.0.82",
     "@ai-sdk/groq": "^3.0.41",
     "ai": "^6.0.205",
-    "next": "16.2.9",
+    "next": "^16.3.5",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@playwright/test": "^1.63.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "16.2.9",
+    "eslint-config-next": "^16.3.5",
     "tailwindcss": "^4",
     "tsx": "^4.23.13",
     "typescript": "^5",
