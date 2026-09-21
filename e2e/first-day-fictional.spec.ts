@@ -157,3 +157,21 @@ test("task completion can be undone without deleting history", async ({ page }) 
     registrationTask.getByRole("button", { name: "Mark done" }),
   ).toBeVisible();
 });
+
+test("only harmless Lantern preferences persist locally", async ({ page }) => {
+  await page.goto("/first-day");
+  await page.getByRole("button", { name: "Toggle large text" }).first().click();
+  await page.getByRole("button", { name: "Open the sample case" }).click();
+  const storage = await page.evaluate(() =>
+    Object.fromEntries(
+      Array.from({ length: localStorage.length }, (_, index) => {
+        const key = localStorage.key(index) ?? "";
+        return [key, localStorage.getItem(key)];
+      }),
+    ),
+  );
+  expect(Object.keys(storage)).toEqual(["lantern.preferences.v1"]);
+  expect(JSON.stringify(storage)).not.toContain("Maya");
+  expect(JSON.stringify(storage)).not.toContain("Welcome Center");
+  expect(JSON.stringify(storage)).not.toContain("fact-");
+});

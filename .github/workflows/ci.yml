@@ -24,6 +24,7 @@ jobs:
       - run: npm run evaluate:first-day
       - run: npm run build
       - run: npm run test:e2e
+      - run: npm run test:lighthouse
       - name: Upload Playwright report on failure
         if: failure()
         uses: actions/upload-artifact@v4

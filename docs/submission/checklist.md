@@ -1,11 +1,13 @@
 # Competition release checklist
 
-## Release identity
+## Previous production release identity
 
 - Candidate tag: `competition-candidate-v1`
 - Git commit: `af9cfb78f8e8ec3946bf90689ce7e118b84b92e3`
 - Production URL: `https://lantern-first-day.vercel.app`
 - Vercel deployment ID: `dpl_7dkQbkdukbhBo6yXS28H52vUiqHF`
+
+The cohesive frontend overhaul is being verified on `codex/frontend-overhaul`; its preview and production identifiers must be recorded here when promoted.
 
 ## Automated gate
 
@@ -14,12 +16,15 @@
 - [x] `npm run evaluate:first-day`
 - [x] `npm run build`
 - [x] `npm run test:e2e`
+- [x] `npm run test:lighthouse`
 - [x] `git diff --check`
 - [x] GitHub Actions CI passes on the pushed candidate
 
 ## Product acceptance
 
-- [x] General Lantern remains available at `/`.
+- [x] First Day is the flagship experience at `/`.
+- [x] General Lantern remains available at `/explain`.
+- [x] Privacy disclosures are available at `/privacy`.
 - [x] Fictional First Day works without provider access.
 - [x] Live pages process sequentially and independently.
 - [x] Every accepted proposal has an exact quote from its source page.
