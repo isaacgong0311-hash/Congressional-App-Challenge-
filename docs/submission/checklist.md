@@ -3,9 +3,9 @@
 ## Release identity
 
 - Candidate tag: `competition-candidate-v1`
-- Git commit: pending final release commit
-- Production URL: pending verified deployment
-- Vercel deployment ID: pending verified deployment
+- Git commit: `af9cfb78f8e8ec3946bf90689ce7e118b84b92e3`
+- Production URL: `https://lantern-first-day.vercel.app`
+- Vercel deployment ID: `dpl_7dkQbkdukbhBo6yXS28H52vUiqHF`
 
 ## Automated gate
 
@@ -15,7 +15,7 @@
 - [x] `npm run build`
 - [x] `npm run test:e2e`
 - [x] `git diff --check`
-- [ ] GitHub Actions CI passes on the pushed candidate
+- [x] GitHub Actions CI passes on the pushed candidate
 
 ## Product acceptance
 
@@ -38,15 +38,15 @@
 
 ## Manual production verification
 
-- [ ] `GET /` returns 200.
-- [ ] `GET /first-day` returns 200.
-- [ ] `GET /first-day/how-it-works` returns 200.
-- [ ] `GET /api/health` reports the actual production provider capability.
-- [ ] Fictional six-screen journey completes in English and Spanish.
-- [ ] One synthetic live upload completes when production capability is available.
-- [ ] Letter and A4 print output contain no clipped cards or interactive controls.
-- [ ] Production HTML and API responses contain the four security headers.
-- [ ] No build or runtime errors appear during the synthetic checks.
+- [x] `GET /` returns 200.
+- [x] `GET /first-day` returns 200.
+- [x] `GET /first-day/how-it-works` returns 200.
+- [x] `GET /api/health` accurately reports degraded provider capability (`503`, `groq: false`).
+- [x] Fictional six-screen journey completes in English and Spanish.
+- [x] Live synthetic upload is not applicable while provider capability is unavailable; live entry is correctly disabled.
+- [x] Letter and A4 print output contain no clipped cards or interactive controls.
+- [x] Production HTML and API responses contain the four security headers.
+- [x] No unexpected build or runtime errors appear during the synthetic checks.
 
 ## Known limitations
 
@@ -55,3 +55,4 @@
 - The interface supports English and Spanish; extracted school content is not guaranteed to be available in every language.
 - Provider latency and cost were not measured in the offline held-out evaluation.
 - School procedures can change. The deterministic freshness gate requires re-review rather than treating an old snapshot as current.
+- Production currently has no `GROQ_API_KEY`, so live document intake is disabled and `/api/health` intentionally returns a degraded response. The complete fictional workflow remains available without a provider.

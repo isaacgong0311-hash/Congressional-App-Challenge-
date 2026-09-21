@@ -8,7 +8,7 @@
 
 **Tech Stack:** Next.js 16 App Router, React 19, TypeScript 5, Tailwind CSS 4, Zod 4, Vitest 4, Vercel AI SDK 6, Groq, Vercel
 
-**Plan status:** Approved by Isaac on 2026-09-16. Tasks 1–11 are complete; Task 12 release verification is in progress.
+**Plan status:** Approved by Isaac on 2026-09-16. The competition candidate is released; optional production provider activation remains documented below.
 
 ---
 
@@ -1303,7 +1303,9 @@ GET /api/health             200 with groq: true
 
 Run one synthetic upload and the complete fictional flow. Inspect build/runtime errors without reading or retaining document content.
 
-- [ ] **Step 8: Commit documentation and tag the candidate**
+Release verification on 2026-09-20 confirmed the three public pages, the complete fictional English/Spanish flow, the four security headers, a READY Vercel deployment, and green GitHub Actions CI. Production has no `GROQ_API_KEY`, so `/api/health` accurately reports `groq: false` and live intake remains disabled; no synthetic live upload was sent.
+
+- [x] **Step 8: Commit documentation and tag the candidate**
 
 ```bash
 git add app/first-day/how-it-works e2e playwright.config.ts .github/workflows/ci.yml next.config.ts package.json package-lock.json README.md docs/development-log.md docs/submission
@@ -1328,9 +1330,9 @@ Deploy the tagged commit and record its URL and deployment ID in `docs/submissio
 - [x] Print and JSON output expose unresolved items and rule versions.
 - [x] Logs contain no raw image or extracted document text.
 - [x] Live entry is disabled with a clear explanation when provider health is degraded.
-- [ ] Security headers are present on production HTML and API responses.
+- [x] Security headers are present on production HTML and API responses.
 - [x] Playwright mobile and desktop journeys pass without provider secrets.
-- [ ] CI passes lint, unit, evaluation, build, E2E, and axe gates.
+- [x] CI passes lint, unit, evaluation, build, E2E, and axe gates.
 - [x] Evaluation reports denominators, failures, latency, and cost honestly.
-- [ ] The deployed demo and repository match submission claims.
+- [x] The deployed demo and repository match submission claims.
 - [x] AI use and student contribution are fully disclosed.
