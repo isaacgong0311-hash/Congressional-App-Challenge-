@@ -7,7 +7,17 @@
 - Production URL: `https://lantern-first-day.vercel.app`
 - Vercel deployment ID: `dpl_7dkQbkdukbhBo6yXS28H52vUiqHF`
 
-The cohesive frontend overhaul is being verified on `codex/frontend-overhaul`; its preview and production identifiers must be recorded here when promoted.
+The cohesive frontend overhaul was promoted from its verified preview on 2026-09-21.
+
+## Cohesive frontend release identity
+
+- Release branch: `codex/frontend-overhaul`
+- Production code commit: `7bdca699c82bd530d31ff6a51f11a384124d4fbb`
+- Passing GitHub Actions run: `35616883073`
+- Preview URL: `https://lantern-first-lc80wfrzt-isaacgong0311-5396s-projects.vercel.app`
+- Preview deployment ID: `dpl_3y2et1vcwNSGP8U8hBKcTAj2SyjT`
+- Production URL: `https://lantern-first-day.vercel.app`
+- Production deployment ID: `dpl_CG7sxGEGoNAzEhRbrMkhiTBRHLVT`
 
 ## Automated gate
 
