@@ -11,6 +11,7 @@ import {
 } from "./icons";
 
 export type StartStepProps = {
+  allowLive?: boolean;
   language: Language;
   providerCapability: ProviderCapability;
   onOpenSample: () => void;
@@ -18,6 +19,7 @@ export type StartStepProps = {
 };
 
 export function StartStep({
+  allowLive = true,
   language,
   providerCapability,
   onOpenSample,
@@ -60,6 +62,7 @@ export function StartStep({
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <button
                 className="fd-primary-button"
+                data-demo-target="true"
                 onClick={onOpenSample}
                 type="button"
               >
@@ -72,7 +75,7 @@ export function StartStep({
               </button>
               <button
                 className="fd-secondary-button"
-                disabled={providerCapability !== "available"}
+                disabled={!allowLive || providerCapability !== "available"}
                 onClick={onStartLive}
                 type="button"
               >
@@ -84,9 +87,15 @@ export function StartStep({
                 )}
               </button>
             </div>
-            {providerCapability !== "available" ? (
+            {!allowLive || providerCapability !== "available" ? (
               <p aria-live="polite" className="mt-4 text-sm text-[#65716b]">
-                {providerCapability === "checking"
+                {!allowLive
+                  ? translated(
+                      language,
+                      "Guided demo mode uses fictional data only. Exit demo mode to add live documents.",
+                      "La demostración guiada usa solo datos ficticios. Salga de la demo para añadir documentos reales.",
+                    )
+                  : providerCapability === "checking"
                   ? translated(
                       language,
                       "Checking live document availability…",

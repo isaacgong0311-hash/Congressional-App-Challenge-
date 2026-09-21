@@ -31,9 +31,9 @@ export type ExportStepProps = {
 
 const TASK_ORDER = {
   needs_clarification: 0,
-  needs_review: 1,
-  waiting: 2,
-  ready: 3,
+  ready: 1,
+  needs_review: 2,
+  waiting: 3,
   done: 4,
 } as const;
 
@@ -60,6 +60,8 @@ export function ExportStep({
   const orderedTasks = [...plan.tasks].sort(
     (left, right) => TASK_ORDER[left.state] - TASK_ORDER[right.state],
   );
+  const bestNext = orderedTasks.find((task) => task.state !== "done");
+  const remainingTasks = orderedTasks.filter((task) => task.id !== bestNext?.id);
   const planTitle = caseData.childFirstName
     ? translated(
         language,
@@ -120,6 +122,26 @@ export function ExportStep({
         </p>
       </div>
 
+      <div className="mt-6 grid gap-3 print:hidden md:grid-cols-3">
+        <button className="fd-export-action" data-demo-target="true" onClick={onPrint} type="button">
+          <PrinterIcon className="h-6 w-6 text-cobalt" />
+          <span><strong>{translated(language, "Print or save as PDF", "Imprimir o guardar como PDF")}</strong><small>{translated(language, "A family-readable copy", "Una copia fácil de leer")}</small></span>
+        </button>
+        <button className="fd-export-action" onClick={downloadPlan} type="button">
+          <DocumentIcon className="h-6 w-6 text-cobalt" />
+          <span><strong>{translated(language, "Download plan JSON", "Descargar plan JSON")}</strong><small>{translated(language, "Portable, complete event history", "Historial completo y portátil de eventos")}</small></span>
+        </button>
+        <button aria-describedby="fd-calendar-note" className="fd-export-action" disabled={dates.length === 0} onClick={downloadCalendar} type="button">
+          <ClockIcon className="h-6 w-6 text-cobalt" />
+          <span><strong>{translated(language, "Add dates to calendar", "Añadir fechas al calendario")}</strong><small>{translated(language, "Confirmed dates only", "Solo fechas confirmadas")}</small></span>
+        </button>
+      </div>
+      <p className="mt-3 text-sm text-muted print:hidden" id="fd-calendar-note">
+        {dates.length > 0
+          ? translated(language, `${dates.length} confirmed date${dates.length === 1 ? "" : "s"} will be included.`, `Se incluirá${dates.length === 1 ? "" : "n"} ${dates.length} fecha${dates.length === 1 ? "" : "s"} confirmada${dates.length === 1 ? "" : "s"}.`)
+          : translated(language, "Calendar export is available after you confirm a complete, unambiguous date.", "La exportación al calendario estará disponible después de confirmar una fecha completa y sin ambigüedad.")}
+      </p>
+
       <article className="fd-print-plan mt-8 rounded-[2rem] border border-[#d9dfda] bg-white p-6 shadow-[0_20px_70px_rgba(24,46,38,.08)] sm:p-10">
         <div className="flex flex-col justify-between gap-5 border-b border-[#dfe4df] pb-7 sm:flex-row sm:items-start">
           <div>
@@ -170,13 +192,20 @@ export function ExportStep({
                     <p className="mt-1 text-sm leading-6 text-[#66572f]">
                       {values.join(" · ")}
                     </p>
-                    <p className="mt-2 text-xs text-[#756846]">
-                      {conflict.factIds.join(", ")}
-                    </p>
                   </div>
                 );
               })}
             </div>
+          </section>
+        ) : null}
+
+        {bestNext ? (
+          <section className="mt-7 break-inside-avoid rounded-2xl border border-[#ccd6ff] bg-[#eef2ff] p-5">
+            <h3 className="text-sm font-bold uppercase tracking-[0.15em] text-cobalt">
+              {translated(language, "Best next step", "Mejor paso siguiente")}
+            </h3>
+            <p className="mt-3 text-lg font-bold text-ink">{localizedTaskCopy(bestNext, language).title}</p>
+            <p className="mt-1 text-sm leading-6 text-[#53628b]">{localizedTaskCopy(bestNext, language).action}</p>
           </section>
         ) : null}
 
@@ -185,7 +214,7 @@ export function ExportStep({
             {translated(language, "Plan steps", "Pasos del plan")}
           </h3>
           <div className="space-y-4">
-            {orderedTasks.map((task) => {
+            {remainingTasks.map((task) => {
               const meta = STATE_META[task.state];
               const taskCopy = localizedTaskCopy(task, language);
               return (
@@ -201,15 +230,28 @@ export function ExportStep({
                     <p className="mt-1 text-sm leading-6 text-[#5d6963]">
                       {taskCopy.action}
                     </p>
-                    <p className="mt-2 text-xs text-[#5f6d66]">
-                      {translated(language, "Source references", "Referencias")}
-                      : {task.evidenceIds.join(", ")}
-                    </p>
                   </div>
                 </div>
               );
             })}
           </div>
+        </section>
+
+        <section className="mt-7 break-inside-avoid border-t border-[#dfe4df] pt-6">
+          <h3 className="text-sm font-bold uppercase tracking-[0.15em] text-[#40534a]">
+            {translated(language, "Confirmed calendar dates", "Fechas confirmadas del calendario")}
+          </h3>
+          {dates.length > 0 ? (
+            <ul className="mt-4 space-y-2">
+              {dates.map((date) => (
+                <li className="rounded-2xl bg-[#f4f6f2] p-4 text-sm font-semibold" key={`${date.title}-${date.date}`}>
+                  {date.title} · {date.date}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="mt-3 text-sm text-muted">{translated(language, "No complete confirmed dates yet.", "Todavía no hay fechas completas confirmadas.")}</p>
+          )}
         </section>
 
         <section className="mt-7 break-inside-avoid border-t border-[#dfe4df] pt-6">
@@ -224,9 +266,6 @@ export function ExportStep({
                     {fact.label}
                   </dt>
                   <dd className="mt-2 font-semibold text-[#23342d]">{value}</dd>
-                  <dd className="mt-2 text-xs text-[#66736c]">
-                    {fact.evidenceIds.join(", ")}
-                  </dd>
                 </div>
               ))}
             </dl>
@@ -241,15 +280,11 @@ export function ExportStep({
           )}
         </section>
 
-        <section className="mt-7 break-inside-avoid border-t border-[#dfe4df] pt-6">
-          <h3 className="text-sm font-bold uppercase tracking-[0.15em] text-[#40534a]">
-            {translated(
-              language,
-              "Procedure review metadata",
-              "Metadatos de revisión del procedimiento",
-            )}
-          </h3>
-          <div className="mt-4 space-y-3">
+        <details className="fd-technical-details mt-7 break-inside-avoid border-t border-[#dfe4df] pt-6">
+          <summary className="min-h-11 cursor-pointer py-3 text-sm font-bold uppercase tracking-[0.15em] text-[#40534a]">
+            {translated(language, "Sources and technical details", "Fuentes y detalles técnicos")}
+          </summary>
+          <div className="mt-3 space-y-3">
             {caseData.procedures.map((procedure) => (
               <div
                 className="rounded-2xl border border-[#e0e5e1] p-4 text-sm"
@@ -262,16 +297,16 @@ export function ExportStep({
                 </p>
               </div>
             ))}
+            <div className="rounded-2xl border border-[#e0e5e1] p-4 text-sm">
+              <p className="font-semibold">{translated(language, "Rule version", "Versión de reglas")}: {caseData.ruleVersion}</p>
+              <p className="mt-2 break-words font-mono text-xs text-muted">
+                {translated(language, "Evidence IDs", "IDs de evidencia")}: {caseData.evidence.map((item) => item.id).join(", ")}
+              </p>
+            </div>
           </div>
-        </section>
+        </details>
 
-        <div className="mt-7 grid break-inside-avoid gap-4 border-t border-[#dfe4df] pt-6 sm:grid-cols-2">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[0.15em] text-[#5f6d66]">
-              {translated(language, "Rule version", "Versión de reglas")}
-            </p>
-            <p className="mt-2 text-sm font-semibold">{caseData.ruleVersion}</p>
-          </div>
+        <div className="mt-7 break-inside-avoid border-t border-[#dfe4df] pt-6">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.15em] text-[#5f6d66]">
               {translated(language, "Evidence note", "Nota de evidencia")}
@@ -292,59 +327,6 @@ export function ExportStep({
           </div>
         </div>
       </article>
-
-      <div className="mt-6 flex flex-wrap gap-3 print:hidden">
-        <button className="fd-primary-button" onClick={onPrint} type="button">
-          <PrinterIcon className="h-5 w-5" />
-          {translated(
-            language,
-            "Print or save as PDF",
-            "Imprimir o guardar como PDF",
-          )}
-        </button>
-        <button
-          className="fd-secondary-button"
-          onClick={downloadPlan}
-          type="button"
-        >
-          <DocumentIcon className="h-5 w-5" />
-          {translated(
-            language,
-            "Download plan JSON",
-            "Descargar plan JSON",
-          )}
-        </button>
-        <button
-          aria-describedby="fd-calendar-note"
-          className="fd-secondary-button"
-          disabled={dates.length === 0}
-          onClick={downloadCalendar}
-          type="button"
-        >
-          <ClockIcon className="h-5 w-5" />
-          {translated(
-            language,
-            "Add confirmed dates to calendar",
-            "Añadir fechas confirmadas al calendario",
-          )}
-        </button>
-      </div>
-      <p
-        className="mt-3 text-sm text-[#64716a] print:hidden"
-        id="fd-calendar-note"
-      >
-        {dates.length > 0
-          ? translated(
-              language,
-              `${dates.length} confirmed date${dates.length === 1 ? "" : "s"} will be included.`,
-              `Se incluirá${dates.length === 1 ? "" : "n"} ${dates.length} fecha${dates.length === 1 ? "" : "s"} confirmada${dates.length === 1 ? "" : "s"}.`,
-            )
-          : translated(
-              language,
-              "Calendar export is available after you confirm a complete, unambiguous date.",
-              "La exportación al calendario estará disponible después de confirmar una fecha completa y sin ambigüedad.",
-            )}
-      </p>
     </section>
   );
 }

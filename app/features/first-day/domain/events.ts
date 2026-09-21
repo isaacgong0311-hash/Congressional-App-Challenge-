@@ -59,6 +59,39 @@ export function appendTaskCompletion(
   return appendEvent(caseData, { ...input, type: "task_completed" });
 }
 
+export function appendTaskCompletionReversal(
+  caseData: FirstDayCase,
+  input: EventInput<"task_completion_reverted">,
+): FirstDayCase {
+  if (!caseData.tasks.some((task) => task.id === input.taskId)) {
+    throw new Error(`Unknown task ID: ${input.taskId}`);
+  }
+  const completion = caseData.events.find(
+    (event) => event.id === input.completionEventId,
+  );
+  if (completion?.type !== "task_completed") {
+    throw new Error(`Unknown completion event ID: ${input.completionEventId}`);
+  }
+  if (completion.taskId !== input.taskId) {
+    throw new Error(
+      `Completion event ${input.completionEventId} does not belong to task ${input.taskId}`,
+    );
+  }
+  if (
+    caseData.events.some(
+      (event) =>
+        event.type === "task_completion_reverted" &&
+        event.completionEventId === input.completionEventId,
+    )
+  ) {
+    throw new Error(`Completion event already reversed: ${input.completionEventId}`);
+  }
+  return appendEvent(caseData, {
+    ...input,
+    type: "task_completion_reverted",
+  });
+}
+
 export function appendSourceRemoval(
   caseData: FirstDayCase,
   input: EventInput<"source_removed">,

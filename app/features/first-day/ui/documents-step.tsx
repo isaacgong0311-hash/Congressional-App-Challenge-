@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
 import {
   MAX_CASE_BYTES,
@@ -44,6 +44,8 @@ export function DocumentsStep({
   onOpenSource,
 }: DocumentsStepProps) {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const cameraInputRef = useRef<HTMLInputElement | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
   const visibleDocuments = caseData.documents.filter(
     (document) => document.status !== "removed",
   );
@@ -84,8 +86,40 @@ export function DocumentsStep({
         )}
       </p>
 
+      <dl className="mt-7 grid grid-cols-2 gap-3 xl:grid-cols-4">
+        {[
+          [visibleDocuments.length, "Pages added", "Páginas añadidas"],
+          [readyPages, "Successfully read", "Leídas correctamente"],
+          [failedPages, "Need attention", "Necesitan atención"],
+          [proposedFacts, "Proposed facts", "Datos propuestos"],
+        ].map(([value, en, es]) => (
+          <div className="rounded-card border border-ink/10 bg-white/80 p-4" key={String(en)}>
+            <dd className="text-2xl font-black tracking-[-0.04em] text-ink">{value}</dd>
+            <dt className="mt-1 text-xs font-bold uppercase tracking-[0.1em] text-muted">
+              {translated(language, String(en), String(es))}
+            </dt>
+          </div>
+        ))}
+      </dl>
+
       {caseData.mode === "live" ? (
-        <div className="fd-upload-zone mt-8">
+        <div
+          className={`fd-upload-zone mt-8 ${isDragging ? "is-dragging" : ""}`}
+          onDragEnter={(event) => {
+            event.preventDefault();
+            setIsDragging(true);
+          }}
+          onDragLeave={(event) => {
+            if (event.currentTarget.contains(event.relatedTarget as Node)) return;
+            setIsDragging(false);
+          }}
+          onDragOver={(event) => event.preventDefault()}
+          onDrop={(event) => {
+            event.preventDefault();
+            setIsDragging(false);
+            onAddFiles(Array.from(event.dataTransfer.files));
+          }}
+        >
           <input
             accept=".jpg,.jpeg,.png,image/jpeg,image/png"
             aria-label={translated(
@@ -100,6 +134,18 @@ export function DocumentsStep({
               event.currentTarget.value = "";
             }}
             ref={fileInputRef}
+            type="file"
+          />
+          <input
+            accept="image/jpeg,image/png"
+            aria-label={translated(language, "Take a photo of a school page", "Tomar una foto de una página escolar")}
+            capture="environment"
+            className="hidden"
+            onChange={(event) => {
+              onAddFiles(Array.from(event.currentTarget.files ?? []));
+              event.currentTarget.value = "";
+            }}
+            ref={cameraInputRef}
             type="file"
           />
           <div className="flex flex-col items-start justify-between gap-5 sm:flex-row sm:items-center">
@@ -119,15 +165,25 @@ export function DocumentsStep({
                 )}
               </p>
             </div>
-            <button
-              className="fd-primary-button shrink-0"
-              disabled={visibleDocuments.length >= MAX_DOCUMENTS}
-              onClick={() => fileInputRef.current?.click()}
-              type="button"
-            >
-              <DocumentIcon className="h-5 w-5" />
-              {translated(language, "Choose pages", "Elegir páginas")}
-            </button>
+            <div className="flex flex-wrap gap-2">
+              <button
+                className="fd-primary-button shrink-0"
+                disabled={visibleDocuments.length >= MAX_DOCUMENTS}
+                onClick={() => fileInputRef.current?.click()}
+                type="button"
+              >
+                <DocumentIcon className="h-5 w-5" />
+                {translated(language, "Choose pages", "Elegir páginas")}
+              </button>
+              <button
+                className="fd-secondary-button shrink-0 sm:hidden"
+                disabled={visibleDocuments.length >= MAX_DOCUMENTS}
+                onClick={() => cameraInputRef.current?.click()}
+                type="button"
+              >
+                {translated(language, "Take a photo", "Tomar una foto")}
+              </button>
+            </div>
           </div>
           <div className="mt-5 flex flex-wrap gap-3 text-xs font-semibold text-[#53615a]">
             <span className="rounded-full bg-white px-3 py-1.5">
@@ -163,6 +219,14 @@ export function DocumentsStep({
           const queued = uploadQueue.find(
             (item) => item.documentId === document.id,
           );
+          const documentFactCount = caseData.facts.filter((fact) =>
+            fact.evidenceIds.some((evidenceId) =>
+              caseData.evidence.some(
+                (item) =>
+                  item.id === evidenceId && item.documentId === document.id,
+              ),
+            ),
+          ).length;
           return (
             <article className="fd-document-card" key={document.id}>
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#e9edff] font-semibold text-[#3556d4]">
@@ -193,6 +257,13 @@ export function DocumentsStep({
                             ` · ${document.confidence}% de confianza`,
                           )
                         : ""}
+                    </p>
+                    <p className="mt-2 text-xs font-semibold text-cobalt">
+                      {translated(
+                        language,
+                        `${documentFactCount} proposed fact${documentFactCount === 1 ? "" : "s"}`,
+                        `${documentFactCount} dato${documentFactCount === 1 ? "" : "s"} propuesto${documentFactCount === 1 ? "" : "s"}`,
+                      )}
                     </p>
                   </div>
                   <span
@@ -257,6 +328,7 @@ export function DocumentsStep({
                 {evidence ? (
                   <div className="mt-4">
                     <SourceButton
+                      highlight={index === 0}
                       label={sourceLabel}
                       onClick={(button) => onOpenSource(evidence.id, button)}
                     />
@@ -278,6 +350,7 @@ export function DocumentsStep({
                       </button>
                     ) : null}
                     <button
+                      aria-describedby={`remove-note-${document.id}`}
                       className="fd-remove-button"
                       onClick={() => onRemove(document.id)}
                       type="button"
@@ -288,6 +361,9 @@ export function DocumentsStep({
                         "Eliminar página",
                       )}
                     </button>
+                    <span className="sr-only" id={`remove-note-${document.id}`}>
+                      {translated(language, "Removing this page also removes its usable facts from the plan.", "Eliminar esta página también elimina sus datos utilizables del plan.")}
+                    </span>
                   </div>
                 ) : null}
               </div>

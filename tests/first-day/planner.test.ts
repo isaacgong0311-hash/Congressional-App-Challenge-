@@ -71,6 +71,54 @@ describe("First Day deterministic planner", () => {
     expect(byId(planCase(changed), "task-registration").state).toBe("done");
   });
 
+  it("restores a task after its latest completion is reversed", () => {
+    const changed = copyCase();
+    changed.events.push(
+      {
+        id: "event-registration-complete",
+        type: "task_completed",
+        taskId: "task-registration",
+        timestamp: "2026-09-15T12:00:00.000Z",
+      },
+      {
+        id: "event-registration-reverted",
+        type: "task_completion_reverted",
+        taskId: "task-registration",
+        completionEventId: "event-registration-complete",
+        timestamp: "2026-09-15T12:01:00.000Z",
+      },
+    );
+
+    expect(byId(planCase(changed), "task-registration").state).toBe("ready");
+  });
+
+  it("keeps a later completion active after an earlier completion was reversed", () => {
+    const changed = copyCase();
+    changed.events.push(
+      {
+        id: "event-registration-complete-one",
+        type: "task_completed",
+        taskId: "task-registration",
+        timestamp: "2026-09-15T12:00:00.000Z",
+      },
+      {
+        id: "event-registration-complete-two",
+        type: "task_completed",
+        taskId: "task-registration",
+        timestamp: "2026-09-15T12:01:00.000Z",
+      },
+      {
+        id: "event-registration-reverted-one",
+        type: "task_completion_reverted",
+        taskId: "task-registration",
+        completionEventId: "event-registration-complete-one",
+        timestamp: "2026-09-15T12:02:00.000Z",
+      },
+    );
+
+    expect(byId(planCase(changed), "task-registration").state).toBe("done");
+  });
+
   it("sends an affected task to review when its source is removed", () => {
     const changed = copyCase();
     changed.events.push(

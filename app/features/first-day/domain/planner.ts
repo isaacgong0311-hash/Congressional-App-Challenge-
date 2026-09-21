@@ -44,12 +44,20 @@ export function planCase(
       { state: fact.confirmationState, value: fact.originalValue },
     ]),
   );
-  const completedTasks = new Set<string>();
+  const activeCompletionByTask = new Map<string, string>();
   const removedDocuments = new Set<string>();
   const resolutionEventIndex = new Map<string, number>();
 
   caseData.events.forEach((event, index) => {
-    if (event.type === "task_completed") completedTasks.add(event.taskId);
+    if (event.type === "task_completed") {
+      activeCompletionByTask.set(event.taskId, event.id);
+    }
+    if (
+      event.type === "task_completion_reverted" &&
+      activeCompletionByTask.get(event.taskId) === event.completionEventId
+    ) {
+      activeCompletionByTask.delete(event.taskId);
+    }
     if (event.type === "source_removed") {
       removedDocuments.add(event.documentId);
     }
@@ -240,7 +248,7 @@ export function planCase(
     } else if (procedureNeedsReview) {
       state = "needs_review";
       reason = PROCEDURE_REVIEW_REASON;
-    } else if (completedTasks.has(taskId)) {
+    } else if (activeCompletionByTask.has(taskId)) {
       state = "done";
     } else {
       const dependencyState = evaluateDependency(

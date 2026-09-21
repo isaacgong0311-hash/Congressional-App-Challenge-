@@ -1,536 +1,310 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useMemo, useRef, useState } from "react";
 
-import { roundRockEnrollmentProcedures } from "../content/procedures/round-rock-isd";
-import { resolveConflict as recordConflictResolution } from "../domain/conflicts";
-import {
-  appendFactConfirmation,
-  appendFactCorrection,
-  appendFactUnclear,
-  appendTaskCompletion,
-} from "../domain/events";
-import { deriveLiveCase } from "../domain/live-tasks";
-import { planCase } from "../domain/planner";
 import type { FirstDayCase } from "../domain/types";
 import { BlockerStep } from "./blocker-step";
+import { CaseSnapshot } from "./case-snapshot";
+import { DemoRibbon } from "./demo-ribbon";
 import { DocumentsStep } from "./documents-step";
 import { ExportStep } from "./export-step";
 import { FactsStep } from "./facts-step";
-import {
-  STEPS,
-  translated,
-  type Language,
-  type StepId,
-} from "./first-day-copy";
-import {
-  ArrowLeftIcon,
-  ArrowRightIcon,
-  CheckIcon,
-  LanternIcon,
-  ShieldIcon,
-} from "./icons";
+import { translated } from "./first-day-copy";
+import { FirstDayToast } from "./first-day-toast";
+import { ArrowLeftIcon, ArrowRightIcon, LanternIcon } from "./icons";
 import { PlanStep } from "./plan-step";
 import { SourcePanel } from "./source-panel";
 import { StartStep } from "./start-step";
-import { canEnterLiveStep, useLiveCase } from "./use-live-case";
-import { useProviderCapability } from "./use-provider-capability";
+import {
+  type PresentationMode,
+  useFirstDayController,
+} from "./use-first-day-controller";
+import { WorkspaceProgress } from "./workspace-progress";
 
-export function FirstDayWorkspace({ initialCase }: { initialCase: FirstDayCase }) {
-  const [caseData, setCaseData] = useState(initialCase);
-  const [currentStep, setCurrentStep] = useState<StepId>("start");
-  const [language, setLanguage] = useState<Language>(initialCase.language);
-  const [largeText, setLargeText] = useState(false);
-  const [highContrast, setHighContrast] = useState(false);
-  const [sourceId, setSourceId] = useState<string | null>(null);
-  const [activeConflictId, setActiveConflictId] = useState<string | null>(null);
-  const sourceTriggerRef = useRef<HTMLButtonElement | null>(null);
-  const eventSequence = useRef(0);
-  const providerCapability = useProviderCapability();
-  const liveCase = useLiveCase({ caseData, language, setCaseData });
+export function FirstDayWorkspace({
+  initialCase,
+  initialPresentationMode = "standard",
+}: {
+  initialCase: FirstDayCase;
+  initialPresentationMode?: PresentationMode;
+}) {
+  const controller = useFirstDayController({
+    initialCase,
+    initialPresentationMode,
+  });
+  const {
+    activeConflictId,
+    activeStepIndex,
+    canGoForward,
+    caseData,
+    closeSource,
+    completeTask,
+    confirmFact,
+    correctFact,
+    currentStep,
+    dismissDemo,
+    goBack,
+    goForward,
+    highlightedTaskId,
+    language,
+    liveCase,
+    markFactUnclear,
+    openDocument,
+    openEvidence,
+    openProcedure,
+    openSampleCase,
+    openSource,
+    openTaskConflict,
+    plan,
+    preferences,
+    presentationMode,
+    providerCapability,
+    resolveCaseConflict,
+    selectStep,
+    setTaskFilter,
+    setToast,
+    showTaskSource,
+    snapshot,
+    startLiveCase,
+    taskFilter,
+    toast,
+    toggleHighContrast,
+    toggleLargeText,
+    undoTask,
+    updateLanguage,
+  } = controller;
 
-  const plan = useMemo(() => planCase(caseData), [caseData]);
-  const activeStepIndex = STEPS.findIndex((step) => step.id === currentStep);
-  const openEvidence = sourceId
-    ? caseData.evidence.find((evidence) => evidence.id === sourceId)
-    : undefined;
-  const openDocument = openEvidence?.documentId
-    ? caseData.documents.find(
-        (document) => document.id === openEvidence.documentId,
-      )
-    : undefined;
-  const openProcedure = openEvidence?.procedureId
-    ? caseData.procedures.find(
-        (procedure) => procedure.id === openEvidence.procedureId,
-      )
-    : undefined;
-
-  function nextEventId(label: string) {
-    eventSequence.current += 1;
-    return `event-ui-${label}-${eventSequence.current}`;
-  }
-
-  function startLiveCase() {
-    liveCase.reset();
-    setCaseData({
-      id: `case-live-${Date.now()}`,
-      mode: "live",
-      language,
-      district: "Round Rock ISD",
-      childFirstName: "",
-      ruleVersion: "live-intake-v1",
-      documents: [],
-      evidence: [],
-      facts: [],
-      procedures: structuredClone(roundRockEnrollmentProcedures),
-      tasks: [],
-      conflicts: [],
-      events: [],
-    });
-    setActiveConflictId(null);
-    setCurrentStep("documents");
-  }
-
-  function openSampleCase() {
-    liveCase.reset();
-    setCaseData(initialCase);
-    setActiveConflictId(null);
-    setCurrentStep("documents");
-  }
-
-  function openSource(evidenceId: string, trigger: HTMLButtonElement) {
-    sourceTriggerRef.current = trigger;
-    setSourceId(evidenceId);
-  }
-
-  const closeSource = useCallback(() => {
-    setSourceId(null);
-    window.requestAnimationFrame(() => sourceTriggerRef.current?.focus());
-  }, []);
-
-  function confirmFact(factId: string) {
-    setCaseData((current) =>
-      deriveLiveCase(
-        appendFactConfirmation(current, {
-          id: nextEventId("fact"),
-          factId,
-          timestamp: new Date().toISOString(),
-        }),
-      ),
-    );
-  }
-
-  function correctFact(factId: string, value: string) {
-    setCaseData((current) =>
-      deriveLiveCase(
-        appendFactCorrection(current, {
-          id: nextEventId("fact-correction"),
-          factId,
-          value,
-          timestamp: new Date().toISOString(),
-        }),
-      ),
-    );
-  }
-
-  function markFactUnclear(factId: string) {
-    setCaseData((current) =>
-      deriveLiveCase(
-        appendFactUnclear(current, {
-          id: nextEventId("fact-unclear"),
-          factId,
-          timestamp: new Date().toISOString(),
-        }),
-      ),
-    );
-  }
-
-  function completeTask(taskId: string) {
-    setCaseData((current) =>
-      appendTaskCompletion(current, {
-        id: nextEventId("task"),
-        taskId,
-        timestamp: new Date().toISOString(),
-      }),
-    );
-  }
-
-  function resolveCaseConflict(
-    conflictId: string,
-    selectedFactId: string,
-    reportedValue: string,
-  ) {
-    setCaseData((current) =>
-      deriveLiveCase(
-        recordConflictResolution(current, {
-          id: nextEventId("school-confirmation"),
-          type: "school_confirmation_recorded",
-          conflictId,
-          selectedFactId,
-          reportedValue,
-          timestamp: new Date().toISOString(),
-        }),
-      ),
-    );
-    setCurrentStep("plan");
-  }
-
-  function openTaskConflict(taskId: string) {
-    const conflict =
-      caseData.conflicts.find((item) =>
-        item.relatedTaskIds.includes(taskId),
-      ) ?? caseData.conflicts.find((item) => item.status === "open");
-    setActiveConflictId(conflict?.id ?? null);
-    setCurrentStep("blocker");
-  }
-
-  function showTaskSource(taskId: string, trigger: HTMLButtonElement) {
-    const task = caseData.tasks.find((item) => item.id === taskId);
-    const evidenceId = task?.evidenceIds[0];
-    if (evidenceId) openSource(evidenceId, trigger);
-  }
-
-  function goForward() {
-    const next = STEPS[Math.min(activeStepIndex + 1, STEPS.length - 1)];
-    if (!canEnterLiveStep(caseData, next.id)) return;
-    setCurrentStep(next.id);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-
-  function goBack() {
-    const previous = STEPS[Math.max(activeStepIndex - 1, 0)];
-    setCurrentStep(previous.id);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-
-  const copy = {
-    continue: translated(language, "Continue", "Continuar"),
-    back: translated(language, "Back", "Atrás"),
-  };
-  const nextStep = STEPS[activeStepIndex + 1];
-  const canGoForward = nextStep
-    ? canEnterLiveStep(caseData, nextStep.id)
-    : false;
+  const shellInert = openEvidence ? true : undefined;
 
   return (
     <div
-      className="fd-app min-h-screen bg-[#f2f4ef] text-[#14241e]"
-      data-fd-hc={highContrast ? "true" : "false"}
-      data-fd-lt={largeText ? "true" : "false"}
+      className="fd-app min-h-screen text-ink"
+      data-presentation={presentationMode}
+      data-fd-hc={preferences.highContrast ? "true" : "false"}
+      data-fd-lt={preferences.largeText ? "true" : "false"}
     >
-      <header
-        aria-hidden={openEvidence ? true : undefined}
-        className="fd-header print:hidden"
-        inert={openEvidence ? true : undefined}
-      >
-        <div className="mx-auto flex w-full max-w-[1400px] items-center justify-between gap-4 px-4 py-4 sm:px-7 lg:px-10">
-          <div className="flex items-center gap-3">
-            <Link
-              aria-label={translated(
-                language,
-                "Back to all Lantern tools",
-                "Volver a todas las herramientas de Lantern",
-              )}
-              className="fd-back-link"
-              href="/"
-            >
-              <ArrowLeftIcon className="h-4 w-4" />
-              <span className="hidden sm:inline">
-                {translated(
+      <div aria-hidden={shellInert} inert={shellInert}>
+        <header className="fd-header print:hidden">
+          <div className="mx-auto flex w-full max-w-[1400px] items-center justify-between gap-3 px-4 py-3 sm:px-7 lg:px-10">
+            <div className="flex min-w-0 items-center gap-3">
+              <Link
+                aria-label={translated(
                   language,
-                  "All Lantern tools",
-                  "Todas las herramientas",
+                  "Back to Lantern home",
+                  "Volver a Lantern",
                 )}
-              </span>
-            </Link>
-            <span className="hidden h-5 w-px bg-[#ced5d0] sm:block" />
-            <div className="flex items-center gap-2 font-semibold tracking-[-0.02em]">
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#15251f] text-[#f9cb69] shadow-sm">
-                <LanternIcon className="h-5 w-5" />
-              </span>
-              <span>Lantern</span>
-              <span className="font-normal text-[#5f6d66]">/ First Day</span>
+                className="fd-back-link"
+                href="/"
+              >
+                <ArrowLeftIcon className="h-4 w-4" />
+                <span className="hidden md:inline">
+                  {translated(language, "Lantern home", "Inicio de Lantern")}
+                </span>
+              </Link>
+              <span className="hidden h-5 w-px bg-ink/15 sm:block" />
+              <div className="flex min-w-0 items-center gap-2 font-bold tracking-[-0.02em]">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-ink text-amber shadow-sm">
+                  <LanternIcon className="h-5 w-5" />
+                </span>
+                <span className="truncate">
+                  Lantern <span className="font-medium text-muted">/ First Day</span>
+                </span>
+              </div>
+            </div>
+
+            <div className="flex shrink-0 items-center gap-2">
+              <button
+                aria-label={translated(
+                  language,
+                  "Toggle large text",
+                  "Cambiar texto grande",
+                )}
+                aria-pressed={preferences.largeText}
+                className="fd-utility-button hidden sm:inline-flex"
+                onClick={toggleLargeText}
+                type="button"
+              >
+                Aa
+              </button>
+              <button
+                aria-label={translated(
+                  language,
+                  "Toggle high contrast",
+                  "Cambiar alto contraste",
+                )}
+                aria-pressed={preferences.highContrast}
+                className="fd-utility-button hidden sm:inline-flex"
+                onClick={toggleHighContrast}
+                type="button"
+              >
+                ◐
+              </button>
+              <div className="flex rounded-xl border border-ink/15 bg-white p-1 text-xs font-bold shadow-sm">
+                {(["English", "Español"] as const).map((option) => (
+                  <button
+                    aria-pressed={language === option}
+                    className={`min-h-9 rounded-lg px-3 transition-colors ${
+                      language === option
+                        ? "bg-ink text-white"
+                        : "text-muted hover:bg-canvas"
+                    }`}
+                    key={option}
+                    onClick={() => updateLanguage(option)}
+                    type="button"
+                  >
+                    {option === "English" ? "EN" : "ES"}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
-
-          <div className="flex items-center gap-2">
+          <div className="flex items-center justify-end gap-2 px-4 pb-3 sm:hidden">
             <button
-              aria-label={translated(
-                language,
-                "Toggle large text",
-                "Cambiar texto grande",
-              )}
-              aria-pressed={largeText}
-              className="fd-utility-button hidden sm:inline-flex"
-              onClick={() => setLargeText((value) => !value)}
+              aria-label={translated(language, "Toggle large text", "Cambiar texto grande")}
+              aria-pressed={preferences.largeText}
+              className="fd-utility-button inline-flex"
+              onClick={toggleLargeText}
               type="button"
             >
               Aa
             </button>
             <button
-              aria-label={translated(
-                language,
-                "Toggle high contrast",
-                "Cambiar alto contraste",
-              )}
-              aria-pressed={highContrast}
-              className="fd-utility-button hidden sm:inline-flex"
-              onClick={() => setHighContrast((value) => !value)}
+              aria-label={translated(language, "Toggle high contrast", "Cambiar alto contraste")}
+              aria-pressed={preferences.highContrast}
+              className="fd-utility-button inline-flex"
+              onClick={toggleHighContrast}
               type="button"
             >
               ◐
             </button>
-            <div className="flex rounded-xl border border-[#d8deda] bg-white p-1 text-xs font-semibold shadow-sm">
-              {(["English", "Español"] as const).map((option) => (
+          </div>
+        </header>
+
+        {presentationMode === "guided_demo" ? (
+          <DemoRibbon
+            canGoForward={canGoForward}
+            currentStep={currentStep}
+            language={language}
+            onDismiss={dismissDemo}
+            onNext={goForward}
+            onPrevious={goBack}
+          />
+        ) : null}
+
+        <div className="mx-auto grid w-full max-w-[1400px] grid-cols-1 gap-6 px-4 py-5 sm:px-7 lg:grid-cols-[250px_minmax(0,1fr)] lg:gap-9 lg:px-10 lg:py-9">
+          <aside className="space-y-4 print:hidden lg:sticky lg:top-5 lg:self-start">
+            <WorkspaceProgress
+              caseData={caseData}
+              currentStep={currentStep}
+              language={language}
+              onSelectStep={selectStep}
+            />
+            <CaseSnapshot
+              caseData={caseData}
+              language={language}
+              snapshot={snapshot}
+            />
+          </aside>
+
+          <main className="min-w-0 pb-24 lg:pb-8">
+            {currentStep === "start" ? (
+              <StartStep
+                allowLive={presentationMode !== "guided_demo"}
+                language={language}
+                onOpenSample={openSampleCase}
+                onStartLive={startLiveCase}
+                providerCapability={providerCapability}
+              />
+            ) : null}
+            {currentStep === "documents" ? (
+              <DocumentsStep
+                caseData={caseData}
+                language={language}
+                onAddFiles={liveCase.addFiles}
+                onOpenSource={openSource}
+                onRemove={liveCase.remove}
+                onRetry={liveCase.retry}
+                uploadNotice={liveCase.uploadNotice}
+                uploadQueue={liveCase.uploadQueue}
+              />
+            ) : null}
+            {currentStep === "facts" ? (
+              <FactsStep
+                caseData={caseData}
+                language={language}
+                onConfirmFact={confirmFact}
+                onCorrectFact={correctFact}
+                onMarkUnclear={markFactUnclear}
+                onOpenSource={openSource}
+              />
+            ) : null}
+            {currentStep === "plan" ? (
+              <PlanStep
+                caseData={caseData}
+                highlightedTaskId={highlightedTaskId}
+                language={language}
+                onCompleteTask={completeTask}
+                onResolveTask={openTaskConflict}
+                onShowTaskSource={showTaskSource}
+                onTaskFilterChange={setTaskFilter}
+                onUndoTask={undoTask}
+                plan={plan}
+                taskFilter={taskFilter}
+              />
+            ) : null}
+            {currentStep === "blocker" ? (
+              <BlockerStep
+                caseData={caseData}
+                conflictId={activeConflictId}
+                language={language}
+                onOpenSource={openSource}
+                onResolveConflict={resolveCaseConflict}
+              />
+            ) : null}
+            {currentStep === "export" ? (
+              <ExportStep
+                caseData={caseData}
+                language={language}
+                onPrint={() => window.print()}
+                plan={plan}
+              />
+            ) : null}
+
+            {currentStep !== "start" ? (
+              <div className="fd-action-dock print:hidden">
                 <button
-                  aria-pressed={language === option}
-                  className={`rounded-lg px-3 py-2 transition-colors ${
-                    language === option
-                      ? "bg-[#15251f] text-white"
-                      : "text-[#637069] hover:bg-[#f1f3ef]"
-                  }`}
-                  key={option}
-                  onClick={() => {
-                    setLanguage(option);
-                    setCaseData((current) => ({
-                      ...current,
-                      language: option,
-                    }));
-                  }}
+                  className="fd-secondary-button"
+                  disabled={activeStepIndex === 0}
+                  onClick={goBack}
                   type="button"
                 >
-                  {option === "English" ? "EN" : "ES"}
+                  <ArrowLeftIcon className="h-4 w-4" />
+                  {translated(language, "Back", "Atrás")}
                 </button>
-              ))}
-            </div>
-          </div>
+                {currentStep !== "export" && canGoForward ? (
+                  <button className="fd-primary-button" onClick={goForward} type="button">
+                    {translated(language, "Continue", "Continuar")}
+                    <ArrowRightIcon className="h-5 w-5" />
+                  </button>
+                ) : null}
+              </div>
+            ) : null}
+          </main>
         </div>
-        <div className="flex items-center justify-end gap-2 px-4 pb-3 sm:hidden">
-          <button
-            aria-label={translated(
-              language,
-              "Toggle large text",
-              "Cambiar texto grande",
-            )}
-            aria-pressed={largeText}
-            className="fd-utility-button inline-flex"
-            onClick={() => setLargeText((value) => !value)}
-            type="button"
+
+        <footer className="border-t border-ink/10 bg-white/70 px-5 py-7 text-center text-sm text-muted print:hidden">
+          <Link
+            className="font-bold text-cobalt underline decoration-cobalt/30 underline-offset-4 hover:text-cobalt-dark"
+            href="/first-day/how-it-works"
           >
-            Aa
-          </button>
-          <button
-            aria-label={translated(
-              language,
-              "Toggle high contrast",
-              "Cambiar alto contraste",
-            )}
-            aria-pressed={highContrast}
-            className="fd-utility-button inline-flex"
-            onClick={() => setHighContrast((value) => !value)}
-            type="button"
-          >
-            ◐
-          </button>
-        </div>
-      </header>
-
-      <div
-        aria-hidden={openEvidence ? true : undefined}
-        className="border-y border-[#f1c76f]/50 bg-[#fff8df] px-4 py-2.5 text-center text-xs font-semibold text-[#71551c] print:border-[#999] print:bg-white print:text-black"
-        inert={openEvidence ? true : undefined}
-      >
-        {caseData.mode === "fictional"
-          ? translated(
-              language,
-              "Fictional demonstration · Mesa View is not a real district",
-              "Demostración ficticia · Mesa View no es un distrito real",
-            )
-          : translated(
-              language,
-              "Round Rock ISD pilot · images are sent to Lantern’s external AI provider and are not saved as a case",
-              "Piloto de Round Rock ISD · las imágenes se envían al proveedor externo de IA de Lantern y no se guardan como caso",
-            )}
-      </div>
-
-      <div
-        aria-hidden={openEvidence ? true : undefined}
-        className="mx-auto grid w-full max-w-[1400px] grid-cols-1 gap-8 px-4 py-6 sm:px-7 lg:grid-cols-[250px_minmax(0,1fr)] lg:px-10 lg:py-10"
-        inert={openEvidence ? true : undefined}
-      >
-        <aside className="print:hidden lg:sticky lg:top-6 lg:self-start">
-          <nav aria-label="First Day progress" className="fd-step-nav">
-            <div className="mb-5 px-3">
-              <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#5f6d66]">
-                {translated(language, "Your path", "Su camino")}
-              </p>
-              <p className="mt-2 text-sm leading-6 text-[#55625c]">
-                {translated(
-                  language,
-                  "Nothing changes the plan until you confirm it.",
-                  "Nada cambia el plan hasta que usted lo confirme.",
-                )}
-              </p>
-            </div>
-            <ol className="flex gap-2 overflow-x-auto pb-2 lg:flex-col lg:overflow-visible lg:pb-0">
-              {STEPS.map((step, index) => {
-                const active = step.id === currentStep;
-                const visited = index < activeStepIndex;
-                const unavailable = !canEnterLiveStep(caseData, step.id);
-                return (
-                  <li className="min-w-max lg:min-w-0" key={step.id}>
-                    <button
-                      aria-current={active ? "step" : undefined}
-                      className={`fd-step-button ${
-                        active ? "is-active" : ""
-                      }`}
-                      disabled={unavailable}
-                      onClick={() => setCurrentStep(step.id)}
-                      type="button"
-                    >
-                      <span
-                        className={`fd-step-number ${
-                          visited ? "is-visited" : ""
-                        }`}
-                      >
-                        {visited ? (
-                          <CheckIcon className="h-4 w-4" />
-                        ) : (
-                          index + 1
-                        )}
-                      </span>
-                      <span>
-                        {language === "Español" ? step.es : step.en}
-                      </span>
-                    </button>
-                  </li>
-                );
-              })}
-            </ol>
-          </nav>
-
-          <div className="mt-5 hidden rounded-3xl border border-[#dce2dd] bg-white/70 p-5 text-sm leading-6 text-[#59665f] shadow-sm lg:block">
-            <ShieldIcon className="mb-3 text-[#3556d4]" />
-            <strong className="block text-[#1e2d27]">
-              {translated(
-                language,
-                "Private by default",
-                "Privado por defecto",
-              )}
-            </strong>
             {translated(
               language,
-              caseData.mode === "fictional"
-                ? "This demo stays in this page. No account or cloud case history."
-                : "Pages are processed one at a time. Lantern does not create an account or cloud case history.",
-              caseData.mode === "fictional"
-                ? "Esta demo queda en esta página. Sin cuenta ni historial en la nube."
-                : "Las páginas se procesan una por una. Lantern no crea una cuenta ni un historial en la nube.",
+              "See how First Day turns evidence into a plan",
+              "Vea cómo Primer Día convierte la evidencia en un plan",
             )}
-          </div>
-        </aside>
-
-        <main className="min-w-0 pb-16">
-          {currentStep === "start" ? (
-            <StartStep
-              language={language}
-              onOpenSample={openSampleCase}
-              onStartLive={startLiveCase}
-              providerCapability={providerCapability}
-            />
-          ) : null}
-          {currentStep === "documents" ? (
-            <DocumentsStep
-              caseData={caseData}
-              language={language}
-              onAddFiles={liveCase.addFiles}
-              onOpenSource={openSource}
-              onRemove={liveCase.remove}
-              onRetry={liveCase.retry}
-              uploadNotice={liveCase.uploadNotice}
-              uploadQueue={liveCase.uploadQueue}
-            />
-          ) : null}
-          {currentStep === "facts" ? (
-            <FactsStep
-              caseData={caseData}
-              language={language}
-              onConfirmFact={confirmFact}
-              onCorrectFact={correctFact}
-              onMarkUnclear={markFactUnclear}
-              onOpenSource={openSource}
-            />
-          ) : null}
-          {currentStep === "plan" ? (
-            <PlanStep
-              language={language}
-              onCompleteTask={completeTask}
-              onResolveTask={openTaskConflict}
-              onShowTaskSource={showTaskSource}
-              plan={plan}
-            />
-          ) : null}
-          {currentStep === "blocker" ? (
-            <BlockerStep
-              caseData={caseData}
-              conflictId={activeConflictId}
-              language={language}
-              onOpenSource={openSource}
-              onResolveConflict={resolveCaseConflict}
-            />
-          ) : null}
-          {currentStep === "export" ? (
-            <ExportStep
-              caseData={caseData}
-              language={language}
-              onPrint={() => window.print()}
-              plan={plan}
-            />
-          ) : null}
-
-          {currentStep !== "start" ? (
-            <div className="mt-10 flex items-center justify-between border-t border-[#d9dfda] pt-6 print:hidden">
-              <button
-                className="fd-secondary-button"
-                disabled={activeStepIndex === 0}
-                onClick={goBack}
-                type="button"
-              >
-                <ArrowLeftIcon className="h-4 w-4" />
-                {copy.back}
-              </button>
-              {currentStep !== "export" && canGoForward ? (
-                <button
-                  className="fd-primary-button"
-                  onClick={goForward}
-                  type="button"
-                >
-                  {copy.continue}
-                  <ArrowRightIcon className="h-5 w-5" />
-                </button>
-              ) : null}
-            </div>
-          ) : null}
-        </main>
+          </Link>
+        </footer>
       </div>
-
-      <footer
-        aria-hidden={openEvidence ? true : undefined}
-        className="border-t border-[#d9dfda] bg-white/60 px-5 py-7 text-center text-sm text-[#58665f] print:hidden"
-        inert={openEvidence ? true : undefined}
-      >
-        <Link
-          className="font-semibold text-[#3556d4] underline decoration-[#aebbf2] underline-offset-4 hover:text-[#2948be]"
-          href="/first-day/how-it-works"
-        >
-          {translated(
-            language,
-            "See how First Day turns evidence into a plan",
-            "Vea cómo Primer Día convierte la evidencia en un plan",
-          )}
-        </Link>
-      </footer>
 
       {openEvidence ? (
         <SourcePanel
@@ -539,6 +313,16 @@ export function FirstDayWorkspace({ initialCase }: { initialCase: FirstDayCase }
           language={language}
           onClose={closeSource}
           procedure={openProcedure}
+        />
+      ) : null}
+      {toast ? (
+        <FirstDayToast
+          completionEventId={toast.completionEventId}
+          language={language}
+          message={toast.message}
+          onDismiss={() => setToast(null)}
+          onUndo={undoTask}
+          taskId={toast.taskId}
         />
       ) : null}
     </div>

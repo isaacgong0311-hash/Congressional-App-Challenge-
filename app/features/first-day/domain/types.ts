@@ -160,6 +160,13 @@ export type CaseEvent =
     }
   | {
       id: string;
+      type: "task_completion_reverted";
+      taskId: string;
+      completionEventId: string;
+      timestamp: string;
+    }
+  | {
+      id: string;
       type: "source_removed";
       documentId: string;
       timestamp: string;

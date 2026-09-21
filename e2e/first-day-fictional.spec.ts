@@ -94,6 +94,8 @@ test("fictional case completes all six screens with sources and Spanish output",
   await expect(
     page.getByRole("heading", { name: "Qué hacer ahora y por qué." }),
   ).toBeVisible();
+  const compactProgress = page.locator(".fd-mobile-progress summary");
+  if (await compactProgress.isVisible()) await compactProgress.click();
   await page.getByRole("button", { name: /Llevar conmigo/ }).click();
   await expect(
     page.getByRole("heading", {
@@ -120,4 +122,38 @@ test("fictional entry and evidence review are keyboard reachable", async ({
   await expect(page.getByRole("button", { name: "Close source" })).toBeFocused();
   await page.keyboard.press("Escape");
   await expect(source).toBeFocused();
+});
+
+test("guided demo stays fictional and can be dismissed", async ({ page }) => {
+  await page.goto("/first-day?demo=1");
+  await expect(page.getByLabel("Guided demo cue")).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Add Round Rock ISD documents" }),
+  ).toBeDisabled();
+  await expect(page.getByText(/uses fictional data only/i)).toBeVisible();
+  await page.getByRole("button", { name: "Open the sample case" }).click();
+  await expect(page.getByText(/Demo cue 2 of 6/)).toBeVisible();
+  await page.getByRole("button", { name: "Exit demo mode" }).click();
+  await expect(page.getByLabel("Guided demo cue")).toBeHidden();
+});
+
+test("task completion can be undone without deleting history", async ({ page }) => {
+  await page.goto("/first-day");
+  await page.getByRole("button", { name: "Open the sample case" }).click();
+  await page.getByRole("button", { name: "Continue" }).click();
+  while (await page.getByRole("button", { name: "Confirm this" }).count()) {
+    await page.getByRole("button", { name: "Confirm this" }).first().click();
+  }
+  await page.getByRole("button", { name: "Continue" }).click();
+
+  const registrationTask = page.getByRole("article").filter({
+    has: page.getByRole("heading", { name: "Go to the enrollment meeting" }),
+  });
+  await registrationTask.getByRole("button", { name: "Mark done" }).click();
+  await expect(page.getByText("Step marked done.")).toBeVisible();
+  await page.getByRole("button", { name: "Undo" }).click();
+  await expect(page.getByText("Step returned to the plan.")).toBeVisible();
+  await expect(
+    registrationTask.getByRole("button", { name: "Mark done" }),
+  ).toBeVisible();
 });

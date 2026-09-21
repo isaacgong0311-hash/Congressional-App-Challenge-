@@ -166,7 +166,7 @@ export default function HomePage() {
         <section className="bg-[#10241c] text-white" aria-labelledby="difference-title">
           <div className="mx-auto grid max-w-[1440px] gap-10 px-5 py-20 sm:px-8 lg:grid-cols-[.92fr_1.08fr] lg:items-center lg:px-12 lg:py-28">
             <div>
-              <p className="lantern-eyebrow text-amber">The difference</p>
+              <p className="lantern-eyebrow is-on-dark">The difference</p>
               <h2 className="mt-4 max-w-2xl text-balance font-serif text-5xl leading-[1.02] tracking-[-0.045em] sm:text-6xl" id="difference-title">Lantern refuses to hide uncertainty.</h2>
               <p className="mt-6 max-w-xl text-lg leading-8 text-white/68">When two documents disagree, Lantern keeps both sources visible, prepares the question to ask, and waits for the family to record what the school said.</p>
               <Link className="mt-8 inline-flex min-h-12 items-center gap-2 rounded-xl bg-amber px-5 font-bold text-ink transition hover:-translate-y-0.5 hover:bg-[#f0c35d] focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-white" href="/first-day/how-it-works">
@@ -212,7 +212,7 @@ export default function HomePage() {
         <section className="px-5 pb-20 sm:px-8 lg:px-12 lg:pb-28">
           <div className="mx-auto max-w-[1344px] overflow-hidden rounded-[2.25rem] bg-cobalt px-7 py-12 text-white shadow-[0_28px_80px_rgba(53,86,212,.25)] sm:px-12 lg:flex lg:items-center lg:justify-between lg:gap-10 lg:px-16 lg:py-16">
             <div>
-              <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-white/65">A calmer first day</p>
+              <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-white/90">A calmer first day</p>
               <h2 className="mt-4 max-w-3xl text-balance font-serif text-4xl leading-tight tracking-[-0.04em] sm:text-5xl">See the complete evidence-to-plan journey with no upload and no AI key.</h2>
             </div>
             <Link className="mt-8 inline-flex min-h-13 shrink-0 items-center gap-2 rounded-xl bg-white px-6 font-extrabold text-cobalt transition hover:-translate-y-0.5 hover:bg-[#f7f8ff] focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-amber lg:mt-0" href="/first-day?demo=1">

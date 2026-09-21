@@ -8,6 +8,7 @@ import {
   appendSchoolConfirmation,
   appendSourceRemoval,
   appendTaskCompletion,
+  appendTaskCompletionReversal,
 } from "../../app/features/first-day/domain/events";
 
 describe("First Day case events", () => {
@@ -64,6 +65,43 @@ describe("First Day case events", () => {
       next.facts.find((fact) => fact.id === "fact-interpreter-preference")
         ?.confirmationState,
     ).toBe("proposed");
+  });
+
+  it("appends a task-completion reversal without deleting history", () => {
+    const completed = appendTaskCompletion(fictionalCase, {
+      id: "event-registration-complete",
+      taskId: "task-registration",
+      timestamp: "2026-09-15T12:01:00.000Z",
+    });
+    const reversed = appendTaskCompletionReversal(completed, {
+      id: "event-registration-reverted",
+      taskId: "task-registration",
+      completionEventId: "event-registration-complete",
+      timestamp: "2026-09-15T12:02:00.000Z",
+    });
+
+    expect(reversed.events.map((event) => event.type)).toEqual([
+      "task_completed",
+      "task_completion_reverted",
+    ]);
+    expect(completed.events).toHaveLength(1);
+  });
+
+  it("rejects a reversal that does not target the task completion", () => {
+    const completed = appendTaskCompletion(fictionalCase, {
+      id: "event-registration-complete",
+      taskId: "task-registration",
+      timestamp: "2026-09-15T12:01:00.000Z",
+    });
+
+    expect(() =>
+      appendTaskCompletionReversal(completed, {
+        id: "event-invalid-reversal",
+        taskId: "task-health-records",
+        completionEventId: "event-registration-complete",
+        timestamp: "2026-09-15T12:02:00.000Z",
+      }),
+    ).toThrow("Completion event event-registration-complete does not belong to task task-health-records");
   });
 
   it("appends a school report as an immutable event", () => {

@@ -44,6 +44,10 @@ function FactReviewCard({
   const [isCorrecting, setIsCorrecting] = useState(false);
   const [correctedValue, setCorrectedValue] = useState(fact.originalValue);
   const sourceId = fact.evidenceIds[0];
+  const evidence = caseData.evidence.find((item) => item.id === sourceId);
+  const document = evidence?.documentId
+    ? caseData.documents.find((item) => item.id === evidence.documentId)
+    : undefined;
   const factLabel =
     language === "Español" ? FACT_ES[fact.id] ?? fact.label : fact.label;
 
@@ -55,9 +59,11 @@ function FactReviewCard({
   }
 
   return (
-    <article className="fd-fact-card">
-      <div className="flex items-start justify-between gap-3">
-        <div>
+    <article className="fd-fact-card scroll-mt-24" id={`fact-${fact.id}`}>
+      <div className="grid gap-5 lg:grid-cols-[minmax(0,.9fr)_minmax(280px,1.1fr)]">
+        <div className="min-w-0">
+          <div className="flex items-start justify-between gap-3">
+            <div>
           <p className="text-xs font-bold uppercase tracking-[0.15em] text-[#5f6d66]">
             {fact.kind.replace("_", " ")}
           </p>
@@ -75,16 +81,16 @@ function FactReviewCard({
                 .join(" · ")}
             </p>
           ) : null}
-        </div>
-        <span className={`fd-fact-state ${meta.className}`}>
-          {language === "Español" ? meta.es : meta.en}
-        </span>
-      </div>
-      <p className="mt-5 font-serif text-xl leading-7 text-[#203029]">
-        {view.value}
-      </p>
+            </div>
+            <span className={`fd-fact-state ${meta.className}`}>
+              {language === "Español" ? meta.es : meta.en}
+            </span>
+          </div>
+          <p className="mt-5 font-serif text-xl leading-7 text-[#203029]">
+            {view.value}
+          </p>
 
-      {isCorrecting ? (
+          {isCorrecting ? (
         <div className="mt-5 rounded-2xl border border-[#d9dfda] bg-white p-4">
           <label
             className="text-sm font-semibold text-[#293a33]"
@@ -123,40 +129,43 @@ function FactReviewCard({
             </button>
           </div>
         </div>
-      ) : null}
+          ) : null}
 
-      <div className="mt-5 flex flex-wrap items-center gap-3">
-        {sourceId ? (
-          <SourceButton
-            label={translated(language, "Show source", "Ver fuente")}
-            onClick={(button) => onOpenSource(sourceId, button)}
-          />
-        ) : null}
-        {view.state === "proposed" ? (
-          <>
-            <button
-              className="fd-confirm-button"
-              onClick={() => onConfirmFact(fact.id)}
-              type="button"
-            >
-              <CheckIcon className="h-4 w-4" />
-              {translated(language, "Confirm this", "Confirmar")}
-            </button>
-            <button
-              className="fd-secondary-button"
-              onClick={() => setIsCorrecting(true)}
-              type="button"
-            >
-              {translated(language, "Correct", "Corregir")}
-            </button>
-            <button
-              className="fd-remove-button"
-              onClick={() => onMarkUnclear(fact.id)}
-              type="button"
-            >
-              {translated(language, "Not clear", "No está claro")}
-            </button>
-          </>
+          <div className="mt-5 flex flex-wrap items-center gap-3">
+            {view.state === "proposed" ? (
+              <>
+                <button className="fd-confirm-button" onClick={() => onConfirmFact(fact.id)} type="button">
+                  <CheckIcon className="h-4 w-4" />
+                  {translated(language, "Confirm this", "Confirmar")}
+                </button>
+                <button className="fd-secondary-button" onClick={() => setIsCorrecting(true)} type="button">
+                  {translated(language, "Correct", "Corregir")}
+                </button>
+                <button className="fd-remove-button" onClick={() => onMarkUnclear(fact.id)} type="button">
+                  {translated(language, "Not clear", "No está claro")}
+                </button>
+              </>
+            ) : null}
+          </div>
+        </div>
+
+        {evidence ? (
+          <aside className="rounded-card border border-ink/10 bg-canvas p-4">
+            <p className="text-[11px] font-extrabold uppercase tracking-[0.15em] text-cobalt">
+              {translated(language, "Exact source passage", "Fragmento exacto de la fuente")}
+            </p>
+            <blockquote className="mt-3 border-l-2 border-amber pl-4 font-serif text-lg leading-7 text-ink">
+              “{evidence.quote}”
+            </blockquote>
+            <p className="mt-3 text-xs font-semibold leading-5 text-[#445249]">
+              {document?.label ?? translated(language, "Reviewed procedure", "Procedimiento revisado")} · {evidence.location}
+            </p>
+            {sourceId ? (
+              <div className="mt-3">
+                <SourceButton label={translated(language, "More source context", "Más contexto de la fuente")} onClick={(button) => onOpenSource(sourceId, button)} />
+              </div>
+            ) : null}
+          </aside>
         ) : null}
       </div>
     </article>
@@ -165,6 +174,18 @@ function FactReviewCard({
 
 export function FactsStep(props: FactsStepProps) {
   const { caseData, language } = props;
+  const facts = caseData.facts.filter((fact) => factHasActiveSource(caseData, fact));
+  const rank = { conflicted: 0, proposed: 1, unclear: 2, confirmed: 3, superseded: 4 } as const;
+  const ordered = [...facts].sort(
+    (left, right) => rank[currentFactView(caseData, left).state] - rank[currentFactView(caseData, right).state],
+  );
+  const currentFacts = ordered.filter((fact) => currentFactView(caseData, fact).state !== "superseded");
+  const historyFacts = ordered.filter((fact) => currentFactView(caseData, fact).state === "superseded");
+  const nextUnresolved = ordered.find((fact) => currentFactView(caseData, fact).state === "proposed");
+  const reviewed = facts.filter((fact) => {
+    const state = currentFactView(caseData, fact).state;
+    return state === "confirmed" || state === "unclear" || state === "superseded";
+  }).length;
 
   return (
     <section className="fd-enter">
@@ -190,13 +211,43 @@ export function FactsStep(props: FactsStepProps) {
         )}
       </p>
 
-      <div className="mt-8 grid gap-4 xl:grid-cols-2">
-        {caseData.facts
-          .filter((fact) => factHasActiveSource(caseData, fact))
-          .map((fact) => (
-            <FactReviewCard {...props} fact={fact} key={fact.id} />
-          ))}
+      <div className="mt-7 flex flex-col gap-4 rounded-feature border border-cobalt/15 bg-[#eef2ff] p-5 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-lg font-black tracking-[-0.025em] text-ink">
+            {translated(language, `${reviewed} of ${facts.length} reviewed`, `${reviewed} de ${facts.length} revisados`)}
+          </p>
+          <p className="mt-1 text-sm leading-6 text-[#53628b]">
+            {translated(language, "Extraction confidence describes the reading quality—not whether the fact is true.", "La confianza de extracción describe la calidad de lectura, no si el dato es verdadero.")}
+          </p>
+        </div>
+        {nextUnresolved ? (
+          <button
+            className="fd-primary-button shrink-0"
+            data-demo-target="true"
+            onClick={() => document.getElementById(`fact-${nextUnresolved.id}`)?.scrollIntoView({ behavior: "smooth", block: "center" })}
+            type="button"
+          >
+            {translated(language, "Review next fact", "Revisar el siguiente dato")}
+            <CheckIcon className="h-4 w-4" />
+          </button>
+        ) : null}
       </div>
+
+      <div className="mt-8 space-y-4">
+        {currentFacts.map((fact) => (
+          <FactReviewCard {...props} fact={fact} key={fact.id} />
+        ))}
+      </div>
+      {historyFacts.length > 0 ? (
+        <details className="mt-6 rounded-feature border border-ink/10 bg-white/70 p-4">
+          <summary className="min-h-11 cursor-pointer py-3 font-bold text-muted">
+            {translated(language, `Previous source history (${historyFacts.length})`, `Historial anterior de fuentes (${historyFacts.length})`)}
+          </summary>
+          <div className="mt-3 space-y-4">
+            {historyFacts.map((fact) => <FactReviewCard {...props} fact={fact} key={fact.id} />)}
+          </div>
+        </details>
+      ) : null}
     </section>
   );
 }

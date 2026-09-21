@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { ProductHeader } from "../../components/lantern/product-header";
+import { SiteFooter } from "../../components/lantern/site-footer";
+
 export const metadata: Metadata = {
   title: "How First Day works | Lantern",
   description:
@@ -54,7 +57,9 @@ const stages = [
 
 export default function HowFirstDayWorksPage() {
   return (
-    <main className="min-h-screen overflow-hidden bg-[#f3f5f0] text-[#14241e]">
+    <div className="min-h-screen bg-canvas text-ink">
+      <ProductHeader active="how" />
+      <main className="overflow-hidden">
       <div className="relative border-b border-[#dce2dd] bg-[#14271f] text-white">
         <div className="absolute -right-24 -top-36 h-96 w-96 rounded-full bg-[#4868e8]/25 blur-3xl" />
         <div className="absolute -bottom-28 left-[18%] h-72 w-72 rounded-full bg-[#f7c864]/15 blur-3xl" />
@@ -195,7 +200,27 @@ export default function HowFirstDayWorksPage() {
             Try the fictional case →
           </Link>
         </section>
+
+        <details className="mt-6 rounded-feature border border-ink/10 bg-white p-6">
+          <summary className="min-h-11 cursor-pointer py-2 text-lg font-bold">
+            Evaluation limits and technical details
+          </summary>
+          <div className="mt-4 grid gap-5 text-sm leading-6 text-muted md:grid-cols-2">
+            <p>
+              These results use synthetic, held-out packets—not real family documents. They test quote coverage, conflict detection, date normalization, and source retention; they do not establish accuracy for every school or document format.
+            </p>
+            <p>
+              Live page reading depends on an external provider. Planning, dependency evaluation, conflict preservation, completion history, and portable export remain explicit code paths after extraction.
+            </p>
+          </div>
+          <div className="mt-5 flex flex-wrap gap-3">
+            <Link className="lantern-primary-cta" href="/first-day?demo=1">Open guided demo</Link>
+            <a className="lantern-secondary-cta" href="https://github.com/isaacgong0311-hash/Congressional-App-Challenge-" rel="noreferrer" target="_blank">View source repository ↗</a>
+          </div>
+        </details>
       </div>
-    </main>
+      </main>
+      <SiteFooter />
+    </div>
   );
 }

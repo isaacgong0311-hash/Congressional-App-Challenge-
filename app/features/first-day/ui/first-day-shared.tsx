@@ -62,15 +62,18 @@ export function Eyebrow({ children }: { children: ReactNode }) {
 }
 
 export function SourceButton({
+  highlight = false,
   label,
   onClick,
 }: {
+  highlight?: boolean;
   label: string;
   onClick: (button: HTMLButtonElement) => void;
 }) {
   return (
     <button
       className="fd-source-button"
+      data-demo-target={highlight ? "true" : undefined}
       onClick={(event) => onClick(event.currentTarget)}
       type="button"
     >

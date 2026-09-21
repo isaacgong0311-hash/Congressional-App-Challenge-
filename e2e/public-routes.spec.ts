@@ -1,7 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
-for (const route of ["/", "/first-day", "/first-day/how-it-works"]) {
+for (const route of ["/", "/explain", "/first-day", "/first-day/how-it-works"]) {
   test(`${route} renders with security headers and no serious axe violations`, async ({
     page,
   }) => {

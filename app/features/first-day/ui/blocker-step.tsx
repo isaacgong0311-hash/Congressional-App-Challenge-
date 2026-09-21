@@ -25,6 +25,8 @@ export function BlockerStep({
   onOpenSource,
   onResolveConflict,
 }: BlockerStepProps) {
+  const [copied, setCopied] = useState(false);
+  const [practiceNote, setPracticeNote] = useState("");
   const conflict =
     caseData.conflicts.find((item) => item.id === conflictId) ??
     caseData.conflicts.find((item) => item.status === "open") ??
@@ -81,6 +83,8 @@ export function BlockerStep({
         title: document?.label ?? fact.label,
         value: fact.originalValue,
         evidenceId,
+        quote: evidence?.quote,
+        location: evidence?.location,
       },
     ];
   });
@@ -128,6 +132,14 @@ export function BlockerStep({
               <p className="mt-5 font-serif text-3xl tracking-[-0.03em]">
                 {option.value}
               </p>
+              {option.quote ? (
+                <blockquote className="mt-5 rounded-card border border-[#ead39e] bg-white p-4 text-sm leading-6 text-[#554823]">
+                  “{option.quote}”
+                  <footer className="mt-2 text-xs font-bold uppercase tracking-[0.1em] text-[#806a34]">
+                    {option.location}
+                  </footer>
+                </blockquote>
+              ) : null}
               <div className="mt-5 flex flex-wrap gap-2">
                 {option.evidenceId ? (
                   <SourceButton
@@ -177,7 +189,7 @@ export function BlockerStep({
           <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#3556d4] text-white">
             <MessageIcon />
           </span>
-          <div>
+          <div className="min-w-0 flex-1">
             <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#5369bd]">
               {translated(
                 language,
@@ -188,9 +200,41 @@ export function BlockerStep({
             <p className="mt-3 text-lg font-semibold leading-7 text-[#26386f]">
               {preparedQuestion}
             </p>
+            <button
+              className="fd-secondary-button mt-4"
+              data-demo-target="true"
+              onClick={async () => {
+                await navigator.clipboard.writeText(preparedQuestion);
+                setCopied(true);
+              }}
+              type="button"
+            >
+              {copied
+                ? translated(language, "Question copied", "Pregunta copiada")
+                : translated(language, "Copy question", "Copiar pregunta")}
+            </button>
           </div>
         </div>
       </div>
+
+      {!resolution ? (
+        <details className="mt-5 rounded-feature border border-ink/10 bg-white/75 p-5">
+          <summary className="min-h-11 cursor-pointer py-2 font-bold text-ink">
+            {translated(language, "Practice the conversation (simulated)", "Practicar la conversación (simulada)")}
+          </summary>
+          <label className="mt-4 block text-sm font-semibold text-muted" htmlFor="fd-practice-note">
+            {translated(language, "Write a practice answer. This does not update the plan.", "Escriba una respuesta de práctica. Esto no actualiza el plan.")}
+          </label>
+          <textarea
+            className="mt-2 min-h-28 w-full rounded-xl border border-ink/15 bg-white p-3 text-sm outline-none focus:border-cobalt focus:ring-2 focus:ring-cobalt/20"
+            id="fd-practice-note"
+            onChange={(event) => setPracticeNote(event.currentTarget.value)}
+            placeholder={translated(language, "For practice only…", "Solo para practicar…")}
+            value={practiceNote}
+          />
+        </details>
+      ) : null}
     </section>
   );
 }
+import { useState } from "react";
