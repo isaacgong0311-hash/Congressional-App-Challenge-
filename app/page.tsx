@@ -163,6 +163,27 @@ export default function HomePage() {
           </div>
         </section>
 
+        <section className="border-y border-ink/10 bg-surface" aria-labelledby="families-title">
+          <div className="mx-auto max-w-[1440px] px-5 py-16 sm:px-8 lg:px-12 lg:py-20">
+            <p className="lantern-eyebrow">For real family questions</p>
+            <h2 className="mt-3 max-w-4xl text-balance font-serif text-4xl tracking-[-0.04em] sm:text-5xl" id="families-title">
+              The hard part is rarely one sentence. It is knowing what matters together.
+            </h2>
+            <div className="mt-10 grid gap-4 md:grid-cols-3">
+              {[
+                ["The date is on one page.", "The location is buried in another reminder."],
+                ["Two letters disagree.", "The family needs a question—not a silent guess."],
+                ["A requirement is still unclear.", "The next safe step should stay visible without pretending it is resolved."],
+              ].map(([problem, detail]) => (
+                <article className="rounded-card border border-ink/10 bg-canvas p-6" key={problem}>
+                  <p className="text-xl font-bold tracking-[-0.025em] text-ink">{problem}</p>
+                  <p className="mt-3 text-sm leading-6 text-muted">{detail}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
         <section className="bg-[#10241c] text-white" aria-labelledby="difference-title">
           <div className="mx-auto grid max-w-[1440px] gap-10 px-5 py-20 sm:px-8 lg:grid-cols-[.92fr_1.08fr] lg:items-center lg:px-12 lg:py-28">
             <div>

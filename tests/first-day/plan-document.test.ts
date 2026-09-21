@@ -1,10 +1,40 @@
 import { describe, expect, it } from "vitest";
 
 import { fictionalCase } from "../../app/features/first-day/content/fictional-case";
+import {
+  appendTaskCompletion,
+  appendTaskCompletionReversal,
+} from "../../app/features/first-day/domain/events";
 import { createPortablePlan } from "../../app/features/first-day/export/plan-document";
 import { planCase } from "../../app/features/first-day/domain/planner";
 
 describe("portable First Day plan", () => {
+  it("keeps completion and reversal history while exporting the effective task state", () => {
+    const completed = appendTaskCompletion(fictionalCase, {
+      id: "event-task-done",
+      taskId: "task-registration",
+      timestamp: "2026-09-20T12:00:00.000Z",
+    });
+    const reversed = appendTaskCompletionReversal(completed, {
+      id: "event-task-undone",
+      taskId: "task-registration",
+      completionEventId: "event-task-done",
+      timestamp: "2026-09-20T12:01:00.000Z",
+    });
+    const portable = createPortablePlan(
+      reversed,
+      planCase(reversed),
+      "2026-09-20T12:02:00.000Z",
+    );
+
+    expect(portable.events.map((event) => event.type)).toEqual([
+      "task_completed",
+      "task_completion_reverted",
+    ]);
+    expect(
+      portable.tasks.find((task) => task.id === "task-registration")?.state,
+    ).toBe("ready");
+  });
   it("keeps task, fact, conflict, and procedure provenance", () => {
     const portable = createPortablePlan(
       fictionalCase,

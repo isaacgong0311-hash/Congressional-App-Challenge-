@@ -305,6 +305,15 @@ export function ExportStep({
             </div>
           </div>
         </details>
+        <section className="fd-technical-print mt-7 hidden break-inside-avoid border-t border-[#dfe4df] pt-6 print:block">
+          <h3 className="text-sm font-bold uppercase tracking-[0.15em]">
+            {translated(language, "Sources and technical details", "Fuentes y detalles técnicos")}
+          </h3>
+          <p className="mt-3 text-sm">{translated(language, "Rule version", "Versión de reglas")}: {caseData.ruleVersion}</p>
+          <p className="mt-2 break-words font-mono text-xs">
+            {translated(language, "Evidence IDs", "IDs de evidencia")}: {caseData.evidence.map((item) => item.id).join(", ")}
+          </p>
+        </section>
 
         <div className="mt-7 break-inside-avoid border-t border-[#dfe4df] pt-6">
           <div>

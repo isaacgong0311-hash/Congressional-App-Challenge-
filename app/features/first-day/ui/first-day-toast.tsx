@@ -1,3 +1,4 @@
+import { Toast } from "../../../components/lantern/primitives";
 import { translated, type Language } from "./first-day-copy";
 
 export function FirstDayToast({
@@ -16,7 +17,7 @@ export function FirstDayToast({
   taskId?: string;
 }) {
   return (
-    <div className="fd-toast print:hidden" role="status">
+    <Toast>
       <p className="text-sm font-semibold">{message}</p>
       <div className="flex items-center gap-2">
         {taskId && completionEventId ? (
@@ -26,6 +27,6 @@ export function FirstDayToast({
         ) : null}
         <button aria-label={translated(language, "Dismiss message", "Cerrar mensaje")} className="rounded-lg px-2 py-1 text-white/65 hover:bg-white/10 hover:text-white" onClick={onDismiss} type="button">×</button>
       </div>
-    </div>
+    </Toast>
   );
 }

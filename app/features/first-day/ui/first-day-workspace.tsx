@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 
+import { ActionDock } from "../../../components/lantern/primitives";
 import type { FirstDayCase } from "../domain/types";
 import { BlockerStep } from "./blocker-step";
 import { CaseSnapshot } from "./case-snapshot";
@@ -192,7 +193,7 @@ export function FirstDayWorkspace({
         ) : null}
 
         <div className="mx-auto grid w-full max-w-[1400px] grid-cols-1 gap-6 px-4 py-5 sm:px-7 lg:grid-cols-[250px_minmax(0,1fr)] lg:gap-9 lg:px-10 lg:py-9">
-          <aside className="space-y-4 print:hidden lg:sticky lg:top-5 lg:self-start">
+          <aside className="grid gap-4 print:hidden sm:grid-cols-[minmax(0,.85fr)_minmax(0,1.15fr)] lg:sticky lg:top-5 lg:block lg:self-start lg:space-y-4">
             <WorkspaceProgress
               caseData={caseData}
               currentStep={currentStep}
@@ -271,7 +272,7 @@ export function FirstDayWorkspace({
             ) : null}
 
             {currentStep !== "start" ? (
-              <div className="fd-action-dock print:hidden">
+              <ActionDock className="print:hidden">
                 <button
                   className="fd-secondary-button"
                   disabled={activeStepIndex === 0}
@@ -287,7 +288,7 @@ export function FirstDayWorkspace({
                     <ArrowRightIcon className="h-5 w-5" />
                   </button>
                 ) : null}
-              </div>
+              </ActionDock>
             ) : null}
           </main>
         </div>

@@ -1,4 +1,5 @@
 import type {
+  CaseEvent,
   ConfirmationState,
   Fact,
   FirstDayCase,
@@ -13,6 +14,7 @@ export type PortablePlan = {
   caseMode: FirstDayCase["mode"];
   district: string;
   language: FirstDayCase["language"];
+  events: CaseEvent[];
   tasks: Array<{
     id: string;
     title: string;
@@ -161,6 +163,7 @@ export function createPortablePlan(
     caseMode: caseData.mode,
     district: caseData.district,
     language: caseData.language,
+    events: structuredClone(caseData.events),
     tasks: plan.tasks.map((task) => ({
       id: task.id,
       title: task.title,

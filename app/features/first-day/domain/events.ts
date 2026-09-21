@@ -77,6 +77,24 @@ export function appendTaskCompletionReversal(
       `Completion event ${input.completionEventId} does not belong to task ${input.taskId}`,
     );
   }
+  let activeCompletionId: string | undefined;
+  for (const event of caseData.events) {
+    if (event.type === "task_completed" && event.taskId === input.taskId) {
+      activeCompletionId = event.id;
+    }
+    if (
+      event.type === "task_completion_reverted" &&
+      event.taskId === input.taskId &&
+      event.completionEventId === activeCompletionId
+    ) {
+      activeCompletionId = undefined;
+    }
+  }
+  if (activeCompletionId !== input.completionEventId) {
+    throw new Error(
+      `Only the latest effective completion can be reversed for task ${input.taskId}`,
+    );
+  }
   if (
     caseData.events.some(
       (event) =>

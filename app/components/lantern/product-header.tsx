@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import { LanternMark } from "./brand";
 
 type ProductHeaderProps = {
-  active?: "home" | "explain" | "first-day" | "how";
+  active?: "home" | "explain" | "first-day" | "how" | "privacy";
   controls?: ReactNode;
 };
 
@@ -12,6 +12,7 @@ const links = [
   { href: "/first-day", label: "First Day", id: "first-day" },
   { href: "/explain", label: "Explain a letter", id: "explain" },
   { href: "/first-day/how-it-works", label: "How it works", id: "how" },
+  { href: "/privacy", label: "Privacy", id: "privacy" },
 ] as const;
 
 export function ProductHeader({ active = "home", controls }: ProductHeaderProps) {
@@ -32,7 +33,7 @@ export function ProductHeader({ active = "home", controls }: ProductHeaderProps)
           </span>
         </Link>
 
-        <nav aria-label="Main navigation" className="hidden items-center gap-1 md:flex">
+        <nav aria-label="Main navigation" className="hidden items-center gap-1 lg:flex">
           {links.map((link) => (
             <Link
               aria-current={active === link.id ? "page" : undefined}

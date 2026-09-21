@@ -104,6 +104,28 @@ describe("First Day case events", () => {
     ).toThrow("Completion event event-registration-complete does not belong to task task-health-records");
   });
 
+  it("reverses only the latest effective completion for a task", () => {
+    const first = appendTaskCompletion(fictionalCase, {
+      id: "event-registration-first",
+      taskId: "task-registration",
+      timestamp: "2026-09-15T12:01:00.000Z",
+    });
+    const second = appendTaskCompletion(first, {
+      id: "event-registration-second",
+      taskId: "task-registration",
+      timestamp: "2026-09-15T12:02:00.000Z",
+    });
+
+    expect(() =>
+      appendTaskCompletionReversal(second, {
+        id: "event-invalid-old-reversal",
+        taskId: "task-registration",
+        completionEventId: "event-registration-first",
+        timestamp: "2026-09-15T12:03:00.000Z",
+      }),
+    ).toThrow("Only the latest effective completion can be reversed");
+  });
+
   it("appends a school report as an immutable event", () => {
     const next = appendSchoolConfirmation(fictionalCase, {
       id: "event-school-report",

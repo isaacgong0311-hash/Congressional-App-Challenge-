@@ -1,9 +1,15 @@
 "use client";
 
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import { ProductHeader } from "../../components/lantern/product-header";
 import { useLanternPreferences } from "../../components/lantern/use-lantern-preferences";
+import {
+  deriveLetterToolView,
+  isLetterResult,
+  type Result,
+} from "./letter-tool-state";
 import {
   RESOURCES,
   CRISIS_RESOURCES,
@@ -11,42 +17,15 @@ import {
   type Category,
   type Resource,
 } from "../../resources";
-import Assistant from "../../Assistant";
 
-type Step = { step: string; detail: string };
-type ChecklistItem = { item: string; why: string };
-type ResponseLetter = { applicable: boolean; kind: string; body: string };
-
-type Result = {
-  documentType: string;
-  category: Category;
-  confidence: number;
-  whyThisType: string;
-  urgency: "low" | "medium" | "high";
-  meaning: string;
-  keyDetails: {
-    sender: string | null;
-    contactPhone: string | null;
-    accountNumber: string | null;
-    amountDue: string | null;
-  };
-  whatTheyNeed: string[];
-  documentChecklist: ChecklistItem[];
-  responseLetter: ResponseLetter;
-  nextSteps: Step[];
-  phoneScript: string;
-  deadline: string | null;
-  deadlineISO: string | null;
-  isPossibleScam: boolean;
-  scamSigns: string[];
-  isCrisis: boolean;
-  crisisMessage: string;
-  scamAgencyFacts: string;
-  whatHappensIfNothing: string;
-  photoQualityNote: string | null;
-  detectedLetterLanguage: string | null;
-  originalText: string;
-};
+const Assistant = dynamic(() => import("../../Assistant"), {
+  loading: () => (
+    <div className="rounded-2xl border border-slate-200 bg-white p-5 text-sm text-slate-500">
+      Preparing the practice assistant…
+    </div>
+  ),
+  ssr: false,
+});
 
 const LANGUAGES: { label: string; bcp47: string; tts: string }[] = [
   { label: "English", bcp47: "en", tts: "en-US" },
@@ -168,7 +147,7 @@ export default function LetterWorkspace() {
   const [photoQuality, setPhotoQuality] = useState<"ok" | "dark" | null>(null);
   const [whyNotOpen, setWhyNotOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<0 | 1 | 2>(0);
-  const [screen, setScreen] = useState<"home" | "app" | "help">("home");
+  const [screen, setScreen] = useState<"home" | "app" | "help">("app");
   const [helpCategory, setHelpCategory] = useState<Category | null>(null);
   const [demoIdx, setDemoIdx] = useState(0);
   const [formTab, setFormTab] = useState<0 | 1 | 2>(0);
@@ -308,8 +287,12 @@ export default function LetterWorkspace() {
       const data = await res.json();
       if (!res.ok) {
         setError(data.error || "Something went wrong. Please try again.");
+      } else if (!isLetterResult(data)) {
+        setError(
+          "We couldn't safely read that response. Please try the photo again.",
+        );
       } else {
-        setResult(data as Result);
+        setResult(data);
         setActiveTab(0);
       }
     } catch {
@@ -492,9 +475,15 @@ export default function LetterWorkspace() {
       result.documentChecklist.length > 0 ||
       (result.responseLetter.applicable && !!result.responseLetter.body) ||
       !!result.phoneScript);
+  const view = deriveLetterToolView({
+    error,
+    previewUrl: preview,
+    processingStep: loading ? loadingMsg : null,
+    result,
+  });
 
   return (
-    <div className="flex min-h-screen flex-col" dir={dir} data-hc={highContrast ? "true" : undefined} data-lt={largeText ? "true" : undefined}>
+    <div className="flex min-h-screen flex-col" data-hc={highContrast ? "true" : undefined} data-letter-view={view.status} data-lt={largeText ? "true" : undefined} dir={dir}>
       {/* Crisis accent: a calm but clear signal at the top of the page. */}
       {result?.isCrisis && (
         <div className="h-1.5 w-full bg-red-500" aria-hidden="true" />
@@ -664,13 +653,26 @@ export default function LetterWorkspace() {
         {/* ── App (upload + results) ─────────────────────────── */}
         {screen === "app" && (
         <div className="py-8 max-w-2xl mx-auto">
-        <button
-          onClick={() => { reset(); setScreen("home"); }}
-          className="mb-5 flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-slate-800 focus-visible:outline-none"
+        <Link
+          href="/"
+          className="mb-5 flex min-h-11 items-center gap-1.5 rounded-lg text-sm font-semibold text-slate-700 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
         >
-          ← Back
-        </button>
+          ← Lantern home
+        </Link>
 
+        {!loading && !result && !error ? (
+          <div className="mb-7">
+            <p className="lantern-eyebrow">Explain a letter</p>
+            <h1 className="mt-3 text-balance font-serif text-4xl leading-tight tracking-[-0.04em] text-ink sm:text-5xl">
+              Understand the letter. See what to do next.
+            </h1>
+            <p className="mt-4 max-w-xl text-base leading-7 text-muted">
+              Take a clear photo or choose an image. Lantern will surface urgency, dates, amounts, scam signals, and practical next steps.
+            </p>
+          </div>
+        ) : null}
+
+        {!loading && !result && !error ? (
         <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm ring-1 ring-black/[0.02]">
           {/* Form tab bar */}
           <div className="flex border-b border-slate-200" role="tablist">
@@ -827,6 +829,7 @@ export default function LetterWorkspace() {
             )}
           </div>
         </div>
+        ) : null}
 
         {/* Visual progress steps */}
         {loading && (
@@ -863,6 +866,24 @@ export default function LetterWorkspace() {
             <div>
               <p className="font-semibold">We hit a snag</p>
               <p className="mt-0.5 text-sm">{error}</p>
+              {file ? (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <button
+                    className="min-h-11 rounded-xl bg-red-800 px-4 text-sm font-bold text-white hover:bg-red-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-700 focus-visible:ring-offset-2"
+                    onClick={explain}
+                    type="button"
+                  >
+                    Try again
+                  </button>
+                  <button
+                    className="min-h-11 rounded-xl border border-red-300 bg-white px-4 text-sm font-bold text-red-800 hover:bg-red-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-700"
+                    onClick={reset}
+                    type="button"
+                  >
+                    Choose another photo
+                  </button>
+                </div>
+              ) : null}
             </div>
           </div>
         )}

@@ -1,5 +1,7 @@
 import { useRef, useState } from "react";
 
+import { MetricCard } from "../../../components/lantern/primitives";
+
 import {
   MAX_CASE_BYTES,
   MAX_DOCUMENT_BYTES,
@@ -86,21 +88,16 @@ export function DocumentsStep({
         )}
       </p>
 
-      <dl className="mt-7 grid grid-cols-2 gap-3 xl:grid-cols-4">
+      <div className="mt-7 grid grid-cols-2 gap-3 xl:grid-cols-4">
         {[
           [visibleDocuments.length, "Pages added", "Páginas añadidas"],
           [readyPages, "Successfully read", "Leídas correctamente"],
           [failedPages, "Need attention", "Necesitan atención"],
           [proposedFacts, "Proposed facts", "Datos propuestos"],
         ].map(([value, en, es]) => (
-          <div className="rounded-card border border-ink/10 bg-white/80 p-4" key={String(en)}>
-            <dd className="text-2xl font-black tracking-[-0.04em] text-ink">{value}</dd>
-            <dt className="mt-1 text-xs font-bold uppercase tracking-[0.1em] text-muted">
-              {translated(language, String(en), String(es))}
-            </dt>
-          </div>
+          <MetricCard key={String(en)} label={translated(language, String(en), String(es))} value={value} />
         ))}
-      </dl>
+      </div>
 
       {caseData.mode === "live" ? (
         <div

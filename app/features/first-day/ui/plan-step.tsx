@@ -145,7 +145,7 @@ export function PlanStep({
       </div>
 
       <div className="mt-5 space-y-8">
-        {(Object.keys(STATE_META) as Array<keyof typeof STATE_META>).map(
+        {(["needs_clarification", "ready", "needs_review", "waiting", "done"] as Array<keyof typeof STATE_META>).map(
           (state) => {
             const tasks = visibleTasks.filter((task) => task.state === state);
             if (tasks.length === 0) return null;

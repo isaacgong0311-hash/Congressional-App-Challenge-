@@ -885,6 +885,11 @@ body {
   font-size: 1.5rem !important;
 }
 
+[data-letter-view] .text-slate-500,
+[data-letter-view] .text-slate-400 {
+  color: #475569;
+}
+
 /* ── Print / Save as PDF ─────────────────────────────────────── */
 @media print {
   body {

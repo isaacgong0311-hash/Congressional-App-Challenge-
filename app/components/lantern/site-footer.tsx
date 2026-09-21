@@ -24,6 +24,7 @@ export function SiteFooter() {
           <Link className="hover:text-white" href="/first-day">First Day</Link>
           <Link className="hover:text-white" href="/explain">Explain a letter</Link>
           <Link className="hover:text-white" href="/first-day/how-it-works">How it works</Link>
+          <Link className="hover:text-white" href="/privacy">Privacy</Link>
           <a className="hover:text-white" href="https://github.com/isaacgong0311-hash/Congressional-App-Challenge-" rel="noreferrer" target="_blank">Source code</a>
         </nav>
       </div>

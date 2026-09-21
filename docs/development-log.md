@@ -82,6 +82,16 @@ Provider pricing and retention terms are external and may change. The project do
 - Added a public technical explanation, free GitHub Actions CI, and browser security headers on all routes. The headers reduce browser attack surface but do not replace input validation, evidence checks, or provider privacy controls.
 - Applied Next.js App Router guidance to keep the explanation page static and server-rendered, and React review guidance to keep shared task localization outside the export and plan components.
 
+## 2026-09-20 — Cohesive flagship frontend overhaul
+
+- Made First Day the server-rendered flagship homepage, moved the original letter workflow to `/explain`, and added shared product navigation, a dedicated privacy page, and a cohesive editorial civic visual system.
+- Rebuilt the First Day shell around a typed controller, desktop progress rail, compact tablet summary, mobile progress disclosure, persistent case snapshot, safe-area action dock, and source sheet with trapped focus and trigger restoration.
+- Added guided fictional-demo cues, deterministic task presentation priority and filters, exact evidence beside each fact and plan step, comparison-focused conflict resolution, family-readable exports, and append-only task-completion reversal.
+- Kept task undo fully derived: a reversal appends history, only the latest effective completion may be reversed, and the portable JSON retains both events while presenting the task's current effective state.
+- Consolidated persisted settings into `lantern.preferences.v1`. Only language, large-text, and high-contrast preferences are stored; documents, images, extracted text, facts, tasks, and event history remain memory-only.
+- Added runtime guarding for malformed letter-tool responses, a recoverable retry state, browser speech fallback coverage, RTL direction updates, and deferred loading for the optional practice assistant.
+- Added visual regression baselines for 10 critical states at 390, 768, 1024, and 1440 pixels with a 1% threshold, plus horizontal-overflow checks, Letter/A4 PDF checks, accessibility scans, layout-shift/transfer gates, and privacy-storage coverage.
+
 ## AI assistance disclosure
 
 OpenAI Codex assisted with:
