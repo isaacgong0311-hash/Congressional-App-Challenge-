@@ -132,9 +132,10 @@ export function LetterResults({
               {result.originalText && (() => {
                 const before = fleschKincaidGrade(result.originalText);
                 const after = fleschKincaidGrade(result.meaning);
+                const improved = after < before;
                 return (
-                  <span className="inline-flex items-center gap-1.5 rounded-full border border-confirmed/20 bg-[#e3f4e8] px-2.5 py-1 text-xs font-semibold text-[#24633a]">
-                    Grade {before} → Grade {after}
+                  <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold ${improved ? "border-confirmed/20 bg-[#e3f4e8] text-[#24633a]" : "border-ink/10 bg-canvas text-muted"}`}>
+                    {improved ? `Reading level · Grade ${before} → ${after}` : `Reading level · Grade ${after}`}
                   </span>
                 );
               })()}

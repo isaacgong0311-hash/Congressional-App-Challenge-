@@ -52,6 +52,13 @@ test("Explain intake exposes semantic tabs without decorative glyph labels", asy
   await expect(
     tablist.getByRole("tab", { name: "Options" }),
   ).toHaveAttribute("aria-selected", "true");
+  await page.keyboard.press("ArrowRight");
+  await expect(
+    tablist.getByRole("tab", { name: "Privacy" }),
+  ).toHaveAttribute("aria-selected", "true");
+  await expect(
+    tablist.getByRole("tab", { name: "Privacy" }),
+  ).toBeFocused();
 });
 
 test("Explain intake keeps one clear primary action and stable processing status", async ({

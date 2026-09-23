@@ -2,6 +2,7 @@ import type {
   ButtonHTMLAttributes,
   DetailsHTMLAttributes,
   HTMLAttributes,
+  KeyboardEvent,
   ReactNode,
 } from "react";
 
@@ -214,16 +215,41 @@ export function SegmentedControl<T extends string | number>({
   options: readonly { icon?: ReactNode; label: string; value: T }[];
   value: T;
 }) {
+  function moveSelection(event: KeyboardEvent<HTMLButtonElement>, index: number) {
+    const lastIndex = options.length - 1;
+    let nextIndex: number | null = null;
+
+    if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+      nextIndex = index === lastIndex ? 0 : index + 1;
+    } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+      nextIndex = index === 0 ? lastIndex : index - 1;
+    } else if (event.key === "Home") {
+      nextIndex = 0;
+    } else if (event.key === "End") {
+      nextIndex = lastIndex;
+    }
+
+    if (nextIndex === null) return;
+    event.preventDefault();
+    onChange(options[nextIndex].value);
+    const tabs = event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>(
+      '[role="tab"]',
+    );
+    tabs?.[nextIndex]?.focus();
+  }
+
   return (
     <div aria-label={label} className="lantern-segmented" role="tablist">
-      {options.map((option) => (
+      {options.map((option, index) => (
         <button
           aria-selected={value === option.value}
           className="lantern-segmented-option"
           data-selected={value === option.value ? "true" : undefined}
           key={option.value}
           onClick={() => onChange(option.value)}
+          onKeyDown={(event) => moveSelection(event, index)}
           role="tab"
+          tabIndex={value === option.value ? 0 : -1}
           type="button"
         >
           {option.icon}
