@@ -86,6 +86,43 @@ body {
   transform: translateY(-1px);
 }
 
+.lantern-segmented {
+  display: flex;
+  gap: 0.375rem;
+  border-bottom: 1px solid rgba(20, 36, 30, 0.1);
+  background: rgba(244, 241, 234, 0.66);
+  padding: 0.375rem;
+}
+
+.lantern-segmented-option {
+  display: inline-flex;
+  min-height: 44px;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 0.75rem;
+  color: var(--lantern-muted);
+  font-size: 0.875rem;
+  font-weight: 750;
+  transition: background 160ms ease, color 160ms ease, box-shadow 160ms ease, transform 120ms ease;
+}
+
+.lantern-segmented-option svg {
+  height: 1rem;
+  width: 1rem;
+}
+
+.lantern-segmented-option[data-selected="true"] {
+  background: var(--lantern-surface);
+  color: var(--lantern-cobalt);
+  box-shadow: 0 2px 10px rgba(20, 36, 30, 0.08);
+}
+
+.lantern-segmented-option:active {
+  transform: scale(0.985);
+}
+
 .lantern-primary-cta:focus-visible,
 .lantern-secondary-cta:focus-visible {
   outline: 3px solid var(--lantern-amber);

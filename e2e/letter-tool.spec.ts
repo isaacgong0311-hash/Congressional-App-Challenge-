@@ -39,6 +39,21 @@ const validResult = {
   originalText: "This fictional utility notice says a balance is due.",
 };
 
+test("Explain intake exposes semantic tabs without decorative glyph labels", async ({
+  page,
+}) => {
+  await page.goto("/explain");
+  const tablist = page.getByRole("tablist", { name: "Letter setup" });
+  await expect(tablist).toBeVisible();
+  await expect(
+    tablist.getByRole("tab", { name: "Upload" }),
+  ).toHaveAttribute("aria-selected", "true");
+  await tablist.getByRole("tab", { name: "Options" }).click();
+  await expect(
+    tablist.getByRole("tab", { name: "Options" }),
+  ).toHaveAttribute("aria-selected", "true");
+});
+
 test("letter workspace recovers from malformed output and keeps speech fallback", async ({
   page,
 }) => {

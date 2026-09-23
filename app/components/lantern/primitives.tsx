@@ -202,3 +202,34 @@ export function AccessibilityControls({
     </div>
   );
 }
+
+export function SegmentedControl<T extends string | number>({
+  label,
+  onChange,
+  options,
+  value,
+}: {
+  label: string;
+  onChange: (value: T) => void;
+  options: readonly { icon?: ReactNode; label: string; value: T }[];
+  value: T;
+}) {
+  return (
+    <div aria-label={label} className="lantern-segmented" role="tablist">
+      {options.map((option) => (
+        <button
+          aria-selected={value === option.value}
+          className="lantern-segmented-option"
+          data-selected={value === option.value ? "true" : undefined}
+          key={option.value}
+          onClick={() => onChange(option.value)}
+          role="tab"
+          type="button"
+        >
+          {option.icon}
+          <span>{option.label}</span>
+        </button>
+      ))}
+    </div>
+  );
+}

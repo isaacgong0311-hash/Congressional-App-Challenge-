@@ -1,5 +1,7 @@
 import type { ChangeEventHandler, Dispatch, SetStateAction } from "react";
 
+import { LockIcon, SlidersIcon, UploadIcon } from "../../components/lantern/icons";
+import { SegmentedControl } from "../../components/lantern/primitives";
 import { Spinner } from "./letter-support";
 
 type LanguageOption = {
@@ -49,28 +51,16 @@ export function LetterIntake({
 }) {
   return (
     <div className="overflow-hidden rounded-feature border border-ink/10 bg-surface shadow-[0_18px_55px_rgba(20,36,30,.07)]">
-      <div className="flex border-b border-ink/10 bg-canvas/60 p-1.5" role="tablist">
-        {([
-          { label: "Upload", icon: "▣", index: 0 },
-          { label: "Options", icon: "◌", index: 1 },
-          { label: "Privacy", icon: "⌑", index: 2 },
-        ] as const).map((tab) => (
-          <button
-            aria-selected={formTab === tab.index}
-            className={`min-h-11 flex-1 rounded-xl px-3 py-2 text-sm font-bold transition focus-visible:outline-3 focus-visible:outline-offset-1 focus-visible:outline-amber ${
-              formTab === tab.index
-                ? "bg-white text-cobalt shadow-sm"
-                : "text-muted hover:bg-white/60 hover:text-ink"
-            }`}
-            key={tab.index}
-            onClick={() => setFormTab(tab.index)}
-            role="tab"
-            type="button"
-          >
-            <span aria-hidden="true">{tab.icon}</span> {tab.label}
-          </button>
-        ))}
-      </div>
+      <SegmentedControl
+        label="Letter setup"
+        onChange={(value) => setFormTab(value)}
+        options={[
+          { icon: <UploadIcon />, label: "Upload", value: 0 },
+          { icon: <SlidersIcon />, label: "Options", value: 1 },
+          { icon: <LockIcon />, label: "Privacy", value: 2 },
+        ] as const}
+        value={formTab}
+      />
 
       <div className="p-5">
         {formTab === 0 ? (
@@ -142,7 +132,7 @@ export function LetterIntake({
               <input className="min-h-11 w-full rounded-xl border border-ink/15 bg-white px-3 text-sm focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-amber" id="zip" inputMode="numeric" maxLength={5} onChange={(event) => setZip(event.target.value.replace(/\D/g, ""))} placeholder="e.g. 90210" type="text" value={zip} />
             </div>
             <div className="flex items-center gap-2 rounded-xl border border-ink/10 bg-canvas px-3 py-3 text-xs text-muted">
-              <LockIcon /> Settings apply to your next explanation. Only interface preferences persist.
+              <LockIcon className="h-3.5 w-3.5 shrink-0" /> Settings apply to your next explanation. Only interface preferences persist.
             </div>
           </div>
         ) : null}
@@ -159,21 +149,12 @@ export function LetterIntake({
               <li>Close or refresh this tab to clear Lantern&apos;s in-memory result.</li>
             </ol>
             <div className="flex items-center gap-2 rounded-xl border border-confirmed/20 bg-[#e3f4e8] px-3 py-3 text-xs font-bold text-[#24633a]">
-              <LockIcon /> No account · No cloud case history · Encrypted in transit
+              <LockIcon className="h-3.5 w-3.5 shrink-0" /> No account · No cloud case history · Encrypted in transit
             </div>
           </div>
         ) : null}
       </div>
     </div>
-  );
-}
-
-function LockIcon() {
-  return (
-    <svg aria-hidden="true" fill="none" height="12" viewBox="0 0 24 24" width="12">
-      <rect fill="currentColor" height="9" rx="2" width="14" x="5" y="11" />
-      <path d="M8 11V8a4 4 0 0 1 8 0v3" stroke="currentColor" strokeWidth="2" />
-    </svg>
   );
 }
 
