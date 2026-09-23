@@ -47,6 +47,70 @@ label:active .letter-upload-action {
   box-shadow: 0 18px 50px rgba(20, 36, 30, 0.07);
 }
 
+.letter-summary-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 1rem;
+  border: 1px solid rgba(20, 36, 30, 0.1);
+  border-radius: var(--radius-card);
+  background: var(--lantern-surface);
+  padding: 1.25rem;
+  box-shadow: 0 12px 36px rgba(20, 36, 30, 0.05);
+}
+
+.letter-icon-well {
+  display: inline-flex;
+  height: 2.5rem;
+  width: 2.5rem;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.8rem;
+  background: #eef2ff;
+  color: var(--lantern-cobalt);
+}
+
+.letter-result-shell {
+  isolation: isolate;
+}
+
+.letter-action-button {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  border: 1px solid rgba(20, 36, 30, 0.15);
+  border-radius: 0.75rem;
+  background: white;
+  padding: 0.55rem 0.8rem;
+  color: var(--lantern-ink);
+  font-size: 0.875rem;
+  font-weight: 750;
+  transition: background 160ms ease, border-color 160ms ease, transform 120ms ease;
+}
+
+.letter-action-button:hover {
+  border-color: rgba(53, 86, 212, 0.3);
+  background: #eef2ff;
+}
+
+.letter-action-button:active {
+  transform: scale(0.985);
+}
+
+.letter-action-button:focus-visible {
+  outline: 3px solid var(--lantern-amber);
+  outline-offset: 3px;
+}
+
+@media (max-width: 639px) {
+  .letter-summary-card {
+    gap: 0.75rem;
+    padding: 1rem;
+  }
+}
+
 /* ── High contrast mode ───────────────────────────────────────── */
 [data-high-contrast="true"] body,
 [data-high-contrast="true"] {
@@ -139,4 +203,3 @@ label:active .letter-upload-action {
 [data-letter-view] .text-slate-400 {
   color: #475569;
 }
-

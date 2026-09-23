@@ -2,6 +2,7 @@
 
 import { useState, type ReactNode } from "react";
 
+import { PhoneIcon, SearchIcon } from "../../components/lantern/icons";
 import type { Category, Resource } from "../../resources";
 
 type LocalResource = {
@@ -57,8 +58,8 @@ export function LocalHelpFinder({ category }: { category: Category }) {
     <div className="ttf-fade-in overflow-hidden rounded-feature border border-cobalt/20 bg-[#eef2ff]">
       <div className="p-5">
         <div className="flex items-center gap-2.5">
-          <span className="flex h-9 w-9 flex-none items-center justify-center rounded-xl bg-cobalt text-lg text-white">
-            🔍
+          <span className="flex h-9 w-9 flex-none items-center justify-center rounded-xl bg-cobalt text-white">
+            <SearchIcon className="h-5 w-5" />
           </span>
           <div>
             <h3 className="font-bold text-ink">Find local help near you</h3>
@@ -115,8 +116,8 @@ export function LocalHelpFinder({ category }: { category: Category }) {
                       ) : null}
                     </div>
                     {resource.phone ? (
-                      <a className="inline-flex min-h-11 items-center rounded-xl border border-ink/15 px-3 text-sm font-bold text-cobalt" href={`tel:${resource.phone.replace(/[^+\d]/g, "")}`}>
-                        Call {resource.phone}
+                      <a className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-ink/15 px-3 text-sm font-bold text-cobalt" href={`tel:${resource.phone.replace(/[^+\d]/g, "")}`}>
+                        <PhoneIcon className="h-4 w-4" /> Call {resource.phone}
                       </a>
                     ) : null}
                   </div>
@@ -193,8 +194,8 @@ export function ResourceRow({ resource }: { resource: Resource }) {
           ) : null}
         </div>
         {resource.phone ? (
-          <a className="inline-flex min-h-11 items-center rounded-xl border border-ink/15 px-3 text-sm font-bold text-cobalt" href={`tel:${resource.phone.replace(/[^+\d]/g, "")}`}>
-            Call {resource.phone}
+          <a className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-ink/15 px-3 text-sm font-bold text-cobalt" href={`tel:${resource.phone.replace(/[^+\d]/g, "")}`}>
+            <PhoneIcon className="h-4 w-4" /> Call {resource.phone}
           </a>
         ) : null}
       </div>

@@ -120,13 +120,24 @@ test("letter workspace recovers from malformed output and keeps speech fallback"
   await expect(
     page.getByRole("heading", { name: "Utility notice", exact: true }),
   ).toBeVisible();
+  await expect(
+    page.getByRole("region", { name: "Letter summary" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("tablist", { name: "Explanation sections" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Read explanation aloud" }),
+  ).toBeVisible();
 
   await page.evaluate(() => {
     window.speechSynthesis.speak = () => {
       document.documentElement.dataset.speechFallback = "used";
     };
   });
-  await page.getByRole("button", { name: /Read aloud/ }).click();
+  await page
+    .getByRole("button", { name: "Read explanation aloud" })
+    .click();
   await expect(page.locator("html")).toHaveAttribute("data-speech-fallback", "used");
 
   const results = await new AxeBuilder({ page })

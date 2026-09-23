@@ -3,6 +3,19 @@
 import dynamic from "next/dynamic";
 import type { Dispatch, SetStateAction } from "react";
 
+import {
+  CalendarIcon,
+  CameraIcon,
+  CheckIcon,
+  DocumentIcon,
+  HelpIcon,
+  LightbulbIcon,
+  PhoneIcon,
+  ShieldAlertIcon,
+  StopIcon,
+  VolumeIcon,
+} from "../../components/lantern/icons";
+import { SegmentedControl } from "../../components/lantern/primitives";
 import { CRISIS_RESOURCES, RESOURCES, SCAM_RESOURCE } from "../../resources";
 import type { Result } from "./letter-tool-state";
 import { LetterMobilePreview, LetterResultOverview } from "./letter-result-overview";
@@ -22,7 +35,7 @@ type LanguageOption = { label: string; bcp47: string; tts: string };
 const URGENCY_STYLES: Record<Result["urgency"], string> = {
   high: "bg-red-100 text-red-800 border-red-300",
   medium: "bg-amber-100 text-amber-800 border-amber-300",
-  low: "bg-emerald-100 text-emerald-800 border-emerald-300",
+  low: "bg-[#e3f4e8] text-[#24633a] border-confirmed/25",
 };
 
 const URGENCY_LABEL: Record<Result["urgency"], string> = {
@@ -114,13 +127,13 @@ export function LetterResults({
             aria-live="polite"
           >
             {/* Human-in-loop banner + FK grade */}
-            <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-xs text-slate-600">
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-ink/10 bg-surface px-4 py-2.5 text-xs text-muted">
               <span><span className="font-semibold">Lantern explains — it doesn&apos;t decide.</span> Always confirm with the office named on your letter before taking action.</span>
               {result.originalText && (() => {
                 const before = fleschKincaidGrade(result.originalText);
                 const after = fleschKincaidGrade(result.meaning);
                 return (
-                  <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-800">
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-confirmed/20 bg-[#e3f4e8] px-2.5 py-1 text-xs font-semibold text-[#24633a]">
                     Grade {before} → Grade {after}
                   </span>
                 );
@@ -136,8 +149,8 @@ export function LetterResults({
 
 
             {result.photoQualityNote && (
-              <div className="ttf-fade-in rounded-xl border border-amber-300 bg-amber-50 px-4 py-2.5 text-sm text-amber-800">
-                📷 {result.photoQualityNote}
+              <div className="ttf-fade-in flex items-center gap-2 rounded-xl border border-amber/45 bg-[#fff8df] px-4 py-2.5 text-sm text-[#795a18]">
+                <CameraIcon className="h-4 w-4 shrink-0" /> {result.photoQualityNote}
               </div>
             )}
 
@@ -146,8 +159,8 @@ export function LetterResults({
                 role="alert"
                 className="ttf-fade-in rounded-2xl border-2 border-orange-500 bg-orange-50 p-4"
               >
-                <p className="font-bold text-orange-900">
-                  🚩 This may be a scam — please be careful
+                <p className="flex items-center gap-2 font-bold text-orange-900">
+                  <ShieldAlertIcon className="h-5 w-5 shrink-0" /> This may be a scam — please be careful
                 </p>
                 {result.scamSigns.length > 0 && (
                   <ul className="mt-2 list-disc space-y-1 ps-5 text-orange-900">
@@ -186,7 +199,7 @@ export function LetterResults({
                 role="alert"
                 className="ttf-fade-in rounded-2xl border-2 border-red-400 bg-red-50 p-4"
               >
-                <p className="font-semibold text-red-800">⚠️ This needs attention soon</p>
+                <p className="flex items-center gap-2 font-semibold text-red-800"><ShieldAlertIcon className="h-5 w-5 shrink-0" /> This needs attention soon</p>
                 <p className="mt-1 text-red-800">{result.crisisMessage}</p>
               </div>
             )}
@@ -199,31 +212,24 @@ export function LetterResults({
                   <img src={preview} alt="Your letter" className="max-h-[70vh] w-full rounded-card border border-ink/10 bg-white object-contain shadow-[0_18px_45px_rgba(20,36,30,.08)]" />
                   <div className="flex flex-wrap gap-1">
                     <span className={`rounded-full border px-2 py-0.5 text-xs font-semibold ${URGENCY_STYLES[result.urgency]}`}>{URGENCY_LABEL[result.urgency]}</span>
-                    {result.keyDetails?.amountDue && <span className="rounded-full border border-red-200 bg-red-50 px-2 py-0.5 text-xs font-semibold text-red-700">💵 {result.keyDetails.amountDue}</span>}
-                    {result.keyDetails?.contactPhone && <span className="rounded-full border border-slate-200 bg-white px-2 py-0.5 text-xs text-slate-600">📞 {result.keyDetails.contactPhone}</span>}
+                    {result.keyDetails?.amountDue && <span className="rounded-full border border-review/20 bg-[#fbe8e3] px-2 py-0.5 text-xs font-semibold text-review">Amount {result.keyDetails.amountDue}</span>}
+                    {result.keyDetails?.contactPhone && <span className="inline-flex items-center gap-1 rounded-full border border-ink/10 bg-white px-2 py-0.5 text-xs text-muted"><PhoneIcon className="h-3 w-3" /> {result.keyDetails.contactPhone}</span>}
                   </div>
                 </div>
               )}
 
             {/* Tab bar */}
-            <div className="overflow-hidden rounded-feature border border-ink/10 bg-surface shadow-[0_18px_55px_rgba(20,36,30,.07)]">
-              <div className="flex border-b border-ink/10 bg-canvas/60 p-1.5" role="tablist">
-                {(["Understand", "Take Action", "Get Help"] as const).map((label, i) => (
-                  <button
-                    key={label}
-                    role="tab"
-                    aria-selected={activeTab === i}
-                    onClick={() => setActiveTab(i as 0 | 1 | 2)}
-                    className={`min-h-11 flex-1 rounded-xl px-3 py-2 text-sm font-bold transition focus-visible:outline-3 focus-visible:outline-offset-1 focus-visible:outline-amber ${
-                      activeTab === i
-                        ? "bg-white text-cobalt shadow-sm"
-                        : "text-muted hover:bg-white/60 hover:text-ink"
-                    }`}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
+            <div className="letter-result-shell overflow-hidden rounded-feature border border-ink/10 bg-surface shadow-[0_18px_55px_rgba(20,36,30,.07)]">
+              <SegmentedControl
+                label="Explanation sections"
+                onChange={(value) => setActiveTab(value)}
+                options={[
+                  { icon: <DocumentIcon />, label: "Understand", value: 0 },
+                  { icon: <CheckIcon />, label: "Take Action", value: 1 },
+                  { icon: <HelpIcon />, label: "Get Help", value: 2 },
+                ] as const}
+                value={activeTab}
+              />
 
               <div className="p-5">
                 {/* Tab 0 — Understand */}
@@ -231,14 +237,14 @@ export function LetterResults({
                   <div className="space-y-4">
                     <div>
                       <div className="flex flex-wrap items-center gap-2">
-                        <p className="text-sm font-medium uppercase tracking-wide text-blue-600">
+                        <p className="text-sm font-bold uppercase tracking-wide text-cobalt">
                           {result.documentType}
                         </p>
                         <span className={`rounded-full border px-2 py-0.5 text-xs font-semibold ${URGENCY_STYLES[result.urgency]}`}>
                           {URGENCY_LABEL[result.urgency]}
                         </span>
                         {result.detectedLetterLanguage && result.detectedLetterLanguage !== "English" && (
-                          <span className="rounded-full border border-indigo-200 bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-700">
+                          <span className="rounded-full border border-cobalt/20 bg-[#eef2ff] px-2 py-0.5 text-xs font-medium text-cobalt">
                             Letter in {result.detectedLetterLanguage}
                           </span>
                         )}
@@ -247,19 +253,21 @@ export function LetterResults({
                         <h2 className="text-xl font-bold">What this means</h2>
                         <button
                           onClick={readAloud}
-                          className="flex flex-none items-center gap-1.5 rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
+                          aria-label={speaking ? "Stop reading explanation" : "Read explanation aloud"}
+                          className="letter-action-button"
                           aria-pressed={speaking}
                         >
-                          {speaking ? "⏹ Stop" : "🔊 Read aloud"}
+                          {speaking ? <StopIcon className="h-4 w-4" /> : <VolumeIcon className="h-4 w-4" />}
+                          {speaking ? "Stop" : "Read aloud"}
                         </button>
                       </div>
-                      <p className="mt-2 text-base leading-relaxed text-slate-700">{result.meaning}</p>
-                      <div className="mt-4 rounded-xl bg-slate-50 p-3 text-sm text-slate-600">
+                      <p className="mt-2 text-base leading-relaxed text-ink/80">{result.meaning}</p>
+                      <div className="mt-4 rounded-xl border border-ink/10 bg-canvas p-3 text-sm text-muted">
                         <p><span className="font-semibold">Why I think this:</span> {result.whyThisType}</p>
                         <div className="mt-2 flex items-center gap-2">
                           <span className="font-semibold">Confidence:</span>
-                          <span className="inline-flex h-2 w-24 overflow-hidden rounded-full bg-slate-200">
-                            <span className={`h-full ${result.confidence >= 60 ? "bg-emerald-500" : "bg-amber-500"}`} style={{ width: `${result.confidence}%` }} />
+                          <span className="inline-flex h-2 w-24 overflow-hidden rounded-full bg-ink/10">
+                            <span className={`h-full ${result.confidence >= 60 ? "bg-confirmed" : "bg-amber"}`} style={{ width: `${result.confidence}%` }} />
                           </span>
                           <span>{result.confidence}%</span>
                         </div>
@@ -277,7 +285,7 @@ export function LetterResults({
                           ? "border border-orange-300 bg-orange-50"
                           : "border border-amber-300 bg-amber-50"
                       }`}>
-                        <p className={`font-semibold ${result.deadlineISO && daysUntil(result.deadlineISO) <= 7 ? "text-red-900" : "text-amber-900"}`}>📅 Important date</p>
+                        <p className={`flex items-center gap-2 font-semibold ${result.deadlineISO && daysUntil(result.deadlineISO) <= 7 ? "text-red-900" : "text-amber-900"}`}><CalendarIcon className="h-5 w-5" /> Important date</p>
                         <p className={`mt-1 ${result.deadlineISO && daysUntil(result.deadlineISO) <= 7 ? "text-red-900" : "text-amber-900"}`}>{result.deadline}</p>
                         {result.deadlineISO && (() => {
                           const days = daysUntil(result.deadlineISO);
@@ -297,9 +305,9 @@ export function LetterResults({
                     )}
 
                     {result.whatHappensIfNothing && (
-                      <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-                        <p className="font-semibold text-slate-800">💭 What happens if you do nothing?</p>
-                        <p className="mt-1 text-sm text-slate-700">{result.whatHappensIfNothing}</p>
+                      <div className="rounded-xl border border-ink/10 bg-canvas p-4">
+                        <p className="flex items-center gap-2 font-semibold text-ink"><LightbulbIcon className="h-5 w-5 text-cobalt" /> What happens if you do nothing?</p>
+                        <p className="mt-1 text-sm text-muted">{result.whatHappensIfNothing}</p>
                       </div>
                     )}
 
@@ -325,10 +333,10 @@ export function LetterResults({
                         <ol className="mt-3 space-y-4">
                           {result.nextSteps.map((s, i) => (
                             <li key={i} className="flex gap-3">
-                              <span className="flex h-7 w-7 flex-none items-center justify-center rounded-full bg-blue-600 text-sm font-bold text-white">{i + 1}</span>
+                              <span className="flex h-7 w-7 flex-none items-center justify-center rounded-full bg-cobalt text-sm font-bold text-white">{i + 1}</span>
                               <div>
-                                <p className="font-semibold text-slate-900">{s.step}</p>
-                                <p className="text-slate-700">{s.detail}</p>
+                                <p className="font-semibold text-ink">{s.step}</p>
+                                <p className="text-muted">{s.detail}</p>
                               </div>
                             </li>
                           ))}
@@ -337,11 +345,11 @@ export function LetterResults({
                     )}
 
                     {result.whatTheyNeed.length > 0 && (
-                      <div className="rounded-xl border border-slate-100 bg-slate-50 p-4">
-                        <h2 className="font-bold text-slate-900">What they need from you</h2>
+                      <div className="rounded-xl border border-ink/10 bg-canvas p-4">
+                        <h2 className="font-bold text-ink">What they need from you</h2>
                         <ul className="mt-2 space-y-1.5">
                           {result.whatTheyNeed.map((item, i) => (
-                            <li key={i} className="flex gap-2 text-slate-700"><span className="text-blue-600">•</span><span>{item}</span></li>
+                            <li key={i} className="flex gap-2 text-muted"><span className="text-cobalt">•</span><span>{item}</span></li>
                           ))}
                         </ul>
                       </div>
@@ -350,19 +358,19 @@ export function LetterResults({
                     {result.documentChecklist.length > 0 && (
                       <div>
                         <div className="flex flex-wrap items-baseline justify-between gap-2">
-                          <h2 className="font-bold text-slate-900">Documents to gather</h2>
-                          <span className="text-sm font-medium text-slate-500">{checked.size} of {result.documentChecklist.length} ready</span>
+                          <h2 className="font-bold text-ink">Documents to gather</h2>
+                          <span className="text-sm font-medium text-muted">{checked.size} of {result.documentChecklist.length} ready</span>
                         </div>
                         <ul className="mt-2 space-y-2">
                           {result.documentChecklist.map((c, i) => {
                             const done = checked.has(i);
                             return (
                               <li key={i}>
-                                <label className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3 transition ${done ? "border-emerald-300 bg-emerald-50" : "border-slate-200 bg-white hover:bg-slate-50"}`}>
-                                  <input type="checkbox" checked={done} onChange={() => toggleChecked(i)} className="mt-0.5 h-5 w-5 flex-none rounded border-slate-300 text-emerald-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500" />
+                                <label className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3 transition ${done ? "border-confirmed/25 bg-[#e3f4e8]" : "border-ink/10 bg-white hover:bg-canvas"}`}>
+                                  <input type="checkbox" checked={done} onChange={() => toggleChecked(i)} className="mt-0.5 h-5 w-5 flex-none rounded border-ink/20 text-confirmed focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-amber" />
                                   <span>
-                                    <span className={`font-medium ${done ? "text-emerald-900 line-through" : "text-slate-900"}`}>{c.item}</span>
-                                    {c.why && <span className="block text-sm text-slate-500">{c.why}</span>}
+                                    <span className={`font-medium ${done ? "text-[#24633a] line-through" : "text-ink"}`}>{c.item}</span>
+                                    {c.why && <span className="block text-sm text-muted">{c.why}</span>}
                                   </span>
                                 </label>
                               </li>
@@ -373,46 +381,46 @@ export function LetterResults({
                     )}
 
                     {result.responseLetter.applicable && result.responseLetter.body && (
-                      <Collapsible accent icon={<span className="flex h-9 w-9 flex-none items-center justify-center rounded-xl bg-blue-100 text-base">✍️</span>} title="Your reply, already written" subtitle={result.responseLetter.kind ? `${result.responseLetter.kind} · tap to read, print, or send` : "Tap to read, print, or send"}>
+                      <Collapsible accent icon={<span className="letter-icon-well"><DocumentIcon className="h-5 w-5" /></span>} title="Your reply, already written" subtitle={result.responseLetter.kind ? `${result.responseLetter.kind} · tap to read, print, or send` : "Tap to read, print, or send"}>
                         <div className="flex items-start justify-between gap-3">
-                          <p className="text-sm text-slate-600">We drafted a reply you can print, sign, and send. It&apos;s written in English because that&apos;s what the office reads. Fill in anything in [brackets] and check it before sending.</p>
+                          <p className="text-sm text-muted">We drafted a reply you can print, sign, and send. It&apos;s written in English because that&apos;s what the office reads. Fill in anything in [brackets] and check it before sending.</p>
                           {lang.label !== "English" && (
-                            <button onClick={() => void translateLetter()} disabled={translatingLetter} className="flex-none rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-100 disabled:opacity-50">
+                            <button onClick={() => void translateLetter()} disabled={translatingLetter} className="letter-action-button flex-none px-3 text-xs disabled:opacity-50">
                               {translatingLetter ? "Translating…" : translatedLetter ? "Show English" : `Translate to ${lang.label}`}
                             </button>
                           )}
                         </div>
-                        {translatedLetter && <p className="mt-2 rounded-lg bg-indigo-50 px-3 py-1.5 text-xs text-indigo-700">Showing {lang.label} translation — send the English version above to the office.</p>}
-                        <pre className="ttf-scroll mt-3 max-h-80 overflow-auto whitespace-pre-wrap rounded-xl border border-slate-200 bg-slate-50 p-4 font-serif text-sm leading-relaxed text-slate-800">{translatedLetter ?? result.responseLetter.body}</pre>
+                        {translatedLetter && <p className="mt-2 rounded-lg bg-[#eef2ff] px-3 py-1.5 text-xs text-cobalt">Showing {lang.label} translation — send the English version above to the office.</p>}
+                        <pre className="ttf-scroll mt-3 max-h-80 overflow-auto whitespace-pre-wrap rounded-xl border border-ink/10 bg-canvas p-4 font-serif text-sm leading-relaxed text-ink">{translatedLetter ?? result.responseLetter.body}</pre>
                         <div className="mt-3 flex flex-wrap gap-2">
-                          <button onClick={copyLetter} className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2">{copiedLetter ? "✓ Copied" : "Copy"}</button>
-                          <button onClick={downloadLetter} className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600">Download</button>
-                          <button onClick={printLetter} className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600">Print</button>
+                          <button onClick={copyLetter} className="inline-flex min-h-11 items-center gap-1.5 rounded-xl bg-cobalt px-4 text-sm font-bold text-white transition hover:bg-cobalt-dark focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-amber">{copiedLetter ? <><CheckIcon className="h-4 w-4" /> Copied</> : "Copy"}</button>
+                          <button onClick={downloadLetter} className="letter-action-button px-4">Download</button>
+                          <button onClick={printLetter} className="letter-action-button px-4">Print</button>
                         </div>
                       </Collapsible>
                     )}
 
                     {result.phoneScript && (
-                      <div className="rounded-2xl border border-blue-200 bg-blue-50 p-5">
-                        <h2 className="text-xl font-bold text-blue-900">📞 What to say when you call</h2>
-                        <p className="mt-2 italic leading-relaxed text-blue-900">&ldquo;{result.phoneScript}&rdquo;</p>
+                      <div className="rounded-2xl border border-cobalt/20 bg-[#eef2ff] p-5">
+                        <h2 className="flex items-center gap-2 text-xl font-bold text-ink"><PhoneIcon className="h-5 w-5 text-cobalt" /> What to say when you call</h2>
+                        <p className="mt-2 italic leading-relaxed text-[#34487f]">&ldquo;{result.phoneScript}&rdquo;</p>
                         <div className="mt-4 flex flex-wrap items-start gap-4">
                           {kd?.contactPhone && (
-                            <a href={`tel:${kd.contactPhone.replace(/[^+\d]/g, "")}`} className="inline-block rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2">
+                            <a href={`tel:${kd.contactPhone.replace(/[^+\d]/g, "")}`} className="inline-flex min-h-11 items-center rounded-xl bg-cobalt px-4 text-sm font-bold text-white transition hover:bg-cobalt-dark focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-amber">
                               Call {kd.contactPhone}
                             </a>
                           )}
-                          <div className="flex items-center gap-3 rounded-xl border border-blue-200 bg-white p-3">
+                          <div className="flex items-center gap-3 rounded-xl border border-cobalt/15 bg-white p-3">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img src={`https://api.qrserver.com/v1/create-qr-code/?size=88x88&format=png&data=${encodeURIComponent(result.phoneScript + (kd?.contactPhone ? `\n\nCall: ${kd.contactPhone}` : ""))}`} alt="QR code — scan to save the phone script on your phone" width={88} height={88} className="rounded-lg" />
-                            <p className="max-w-[120px] text-xs leading-relaxed text-slate-600">Scan to get this script on your phone</p>
+                            <p className="max-w-[120px] text-xs leading-relaxed text-muted">Scan to get this script on your phone</p>
                           </div>
                         </div>
                       </div>
                     )}
 
                     {!hasActions && (
-                      <p className="text-sm text-slate-500">No specific actions required for this document.</p>
+                      <p className="text-sm text-muted">No specific actions required for this document.</p>
                     )}
                   </div>
                 )}
@@ -437,9 +445,9 @@ export function LetterResults({
                     <div>
                       <div className="flex flex-wrap items-center gap-2">
                         <h2 className="text-xl font-bold">Real help you can use now</h2>
-                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700 ring-1 ring-emerald-200">✓ Verified</span>
+                        <span className="inline-flex items-center gap-1 rounded-full bg-[#e3f4e8] px-2.5 py-0.5 text-xs font-semibold text-[#24633a] ring-1 ring-confirmed/20"><CheckIcon className="h-3 w-3" /> Verified</span>
                       </div>
-                      <p className="mt-1 text-sm text-slate-600">These are real national programs from official sources — not AI-generated. We never invent phone numbers.</p>
+                      <p className="mt-1 text-sm text-muted">These are real national programs from official sources — not AI-generated. We never invent phone numbers.</p>
                       <ul className="mt-3 space-y-2">
                         {result.isPossibleScam && <ResourceRow resource={SCAM_RESOURCE} />}
                         {result.isCrisis && CRISIS_RESOURCES.map((r) => <ResourceRow key={r.name} resource={r} />)}
@@ -454,23 +462,24 @@ export function LetterResults({
             </div>
             </div> {/* closes side-by-side wrapper */}
 
-            <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">
-              <span className="font-semibold">⚠️ AI can make mistakes.</span>{" "}
+            <div className="flex items-start gap-2 rounded-xl border border-amber/35 bg-[#fff8df] p-3 text-xs text-[#795a18]">
+              <ShieldAlertIcon className="mt-0.5 h-4 w-4 shrink-0" />
+              <p><span className="font-semibold">AI can make mistakes.</span>{" "}
               Always verify critical dates, amounts, and requirements directly on
               your original letter before acting. For legal or immigration
-              matters, consult a qualified professional.
+              matters, consult a qualified professional.</p>
             </div>
 
             <div className="flex flex-wrap justify-center gap-3 pt-1 print:hidden">
               <button
                 onClick={() => window.print()}
-                className="rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
+                className="letter-action-button px-5"
               >
                 Save as PDF
               </button>
               <button
                 onClick={reset}
-                className="rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
+                className="letter-action-button px-5"
               >
                 Explain another letter
               </button>
@@ -478,4 +487,3 @@ export function LetterResults({
           </section>
   );
 }
-
