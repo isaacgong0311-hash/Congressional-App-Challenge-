@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { ProductHeader } from "../../components/lantern/product-header";
-import { CheckIcon } from "../../components/lantern/icons";
+import { CheckIcon, ShieldAlertIcon } from "../../components/lantern/icons";
 import { AccessibilityControls } from "../../components/lantern/primitives";
 import { useLanternPreferences } from "../../components/lantern/use-lantern-preferences";
 import {
@@ -581,28 +581,28 @@ export default function LetterWorkspace() {
         ) : null}
       </main>
 
-      <footer className="mt-8 border-t border-slate-200/60 bg-white/70 py-5 print:hidden">
+      <footer className="mt-8 border-t border-ink/10 bg-surface/80 py-5 print:hidden">
         <div className="mx-auto max-w-3xl space-y-3 px-6">
-          <div className="text-center text-xs text-slate-500">
+          <div className="text-center text-xs text-muted">
             This tool helps you understand a letter — it is not legal or official
             advice. Always confirm with the office named on your document.
           </div>
-          <div className="rounded-xl border border-slate-200 bg-white">
+          <div className="overflow-hidden rounded-card border border-ink/10 bg-white shadow-[0_14px_38px_rgba(20,36,30,.06)]">
             <button
               type="button"
               onClick={() => setWhyNotOpen((v) => !v)}
-              className="flex w-full items-center justify-between px-4 py-3 text-left text-sm font-medium text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
+              className="flex min-h-12 w-full items-center justify-between gap-3 px-4 py-3 text-left text-sm font-bold text-ink focus-visible:outline-3 focus-visible:outline-offset-[-3px] focus-visible:outline-amber"
               aria-expanded={whyNotOpen}
             >
-              <span>Why not just paste it into ChatGPT?</span>
-              <svg className={`h-4 w-4 text-slate-400 transition-transform ${whyNotOpen ? "rotate-180" : ""}`} viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              <span className="inline-flex items-center gap-2"><ShieldAlertIcon className="h-5 w-5 text-cobalt" /> How Lantern protects your decisions</span>
+              <svg className={`h-4 w-4 shrink-0 text-muted transition-transform ${whyNotOpen ? "rotate-180" : ""}`} viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
             </button>
             {whyNotOpen && (
-              <div className="border-t border-slate-100 px-4 pb-4 text-sm text-slate-600 space-y-2">
-                <p>You could — but there are a few things Lantern does differently:</p>
+              <div className="space-y-2 border-t border-ink/10 px-4 pb-4 pt-3 text-sm leading-6 text-muted">
+                <p>Lantern adds a few safeguards around a general explanation:</p>
                 <ul className="list-disc ps-4 space-y-1">
-                  <li><span className="font-semibold">Verified resources only.</span> The phone numbers and programs we show are hand-checked. ChatGPT can invent plausible-looking hotlines that don&apos;t exist.</li>
-                  <li><span className="font-semibold">Hard scam and crisis rules.</span> If certain keywords appear, we always route you to a hotline — regardless of what the AI concludes. ChatGPT doesn&apos;t have guardrails like that.</li>
+                  <li><span className="font-semibold text-ink">Verified resources only.</span> The phone numbers and programs shown here are hand-checked instead of generated for each letter.</li>
+                  <li><span className="font-semibold text-ink">Fixed scam and crisis rules.</span> Certain signals always surface extra safety guidance, independent of the generated explanation.</li>
                   <li><span className="font-semibold">No account or cloud case history.</span> Lantern does not create a saved family profile or case; provider-side handling is described on the Privacy page.</li>
                   <li><span className="font-semibold">Ready-to-use outputs.</span> Reply letter, phone script, calendar reminder, and document checklist — all in one step.</li>
                 </ul>

@@ -84,6 +84,22 @@ test("Explain intake keeps one clear primary action and stable processing status
   ).toBeVisible();
 });
 
+test("no-letter help feels like a complete product path", async ({ page }) => {
+  await page.goto("/explain");
+  await page.getByRole("button", { name: "Find help without a letter" }).click();
+  await expect(
+    page.getByRole("heading", { name: "What's going on?" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("list", { name: "Help categories" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: /Utilities/ }).click();
+  await expect(
+    page.getByRole("heading", { name: /Utility help/ }),
+  ).toBeVisible();
+  await expect(page.getByText("verified by hand", { exact: false })).toBeVisible();
+});
+
 test("letter workspace recovers from malformed output and keeps speech fallback", async ({
   page,
 }) => {
