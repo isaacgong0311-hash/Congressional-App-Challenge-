@@ -66,7 +66,7 @@ export default function HomePage() {
               </p>
               <div className="mt-9 flex flex-col gap-3 sm:flex-row">
                 <Link className="lantern-primary-cta" href="/first-day?demo=1">
-                  Try the fictional First Day case
+                  Start the 3-minute guided demo
                   <ArrowUpRightIcon className="h-5 w-5" />
                 </Link>
                 <Link className="lantern-secondary-cta" href="/explain">
@@ -74,6 +74,7 @@ export default function HomePage() {
                 </Link>
               </div>
               <div className="mt-7 flex flex-wrap gap-x-6 gap-y-2 text-sm font-semibold text-muted">
+                <span className="inline-flex items-center gap-2"><CheckCircleIcon className="h-4 w-4 text-confirmed" /> Fictional demo data</span>
                 <span className="inline-flex items-center gap-2"><CheckCircleIcon className="h-4 w-4 text-confirmed" /> No account</span>
                 <span className="inline-flex items-center gap-2"><CheckCircleIcon className="h-4 w-4 text-confirmed" /> No cloud case history</span>
                 <span className="inline-flex items-center gap-2"><CheckCircleIcon className="h-4 w-4 text-confirmed" /> English + Spanish</span>

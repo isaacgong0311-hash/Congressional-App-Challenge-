@@ -8,6 +8,7 @@ import {
 import {
   filterPlanTasks,
   prioritizedPlanTasks,
+  type PresentationMode,
   type TaskFilter,
 } from "./first-day-view";
 import { currentFactView, Eyebrow, SourceButton } from "./first-day-shared";
@@ -19,6 +20,7 @@ export type PlanStepProps = {
   plan: PlannerResult;
   taskFilter: TaskFilter;
   highlightedTaskId: string | null;
+  presentationMode: PresentationMode;
   onTaskFilterChange: (filter: TaskFilter) => void;
   onCompleteTask: (taskId: string) => void;
   onUndoTask: (taskId: string) => void;
@@ -43,6 +45,7 @@ export function PlanStep({
   onTaskFilterChange,
   onUndoTask,
   plan,
+  presentationMode,
   taskFilter,
 }: PlanStepProps) {
   const sourceLabel = translated(language, "Show source", "Ver fuente");
@@ -194,22 +197,32 @@ export function PlanStep({
                               <span className={`fd-fact-state ${meta.className}`}>{language === "Español" ? meta.es : meta.en}</span>
                             </div>
                             <p className="mt-2 text-sm leading-6 text-[#52615a]">{taskCopy.action}</p>
-                            <p className="mt-2 text-xs font-medium leading-5 text-[#5f6d66]">
-                              {language === "Español" ? taskCopy.detail : `${task.detail} ${task.reason}`}
-                            </p>
-                            <p className="mt-3 text-xs font-semibold text-muted">
-                              {translated(language, "Supported by", "Respaldado por")}: {supportingDocument ?? translated(language, `${supportCount} source record${supportCount === 1 ? "" : "s"}`, `${supportCount} registro${supportCount === 1 ? "" : "s"} de fuente`)}
-                            </p>
                             {confirmedDate ? (
                               <p className="mt-2 text-sm font-bold text-confirmed">
                                 {translated(language, "Confirmed date", "Fecha confirmada")}: {confirmedDate}
                               </p>
                             ) : null}
-                            {primaryEvidence ? (
-                              <blockquote className="mt-4 rounded-xl border border-ink/10 bg-canvas px-4 py-3 text-sm leading-6 text-[#445249]">
-                                “{primaryEvidence.quote}”
-                              </blockquote>
-                            ) : null}
+                            <details
+                              className="fd-task-reason mt-4 rounded-xl border border-ink/10 bg-canvas/70 px-4"
+                              open={presentationMode === "guided_demo" && highlightedTaskId === task.id ? true : undefined}
+                            >
+                              <summary className="min-h-11 cursor-pointer py-3 text-sm font-bold text-ink">
+                                {translated(language, "Why this status?", "¿Por qué este estado?")}
+                              </summary>
+                              <div className="border-t border-ink/10 pb-4 pt-3">
+                                <p className="text-xs font-medium leading-5 text-[#5f6d66]">
+                                  {language === "Español" ? taskCopy.detail : `${task.detail} ${task.reason}`}
+                                </p>
+                                <p className="mt-3 text-xs font-semibold text-muted">
+                                  {translated(language, "Supported by", "Respaldado por")}: {supportingDocument ?? translated(language, `${supportCount} source record${supportCount === 1 ? "" : "s"}`, `${supportCount} registro${supportCount === 1 ? "" : "s"} de fuente`)}
+                                </p>
+                                {primaryEvidence ? (
+                                  <blockquote className="mt-3 rounded-xl border border-ink/10 bg-white px-4 py-3 text-sm leading-6 text-[#445249]">
+                                    “{primaryEvidence.quote}”
+                                  </blockquote>
+                                ) : null}
+                              </div>
+                            </details>
                             <div className="mt-4 flex flex-wrap gap-2">
                               <SourceButton label={sourceLabel} onClick={(button) => onShowTaskSource(task.id, button)} />
                               {task.state === "ready" ? (

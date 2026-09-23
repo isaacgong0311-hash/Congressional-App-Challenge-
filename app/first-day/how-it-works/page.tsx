@@ -197,7 +197,7 @@ export default function HowFirstDayWorksPage() {
             className="mt-6 inline-flex min-h-12 shrink-0 items-center rounded-xl bg-[#3556d4] px-5 font-semibold text-white shadow-sm transition hover:bg-[#2948be] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#3556d4] sm:mt-0"
             href="/first-day"
           >
-            Try the fictional case →
+            Start the 3-minute demo →
           </Link>
         </section>
 

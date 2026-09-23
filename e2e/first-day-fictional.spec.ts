@@ -102,7 +102,7 @@ test("fictional case completes all six screens with sources and Spanish output",
       name: "Un plan que la familia puede llevar.",
     }),
   ).toBeVisible();
-  await expect(page.getByRole("button", { name: "Descargar plan JSON" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Descargar JSON técnico" })).toBeVisible();
   await expectNoSeriousAxeViolations(page);
 });
 
@@ -128,13 +128,31 @@ test("guided demo stays fictional and can be dismissed", async ({ page }) => {
   await page.goto("/first-day?demo=1");
   await expect(page.getByLabel("Guided demo cue")).toBeVisible();
   await expect(
-    page.getByRole("button", { name: "Add Round Rock ISD documents" }),
-  ).toBeDisabled();
-  await expect(page.getByText(/uses fictional data only/i)).toBeVisible();
-  await page.getByRole("button", { name: "Open the sample case" }).click();
-  await expect(page.getByText(/Demo cue 2 of 6/)).toBeVisible();
+    page.getByRole("heading", { name: "One case, every instruction." }),
+  ).toBeVisible();
+  await expect(
+    page
+      .getByLabel("Guided demo cue")
+      .getByText(/Fictional demonstration · Cue 2 of 6/i),
+  ).toBeVisible();
   await page.getByRole("button", { name: "Exit demo mode" }).click();
   await expect(page.getByLabel("Guided demo cue")).toBeHidden();
+  await expect(
+    page.getByRole("heading", {
+      name: "School instructions, turned into a plan you can trust.",
+    }),
+  ).toBeVisible();
+});
+
+test("guided demo keeps the primary mobile action in the first viewport", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/first-day?demo=1");
+  const continueButton = page.getByRole("button", { name: "Continue" });
+  await expect(continueButton).toBeVisible();
+  const box = await continueButton.boundingBox();
+  expect(box?.y).toBeLessThan(844);
 });
 
 test("task completion can be undone without deleting history", async ({ page }) => {

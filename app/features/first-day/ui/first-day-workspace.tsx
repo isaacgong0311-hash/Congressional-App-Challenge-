@@ -1,8 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import { useLayoutEffect, useRef } from "react";
 
-import { ActionDock } from "../../../components/lantern/primitives";
+import {
+  AccessibilityControls,
+  ActionDock,
+} from "../../../components/lantern/primitives";
 import type { FirstDayCase } from "../domain/types";
 import { BlockerStep } from "./blocker-step";
 import { CaseSnapshot } from "./case-snapshot";
@@ -76,13 +80,22 @@ export function FirstDayWorkspace({
   } = controller;
 
   const shellInert = openEvidence ? true : undefined;
+  const mainRef = useRef<HTMLElement>(null);
+  const previousStepRef = useRef(currentStep);
+
+  useLayoutEffect(() => {
+    if (previousStepRef.current === currentStep) return;
+    previousStepRef.current = currentStep;
+    window.scrollTo({ top: 0, behavior: "auto" });
+    mainRef.current?.focus({ preventScroll: true });
+  }, [currentStep]);
 
   return (
     <div
       className="fd-app min-h-screen text-ink"
       data-presentation={presentationMode}
-      data-fd-hc={preferences.highContrast ? "true" : "false"}
-      data-fd-lt={preferences.largeText ? "true" : "false"}
+      data-high-contrast={preferences.highContrast ? "true" : "false"}
+      data-large-text={preferences.largeText ? "true" : "false"}
     >
       <div aria-hidden={shellInert} inert={shellInert}>
         <header className="fd-header print:hidden">
@@ -114,32 +127,15 @@ export function FirstDayWorkspace({
             </div>
 
             <div className="flex shrink-0 items-center gap-2">
-              <button
-                aria-label={translated(
-                  language,
-                  "Toggle large text",
-                  "Cambiar texto grande",
-                )}
-                aria-pressed={preferences.largeText}
-                className="fd-utility-button hidden sm:inline-flex"
-                onClick={toggleLargeText}
-                type="button"
-              >
-                Aa
-              </button>
-              <button
-                aria-label={translated(
-                  language,
-                  "Toggle high contrast",
-                  "Cambiar alto contraste",
-                )}
-                aria-pressed={preferences.highContrast}
-                className="fd-utility-button hidden sm:inline-flex"
-                onClick={toggleHighContrast}
-                type="button"
-              >
-                ◐
-              </button>
+              <div className="hidden sm:block">
+                <AccessibilityControls
+                  compact
+                  highContrast={preferences.highContrast}
+                  largeText={preferences.largeText}
+                  onToggleHighContrast={toggleHighContrast}
+                  onToggleLargeText={toggleLargeText}
+                />
+              </div>
               <div className="flex rounded-xl border border-ink/15 bg-white p-1 text-xs font-bold shadow-sm">
                 {(["English", "Español"] as const).map((option) => (
                   <button
@@ -159,25 +155,14 @@ export function FirstDayWorkspace({
               </div>
             </div>
           </div>
-          <div className="flex items-center justify-end gap-2 px-4 pb-3 sm:hidden">
-            <button
-              aria-label={translated(language, "Toggle large text", "Cambiar texto grande")}
-              aria-pressed={preferences.largeText}
-              className="fd-utility-button inline-flex"
-              onClick={toggleLargeText}
-              type="button"
-            >
-              Aa
-            </button>
-            <button
-              aria-label={translated(language, "Toggle high contrast", "Cambiar alto contraste")}
-              aria-pressed={preferences.highContrast}
-              className="fd-utility-button inline-flex"
-              onClick={toggleHighContrast}
-              type="button"
-            >
-              ◐
-            </button>
+          <div className="flex items-center justify-end px-4 pb-3 sm:hidden">
+            <AccessibilityControls
+              compact
+              highContrast={preferences.highContrast}
+              largeText={preferences.largeText}
+              onToggleHighContrast={toggleHighContrast}
+              onToggleLargeText={toggleLargeText}
+            />
           </div>
         </header>
 
@@ -199,15 +184,22 @@ export function FirstDayWorkspace({
               currentStep={currentStep}
               language={language}
               onSelectStep={selectStep}
-            />
-            <CaseSnapshot
-              caseData={caseData}
-              language={language}
               snapshot={snapshot}
             />
+            <div className="hidden lg:block">
+              <CaseSnapshot
+                caseData={caseData}
+                language={language}
+                snapshot={snapshot}
+              />
+            </div>
           </aside>
 
-          <main className="min-w-0 pb-24 lg:pb-8">
+          <main
+            className="min-w-0 pb-24 outline-none lg:pb-8"
+            ref={mainRef}
+            tabIndex={-1}
+          >
             {currentStep === "start" ? (
               <StartStep
                 allowLive={presentationMode !== "guided_demo"}
@@ -250,6 +242,7 @@ export function FirstDayWorkspace({
                 onTaskFilterChange={setTaskFilter}
                 onUndoTask={undoTask}
                 plan={plan}
+                presentationMode={presentationMode}
                 taskFilter={taskFilter}
               />
             ) : null}

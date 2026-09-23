@@ -161,3 +161,44 @@ export function MetricCard({ label, value }: { label: string; value: ReactNode }
     </div>
   );
 }
+
+export function AccessibilityControls({
+  highContrast,
+  largeText,
+  onToggleHighContrast,
+  onToggleLargeText,
+  compact = false,
+}: {
+  highContrast: boolean;
+  largeText: boolean;
+  onToggleHighContrast: () => void;
+  onToggleLargeText: () => void;
+  compact?: boolean;
+}) {
+  return (
+    <div aria-label="Reading preferences" className="flex items-center gap-2" role="group">
+      <button
+        aria-label="Toggle large text"
+        aria-pressed={largeText}
+        className={`fd-utility-button inline-flex ${
+          largeText ? "border-cobalt bg-[#eef2ff] text-cobalt" : ""
+        }`}
+        onClick={onToggleLargeText}
+        type="button"
+      >
+        {compact ? "Aa" : "A+"}
+      </button>
+      <button
+        aria-label="Toggle high contrast"
+        aria-pressed={highContrast}
+        className={`fd-utility-button inline-flex ${
+          highContrast ? "border-cobalt bg-[#eef2ff] text-cobalt" : ""
+        }`}
+        onClick={onToggleHighContrast}
+        type="button"
+      >
+        ◐
+      </button>
+    </div>
+  );
+}

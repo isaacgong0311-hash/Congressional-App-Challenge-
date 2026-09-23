@@ -27,3 +27,19 @@ for (const route of ["/", "/explain", "/first-day", "/first-day/how-it-works", "
     ).toEqual([]);
   });
 }
+
+test("mobile navigation is keyboard reachable and closes on Escape", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+  const menu = page.getByRole("button", { name: "Open navigation" });
+  await menu.focus();
+  await page.keyboard.press("Enter");
+  const navigation = page.getByRole("navigation", { name: "Mobile navigation" });
+  await expect(navigation).toBeVisible();
+  await expect(navigation.getByRole("link", { name: "Privacy" })).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(navigation).toBeHidden();
+  await expect(menu).toBeFocused();
+});

@@ -1,0 +1,111 @@
+/* Quiet, modern scrollbars (used in the chat and letter preview). */
+.ttf-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+.ttf-scroll::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.ttf-scroll::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+.ttf-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* ── High contrast mode ───────────────────────────────────────── */
+[data-high-contrast="true"] body,
+[data-high-contrast="true"] {
+  background: #fff !important;
+  color: #000 !important;
+}
+
+[data-high-contrast="true"] .text-slate-400,
+[data-high-contrast="true"] .text-slate-500,
+[data-high-contrast="true"] .text-slate-600 {
+  color: #222 !important;
+}
+
+[data-high-contrast="true"] .border-slate-100,
+[data-high-contrast="true"] .border-slate-200,
+[data-high-contrast="true"] .border-slate-200\/70 {
+  border-color: #555 !important;
+}
+
+[data-high-contrast="true"] .bg-slate-50,
+[data-high-contrast="true"] .bg-slate-100 {
+  background-color: #f0f0f0 !important;
+}
+
+[data-high-contrast="true"] .text-blue-700,
+[data-high-contrast="true"] .text-blue-800,
+[data-high-contrast="true"] .text-blue-900 {
+  color: #003580 !important;
+}
+
+[data-high-contrast="true"] .bg-blue-50 {
+  background-color: #dbe9ff !important;
+}
+
+[data-high-contrast="true"] .text-amber-700,
+[data-high-contrast="true"] .text-amber-800,
+[data-high-contrast="true"] .text-amber-900 {
+  color: #7a4500 !important;
+}
+
+[data-high-contrast="true"] .bg-amber-50 {
+  background-color: #fff0cc !important;
+}
+
+[data-high-contrast="true"] .text-orange-800,
+[data-high-contrast="true"] .text-orange-900 {
+  color: #7a2000 !important;
+}
+
+[data-high-contrast="true"] .bg-orange-50 {
+  background-color: #ffe8d6 !important;
+}
+
+[data-high-contrast="true"] .text-red-700,
+[data-high-contrast="true"] .text-red-800 {
+  color: #8b0000 !important;
+}
+
+/* ── Large text mode ─────────────────────────────────────────── */
+[data-large-text="true"] {
+  font-size: 1.125rem;
+}
+
+[data-large-text="true"] .text-sm {
+  font-size: 1rem !important;
+  line-height: 1.6 !important;
+}
+
+[data-large-text="true"] .text-xs {
+  font-size: 0.875rem !important;
+}
+
+[data-large-text="true"] .text-base {
+  font-size: 1.2rem !important;
+  line-height: 1.7 !important;
+}
+
+[data-large-text="true"] h1,
+[data-large-text="true"] .text-2xl,
+[data-large-text="true"] .text-3xl {
+  font-size: 2rem !important;
+}
+
+[data-large-text="true"] h2,
+[data-large-text="true"] .text-xl {
+  font-size: 1.5rem !important;
+}
+
+[data-letter-view] .text-slate-500,
+[data-letter-view] .text-slate-400 {
+  color: #475569;
+}
+
+

@@ -48,7 +48,11 @@ export function DemoRibbon({
     <aside className="fd-demo-ribbon print:hidden" aria-label={translated(language, "Guided demo cue", "Guía de demostración")}>
       <div>
         <p className="text-[10px] font-extrabold uppercase tracking-[0.18em] text-amber">
-          {translated(language, `Demo cue ${index + 1} of ${STEPS.length}`, `Guía ${index + 1} de ${STEPS.length}`)}
+          {translated(
+            language,
+            `Fictional demonstration · Cue ${index + 1} of ${STEPS.length}`,
+            `Demostración ficticia · Guía ${index + 1} de ${STEPS.length}`,
+          )}
         </p>
         <p className="mt-1 text-sm font-semibold text-white">{language === "Español" ? cue.es : cue.en}</p>
       </div>

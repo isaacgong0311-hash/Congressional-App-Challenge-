@@ -122,18 +122,18 @@ export function ExportStep({
         </p>
       </div>
 
-      <div className="mt-6 grid gap-3 print:hidden md:grid-cols-3">
-        <button className="fd-export-action" data-demo-target="true" onClick={onPrint} type="button">
-          <PrinterIcon className="h-6 w-6 text-cobalt" />
+      <div className="mt-6 grid gap-3 print:hidden md:grid-cols-[1.25fr_1fr]">
+        <button className="fd-export-action fd-export-primary md:row-span-2" data-demo-target="true" onClick={onPrint} type="button">
+          <PrinterIcon className="h-7 w-7" />
           <span><strong>{translated(language, "Print or save as PDF", "Imprimir o guardar como PDF")}</strong><small>{translated(language, "A family-readable copy", "Una copia fácil de leer")}</small></span>
-        </button>
-        <button className="fd-export-action" onClick={downloadPlan} type="button">
-          <DocumentIcon className="h-6 w-6 text-cobalt" />
-          <span><strong>{translated(language, "Download plan JSON", "Descargar plan JSON")}</strong><small>{translated(language, "Portable, complete event history", "Historial completo y portátil de eventos")}</small></span>
         </button>
         <button aria-describedby="fd-calendar-note" className="fd-export-action" disabled={dates.length === 0} onClick={downloadCalendar} type="button">
           <ClockIcon className="h-6 w-6 text-cobalt" />
           <span><strong>{translated(language, "Add dates to calendar", "Añadir fechas al calendario")}</strong><small>{translated(language, "Confirmed dates only", "Solo fechas confirmadas")}</small></span>
+        </button>
+        <button className="fd-export-action" onClick={downloadPlan} type="button">
+          <DocumentIcon className="h-6 w-6 text-cobalt" />
+          <span><strong>{translated(language, "Download technical JSON", "Descargar JSON técnico")}</strong><small>{translated(language, "Portable event history", "Historial portátil de eventos")}</small></span>
         </button>
       </div>
       <p className="mt-3 text-sm text-muted print:hidden" id="fd-calendar-note">

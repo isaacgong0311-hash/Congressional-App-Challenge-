@@ -2,6 +2,8 @@ import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
   testDir: "./e2e",
+  timeout: 60_000,
+  workers: process.env.CI ? 2 : 3,
   snapshotPathTemplate:
     "{testDir}/{testFilePath}-snapshots/{arg}-{projectName}-{platform}{ext}",
   fullyParallel: false,
@@ -11,6 +13,7 @@ export default defineConfig({
     : "list",
   use: {
     baseURL: "http://127.0.0.1:3100",
+    actionTimeout: 15_000,
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
   },

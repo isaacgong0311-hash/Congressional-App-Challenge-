@@ -1,5 +1,6 @@
 import type { FirstDayCase } from "../domain/types";
 import { STEPS, translated, type Language, type StepId } from "./first-day-copy";
+import type { CaseSnapshotView } from "./first-day-view";
 import { CheckIcon } from "./icons";
 import { canEnterLiveStep } from "./use-live-case";
 
@@ -8,6 +9,7 @@ type WorkspaceProgressProps = {
   currentStep: StepId;
   language: Language;
   onSelectStep: (step: StepId) => void;
+  snapshot: CaseSnapshotView;
 };
 
 function StepList({
@@ -60,18 +62,43 @@ export function WorkspaceProgress(props: WorkspaceProgressProps) {
               {props.language === "Español" ? current?.es : current?.en}
             </span>
           </span>
-          <span className="text-right text-xs font-semibold text-muted">
-            {next
-              ? translated(
+          <span className="flex flex-wrap justify-end gap-1.5 text-right text-[11px] font-bold text-muted">
+            {props.snapshot.pendingFactCount > 0 ? (
+              <span className="rounded-full bg-[#fff0cc] px-2 py-1 text-[#704c0e]">
+                {translated(
                   props.language,
-                  `Next: ${next.en}`,
-                  `Siguiente: ${next.es}`,
-                )
-              : translated(props.language, "Final step", "Paso final")}
+                  `${props.snapshot.pendingFactCount} to check`,
+                  `${props.snapshot.pendingFactCount} por revisar`,
+                )}
+              </span>
+            ) : null}
+            {props.snapshot.openConflictCount > 0 ? (
+              <span className="rounded-full bg-[#fbe8e3] px-2 py-1 text-review">
+                {translated(
+                  props.language,
+                  `${props.snapshot.openConflictCount} blocker`,
+                  `${props.snapshot.openConflictCount} bloqueo`,
+                )}
+              </span>
+            ) : (
+              <span>{next ? translated(props.language, `Next: ${next.en}`, `Siguiente: ${next.es}`) : translated(props.language, "Final step", "Paso final")}</span>
+            )}
           </span>
         </summary>
         <div className="border-t border-ink/10 px-3 pb-3 pt-2">
           <StepList {...props} activeStepIndex={activeStepIndex} />
+          <div className="mt-3 grid grid-cols-3 gap-2 border-t border-ink/10 pt-3 text-center">
+            {[
+              [props.snapshot.processedDocumentCount, translated(props.language, "pages", "páginas")],
+              [props.snapshot.readyTaskCount, translated(props.language, "ready", "listos")],
+              [props.snapshot.openConflictCount, translated(props.language, "blockers", "bloqueos")],
+            ].map(([value, label]) => (
+              <div className="rounded-xl bg-canvas px-2 py-2" key={String(label)}>
+                <span className="block text-base font-black text-ink">{value}</span>
+                <span className="block text-[10px] font-semibold text-muted">{label}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </details>
 

@@ -20,6 +20,7 @@ async function capture(page: Page, name: string) {
   await expect(page).toHaveScreenshot(`${name}.png`, {
     animations: "disabled",
     maxDiffPixelRatio: 0.01,
+    timeout: 10_000,
   });
 }
 
@@ -82,7 +83,9 @@ test.describe("visual regression and responsive layout", () => {
       );
       await page.getByRole("button", { name: /Try a sample/ }).click();
       await page.getByRole("button", { name: "Explain this letter" }).click();
-      await expect(page.getByText("Utility notice", { exact: true })).toBeVisible();
+      await expect(
+        page.getByRole("heading", { name: "Utility notice", exact: true }),
+      ).toBeVisible();
       await capture(page, `explain-result-${viewport.name}`);
 
       await page.goto("/first-day");

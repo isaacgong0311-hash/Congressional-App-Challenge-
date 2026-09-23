@@ -62,11 +62,11 @@ export function SourcePanel({
     (isSpanish ? "Fuente" : "Source");
 
   return (
-    <div className="fd-source-backdrop fixed inset-0 z-50 flex items-end justify-center bg-[#0d1b17]/45 p-0 backdrop-blur-sm sm:items-center sm:p-6">
+    <div className="fd-source-backdrop fixed inset-0 z-50 flex items-end justify-end bg-[#0d1b17]/45 p-0 backdrop-blur-sm">
       <section
         aria-labelledby="source-panel-title"
         aria-modal="true"
-        className="fd-source-panel max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-t-[2rem] border border-white/60 bg-[#fffefb] shadow-[0_30px_100px_rgba(13,27,23,.28)] sm:rounded-[2rem]"
+        className="fd-source-panel h-full max-h-[92vh] w-full max-w-xl overflow-y-auto rounded-t-[2rem] border border-white/60 bg-[#fffefb] shadow-[0_30px_100px_rgba(13,27,23,.28)] sm:max-h-none sm:rounded-none sm:rounded-l-[2rem]"
         ref={panelRef}
         role="dialog"
       >

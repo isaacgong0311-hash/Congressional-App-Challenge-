@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { LanternMark } from "./brand";
+import { MobileNavigation } from "./mobile-navigation";
 
 type ProductHeaderProps = {
   active?: "home" | "explain" | "first-day" | "how" | "privacy";
@@ -50,16 +51,19 @@ export function ProductHeader({ active = "home", controls }: ProductHeaderProps)
           ))}
         </nav>
 
-        {controls ? (
-          <div className="flex min-h-11 items-center gap-2">{controls}</div>
-        ) : (
-          <Link
-            className="inline-flex min-h-11 items-center justify-center rounded-xl bg-cobalt px-4 text-sm font-bold text-white shadow-[0_10px_25px_rgba(53,86,212,.2)] transition hover:-translate-y-0.5 hover:bg-cobalt-dark focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-amber"
-            href="/first-day?demo=1"
-          >
-            Try the demo
-          </Link>
-        )}
+        <div className="flex min-h-11 items-center gap-2">
+          {controls ? (
+            <div className="flex items-center gap-2">{controls}</div>
+          ) : (
+            <Link
+              className="hidden min-h-11 items-center justify-center rounded-xl bg-cobalt px-4 text-sm font-bold text-white shadow-[0_10px_25px_rgba(53,86,212,.2)] transition hover:-translate-y-0.5 hover:bg-cobalt-dark focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-amber sm:inline-flex"
+              href="/first-day?demo=1"
+            >
+              Start demo
+            </Link>
+          )}
+          <MobileNavigation active={active} links={links} />
+        </div>
       </div>
     </header>
   );

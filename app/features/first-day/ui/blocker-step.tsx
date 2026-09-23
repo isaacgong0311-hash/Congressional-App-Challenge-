@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import type {
   FirstDayCase,
   SchoolConfirmationEvent,
@@ -120,14 +122,22 @@ export function BlockerStep({
         )}
       </p>
 
+      <div className="mt-7 grid gap-2 rounded-feature border border-[#ead39e] bg-[#fff8df] p-3 text-center text-xs font-bold text-[#684e18] sm:grid-cols-[1fr_auto_1fr_auto_1fr] sm:items-center">
+        <span>{translated(language, "Compare both pages", "Compare ambas páginas")}</span>
+        <span aria-hidden="true" className="hidden text-[#9a6b12] sm:block">→</span>
+        <span>{translated(language, "Ask the school", "Pregunte a la escuela")}</span>
+        <span aria-hidden="true" className="hidden text-[#9a6b12] sm:block">→</span>
+        <span>{translated(language, "Update only affected steps", "Actualice solo los pasos afectados")}</span>
+      </div>
+
       <div className="mt-8 grid gap-4 lg:grid-cols-2">
-        {options.map((option) => {
+        {options.map((option, optionIndex) => {
           const selected = resolution?.selectedFactId === option.factId;
           return (
             <article className="fd-conflict-card" key={option.factId}>
               <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.15em] text-[#8a6721]">
                 <WarningIcon className="h-4 w-4" />
-                {option.title}
+                {translated(language, `Page ${optionIndex + 1}`, `Página ${optionIndex + 1}`)} · {option.title}
               </div>
               <p className="mt-5 font-serif text-3xl tracking-[-0.03em]">
                 {option.value}
@@ -237,4 +247,3 @@ export function BlockerStep({
     </section>
   );
 }
-import { useState } from "react";

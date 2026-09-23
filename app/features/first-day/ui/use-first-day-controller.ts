@@ -41,7 +41,9 @@ export function useFirstDayController({
   initialPresentationMode: PresentationMode;
 }) {
   const [caseData, setCaseData] = useState(initialCase);
-  const [currentStep, setCurrentStep] = useState<StepId>("start");
+  const [currentStep, setCurrentStep] = useState<StepId>(
+    initialPresentationMode === "guided_demo" ? "documents" : "start",
+  );
   const [sourceId, setSourceId] = useState<string | null>(null);
   const [activeConflictId, setActiveConflictId] = useState<string | null>(null);
   const [taskFilter, setTaskFilter] = useState<TaskFilter>("all");
@@ -301,6 +303,13 @@ export function useFirstDayController({
     selectStep(previous.id);
   }
 
+  function dismissDemo() {
+    setPresentationMode("standard");
+    setCurrentStep("start");
+    setHighlightedTaskId(null);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
   return {
     activeConflictId,
     activeStepIndex,
@@ -311,7 +320,7 @@ export function useFirstDayController({
     confirmFact,
     correctFact,
     currentStep,
-    dismissDemo: () => setPresentationMode("standard"),
+    dismissDemo,
     goBack,
     goForward,
     highlightedTaskId,

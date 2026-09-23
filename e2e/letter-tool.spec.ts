@@ -72,7 +72,9 @@ test("letter workspace recovers from malformed output and keeps speech fallback"
 
   valid = true;
   await page.getByRole("button", { name: "Try again" }).click();
-  await expect(page.getByText("Utility notice", { exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Utility notice", exact: true }),
+  ).toBeVisible();
 
   await page.evaluate(() => {
     window.speechSynthesis.speak = () => {
@@ -108,4 +110,83 @@ test("letter language updates direction and persists as a shared preference", as
       ),
     )
     .toMatchObject({ preferredLanguage: "ar" });
+});
+
+test("crisis and scam guidance remain distinct while local help loads", async ({
+  page,
+}) => {
+  const safetyResult = {
+    ...validResult,
+    isPossibleScam: true,
+    scamSigns: ["The letter requests payment with gift cards."],
+    scamAgencyFacts:
+      "The real utility accepts payment through its official billing channels.",
+    isCrisis: true,
+    crisisMessage:
+      "Contact the utility through its official website today to confirm the shutoff risk.",
+  };
+
+  await page.route("**/api/explain", async (route) => {
+    await new Promise((resolve) => setTimeout(resolve, 150));
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify(safetyResult),
+    });
+  });
+  await page.route("**/api/local-help", async (route) => {
+    expect(await route.request().postDataJSON()).toMatchObject({
+      category: "utilities",
+      city: "Round Rock",
+      state: "TX",
+    });
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        resources: [
+          {
+            name: "Fictional Community Action",
+            phone: "555-0134",
+            address: "100 Main Street",
+            url: "https://example.org/help",
+            desc: "Utility-bill assistance for qualifying households.",
+          },
+        ],
+      }),
+    });
+  });
+
+  await page.goto("/explain");
+  await page.getByRole("button", { name: /Try a sample/ }).click();
+  await page.getByRole("button", { name: "Explain this letter" }).click();
+  await expect(page.getByRole("status", { name: "Analyzing your letter" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Utility notice", exact: true }),
+  ).toBeVisible();
+  await expect(page.getByText("This may be a scam — please be careful")).toBeVisible();
+  await expect(page.getByText("This needs attention soon")).toBeVisible();
+  await page
+    .getByRole("button", { name: /Why we flagged this/ })
+    .click();
+  await expect(page.getByText(/official billing channels/)).toBeVisible();
+
+  await page.getByRole("tab", { name: "Get Help" }).click();
+  await page.getByPlaceholder("City (optional)").fill("Round Rock");
+  await page.getByPlaceholder("State *").fill("TX");
+  await page.getByRole("button", { name: "Search" }).click();
+  await expect(page.getByText("Fictional Community Action")).toBeVisible();
+  await expect(page.getByRole("link", { name: "Call 555-0134" })).toBeVisible();
+});
+
+test("reading preferences carry between Explain and First Day", async ({ page }) => {
+  await page.goto("/explain");
+  await page.getByRole("button", { name: "Toggle large text" }).click();
+  await page.getByRole("button", { name: "Toggle high contrast" }).click();
+  await expect(page.locator(".letter-app")).toHaveAttribute("data-large-text", "true");
+  await expect(page.locator(".letter-app")).toHaveAttribute("data-high-contrast", "true");
+
+  await page.goto("/first-day");
+  await expect(page.locator(".fd-app")).toHaveAttribute("data-large-text", "true");
+  await expect(page.locator(".fd-app")).toHaveAttribute("data-high-contrast", "true");
 });
