@@ -1,11 +1,11 @@
 {
   "ci": {
     "collect": {
-      "startServerCommand": "npm run start",
+      "startServerCommand": "PORT=3100 npm run start",
       "startServerReadyPattern": "Ready in",
       "url": [
-        "http://127.0.0.1:3000/",
-        "http://127.0.0.1:3000/first-day"
+        "http://127.0.0.1:3100/",
+        "http://127.0.0.1:3100/first-day"
       ],
       "numberOfRuns": 3,
       "settings": {

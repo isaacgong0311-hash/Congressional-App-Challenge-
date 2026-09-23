@@ -152,6 +152,9 @@ test("letter workspace recovers from malformed output and keeps speech fallback"
   await expect(
     page.getByRole("button", { name: "Read explanation aloud" }),
   ).toBeVisible();
+  await expect(
+    page.getByText("Reading level · Grade 9 → 6", { exact: true }),
+  ).toBeVisible();
 
   await page.evaluate(() => {
     window.speechSynthesis.speak = () => {
