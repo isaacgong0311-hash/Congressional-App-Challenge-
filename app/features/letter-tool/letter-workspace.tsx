@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { ProductHeader } from "../../components/lantern/product-header";
+import { CheckIcon } from "../../components/lantern/icons";
 import { AccessibilityControls } from "../../components/lantern/primitives";
 import { useLanternPreferences } from "../../components/lantern/use-lantern-preferences";
 import {
@@ -31,11 +32,11 @@ const LANGUAGES: { label: string; bcp47: string; tts: string }[] = [
 const RTL_LANGS = new Set(["ar"]);
 
 const LOADING_STEPS = [
-  { icon: "📸", label: "Reading your letter" },
-  { icon: "📅", label: "Finding important dates" },
-  { icon: "🔍", label: "Checking for scam signals" },
-  { icon: "🏥", label: "Matching verified programs" },
-  { icon: "✍️", label: "Writing your reply" },
+  { label: "Reading your letter" },
+  { label: "Finding important dates" },
+  { label: "Checking for scam signals" },
+  { label: "Matching verified programs" },
+  { label: "Writing your reply" },
 ];
 
 function buildIcs(dateISO: string, summary: string): string {
@@ -474,19 +475,28 @@ export default function LetterWorkspace() {
 
         {/* Visual progress steps */}
         {loading && (
-          <div className="ttf-fade-in mt-6 overflow-hidden rounded-2xl border border-blue-100 bg-blue-50 p-5" role="status" aria-label="Analyzing your letter">
-            <p className="mb-3 text-sm font-semibold text-blue-800">Analyzing your letter…</p>
-            <ol className="space-y-2">
+          <div className="letter-processing-card mt-6" role="status" aria-label="Analyzing your letter">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="lantern-eyebrow">Working securely</p>
+                <p className="mt-2 text-lg font-black tracking-[-0.025em] text-ink">Analyzing your letter</p>
+                <p className="mt-1 text-sm text-muted">{LOADING_STEPS[loadingMsg].label}</p>
+              </div>
+              <span className="rounded-full border border-cobalt/20 bg-white px-3 py-1 text-xs font-extrabold text-cobalt">
+                {loadingMsg + 1} of {LOADING_STEPS.length}
+              </span>
+            </div>
+            <progress className="mt-4 h-2 w-full accent-cobalt" max={LOADING_STEPS.length} value={loadingMsg + 1} />
+            <ol className="mt-5 grid gap-2 sm:grid-cols-2">
               {LOADING_STEPS.map((s, i) => {
                 const done = i < loadingMsg;
                 const active = i === loadingMsg;
                 return (
-                  <li key={i} className={`flex items-center gap-3 text-sm transition-all ${done ? "text-emerald-700" : active ? "text-blue-800 font-semibold" : "text-slate-400"}`}>
-                    <span className="flex h-6 w-6 flex-none items-center justify-center rounded-full text-sm">
-                      {done ? "✓" : active ? s.icon : s.icon}
+                  <li key={i} className={`flex items-center gap-3 rounded-xl border px-3 py-2.5 text-sm ${done ? "border-confirmed/20 bg-[#e3f4e8] text-[#24633a]" : active ? "border-cobalt/25 bg-white font-bold text-cobalt" : "border-ink/8 bg-white/50 text-muted"}`}>
+                    <span className={`flex h-7 w-7 flex-none items-center justify-center rounded-full text-xs font-extrabold ${done ? "bg-confirmed text-white" : active ? "bg-cobalt text-white" : "bg-canvas text-muted"}`}>
+                      {done ? <CheckIcon className="h-4 w-4" /> : i + 1}
                     </span>
                     <span>{s.label}</span>
-                    {active && <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-blue-500" />}
                   </li>
                 );
               })}

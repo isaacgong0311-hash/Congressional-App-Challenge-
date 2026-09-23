@@ -15,6 +15,38 @@
   background: transparent;
 }
 
+.letter-upload-action {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625rem;
+  border-radius: 0.875rem;
+  background: var(--lantern-cobalt);
+  padding: 0.75rem 1rem;
+  color: white;
+  font-weight: 800;
+  box-shadow: 0 12px 28px rgba(53, 86, 212, 0.22);
+  transition: background 160ms ease, box-shadow 160ms ease, transform 120ms ease;
+}
+
+label:hover .letter-upload-action {
+  background: var(--lantern-cobalt-dark);
+  box-shadow: 0 15px 34px rgba(53, 86, 212, 0.28);
+}
+
+label:active .letter-upload-action {
+  transform: scale(0.985);
+}
+
+.letter-processing-card {
+  border: 1px solid rgba(53, 86, 212, 0.18);
+  border-radius: var(--radius-feature);
+  background: linear-gradient(145deg, #fffefa, #eef2ff);
+  padding: 1.25rem;
+  box-shadow: 0 18px 50px rgba(20, 36, 30, 0.07);
+}
+
 /* ── High contrast mode ───────────────────────────────────────── */
 [data-high-contrast="true"] body,
 [data-high-contrast="true"] {
@@ -107,5 +139,4 @@
 [data-letter-view] .text-slate-400 {
   color: #475569;
 }
-
 

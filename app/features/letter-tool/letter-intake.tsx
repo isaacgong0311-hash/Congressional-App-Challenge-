@@ -1,6 +1,11 @@
 import type { ChangeEventHandler, Dispatch, SetStateAction } from "react";
 
-import { LockIcon, SlidersIcon, UploadIcon } from "../../components/lantern/icons";
+import {
+  CameraIcon,
+  LockIcon,
+  SlidersIcon,
+  UploadIcon,
+} from "../../components/lantern/icons";
 import { SegmentedControl } from "../../components/lantern/primitives";
 import { Spinner } from "./letter-support";
 
@@ -68,9 +73,12 @@ export function LetterIntake({
             {!preview ? (
               <>
                 <label className="flex cursor-pointer flex-col items-center justify-center rounded-feature border-2 border-dashed border-ink/20 bg-canvas/70 px-6 py-12 text-center transition hover:border-cobalt hover:bg-[#eef2ff] focus-within:border-cobalt focus-within:ring-2 focus-within:ring-cobalt/30">
-                  <CameraIcon />
-                  <span className="mt-3 text-base font-semibold text-ink">Take a photo or upload your letter</span>
-                  <span className="mt-1 text-sm text-muted">JPG or PNG, up to 10 MB</span>
+                  <span className="letter-upload-action">
+                    <CameraIcon className="h-5 w-5" />
+                    Choose a letter photo
+                  </span>
+                  <span className="mt-4 text-base font-semibold text-ink">Take a photo or choose an image</span>
+                  <span className="mt-1 text-sm text-muted">JPG or PNG · up to 10 MB · clear, flat, and well lit</span>
                   <input
                     accept="image/*"
                     aria-label="Take a photo or upload a picture of your letter"
@@ -155,15 +163,5 @@ export function LetterIntake({
         ) : null}
       </div>
     </div>
-  );
-}
-
-function CameraIcon() {
-  return (
-    <svg aria-hidden="true" fill="none" height="40" viewBox="0 0 24 24" width="40">
-      <rect height="13" rx="3" stroke="#3556d4" strokeWidth="1.6" width="18" x="3" y="7" />
-      <path d="M8 7l1.5-2.5h5L16 7" stroke="#3556d4" strokeLinejoin="round" strokeWidth="1.6" />
-      <circle cx="12" cy="13.5" r="3.2" stroke="#3556d4" strokeWidth="1.6" />
-    </svg>
   );
 }

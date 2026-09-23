@@ -54,6 +54,36 @@ test("Explain intake exposes semantic tabs without decorative glyph labels", asy
   ).toHaveAttribute("aria-selected", "true");
 });
 
+test("Explain intake keeps one clear primary action and stable processing status", async ({
+  page,
+}) => {
+  let releaseResponse!: () => void;
+  await page.route("**/api/explain", async (route) => {
+    await new Promise<void>((resolve) => {
+      releaseResponse = resolve;
+    });
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify(validResult),
+    });
+  });
+
+  await page.goto("/explain");
+  await expect(
+    page.getByText("Choose a letter photo", { exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: /Try a sample/ }).click();
+  await page.getByRole("button", { name: "Explain this letter" }).click();
+  await expect(
+    page.getByRole("status", { name: "Analyzing your letter" }),
+  ).toContainText("Reading your letter");
+  releaseResponse();
+  await expect(
+    page.getByRole("heading", { name: "Utility notice", exact: true }),
+  ).toBeVisible();
+});
+
 test("letter workspace recovers from malformed output and keeps speech fallback", async ({
   page,
 }) => {
