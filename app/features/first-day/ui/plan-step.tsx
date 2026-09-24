@@ -52,6 +52,9 @@ export function PlanStep({
   const ordered = prioritizedPlanTasks(plan.tasks);
   const visibleTasks = filterPlanTasks(plan.tasks, taskFilter);
   const bestNext = ordered.find((task) => task.state !== "done");
+  const highlightedTask = highlightedTaskId
+    ? plan.tasks.find((task) => task.id === highlightedTaskId)
+    : undefined;
   const summary = {
     attention: plan.tasks.filter(
       (task) =>
@@ -86,6 +89,39 @@ export function PlanStep({
         </p>
       </div>
 
+      {presentationMode === "guided_demo" && highlightedTask ? (
+        <aside
+          aria-live="polite"
+          className="fd-focused-update mt-7"
+          data-demo-target="true"
+        >
+          <div>
+            <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-cobalt">
+              {translated(language, "One answer · one focused update", "Una respuesta · una actualización precisa")}
+            </p>
+            <h2 className="mt-2 text-xl font-bold tracking-[-0.025em]">
+              {localizedTaskCopy(highlightedTask, language).title}
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-muted">
+              {translated(
+                language,
+                "The school-reported answer changed this dependent task. Unrelated work kept its previous state.",
+                "La respuesta informada por la escuela cambió este paso dependiente. El trabajo no relacionado conservó su estado anterior.",
+              )}
+            </p>
+          </div>
+          <div className="fd-focused-transition" aria-label={translated(language, "Task status changed", "El estado del paso cambió")}>
+            <span>{translated(language, "Needs clarification", "Necesita aclaración")}</span>
+            <b aria-hidden="true">→</b>
+            <span className="is-current">
+              {language === "Español"
+                ? STATE_META[highlightedTask.state].es
+                : STATE_META[highlightedTask.state].en}
+            </span>
+          </div>
+        </aside>
+      ) : null}
+
       <dl className="mt-8 grid grid-cols-2 gap-3 xl:grid-cols-4">
         {[
           [summary.attention, "Needs attention", "Necesita atención", "text-[#704c0e] bg-[#fff3d5]"],
@@ -93,7 +129,12 @@ export function PlanStep({
           [summary.waiting, "Waiting", "En espera", "text-[#4c5952] bg-[#edf0ed]"],
           [summary.done, "Done", "Terminado", "text-[#24633a] bg-[#e3f4e8]"],
         ].map(([value, en, es, style]) => (
-          <div className={`rounded-card p-4 ${style}`} key={String(en)}>
+          <div
+            className={`rounded-card p-4 ${style} ${
+              highlightedTask && en === "Ready now" ? "fd-count-updated" : ""
+            }`}
+            key={String(en)}
+          >
             <dd className="text-3xl font-black tracking-[-0.04em]">{value}</dd>
             <dt className="mt-1 text-xs font-bold uppercase tracking-[0.12em]">
               {translated(language, String(en), String(es))}

@@ -29,6 +29,7 @@ export type DocumentsStepProps = {
   language: Language;
   uploadQueue: UploadQueueItem[];
   uploadNotice: string | null;
+  showDemoPrelude: boolean;
   onAddFiles: (files: File[]) => void;
   onRetry: (documentId: string) => void;
   onRemove: (documentId: string) => void;
@@ -44,6 +45,7 @@ export function DocumentsStep({
   onRetry,
   onRemove,
   onOpenSource,
+  showDemoPrelude,
 }: DocumentsStepProps) {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const cameraInputRef = useRef<HTMLInputElement | null>(null);
@@ -62,6 +64,9 @@ export function DocumentsStep({
     (fact) =>
       factHasActiveSource(caseData, fact) &&
       currentFactView(caseData, fact).state === "proposed",
+  ).length;
+  const openConflicts = caseData.conflicts.filter(
+    (conflict) => conflict.status === "open",
   ).length;
 
   return (
@@ -87,6 +92,47 @@ export function DocumentsStep({
           "Cada página conserva su identidad, texto extraído y estado. Una página con error no borraría las demás.",
         )}
       </p>
+
+      {showDemoPrelude ? (
+        <aside className="fd-before-lantern" aria-labelledby="fd-before-title">
+          <div className="fd-before-copy">
+            <p className="fd-before-kicker">
+              {translated(language, "Before Lantern", "Antes de Lantern")}
+            </p>
+            <h2 id="fd-before-title">
+              {translated(
+                language,
+                "Three pages. Two languages. One family trying not to miss a step.",
+                "Tres páginas. Dos idiomas. Una familia intentando no perder ningún paso.",
+              )}
+            </h2>
+            <p>
+              {translated(
+                language,
+                "The date is in one letter, the health requirement is in another, and two pages disagree about where orientation begins.",
+                "La fecha está en una carta, el requisito de salud en otra y dos páginas no coinciden sobre dónde empieza la orientación.",
+              )}
+            </p>
+            <div className="fd-before-signals">
+              <span>{proposedFacts} {translated(language, "facts to check", "datos por revisar")}</span>
+              <span>{openConflicts} {translated(language, "contradiction", "contradicción")}</span>
+              <span>{translated(language, "English pages → bilingual plan", "Páginas en inglés → plan bilingüe")}</span>
+            </div>
+          </div>
+          <ol aria-label={translated(language, "Scattered school documents", "Documentos escolares dispersos")} className="fd-before-stack">
+            {visibleDocuments.map((document, index) => (
+              <li key={document.id}>
+                <span>{translated(language, `Page ${index + 1}`, `Página ${index + 1}`)}</span>
+                <strong>
+                  {language === "Español"
+                    ? DOCUMENT_ES[document.id] ?? document.label
+                    : document.label}
+                </strong>
+              </li>
+            ))}
+          </ol>
+        </aside>
+      ) : null}
 
       <div className="mt-7 grid grid-cols-2 gap-3 xl:grid-cols-4">
         {[

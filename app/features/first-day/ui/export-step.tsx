@@ -1,4 +1,5 @@
 import type { FirstDayCase, PlannerResult } from "../domain/types";
+import { competitionProof } from "../content/competition-proof";
 import {
   calendarEvents,
   createCalendarFile,
@@ -27,6 +28,8 @@ export type ExportStepProps = {
   language: Language;
   plan: PlannerResult;
   onPrint: () => void;
+  showCompetitionProof: boolean;
+  showGuidedProof: boolean;
 };
 
 const TASK_ORDER = {
@@ -51,6 +54,8 @@ export function ExportStep({
   language,
   plan,
   onPrint,
+  showCompetitionProof,
+  showGuidedProof,
 }: ExportStepProps) {
   const confirmedFacts = effectiveConfirmedFacts(caseData);
   const dates = calendarEvents(caseData);
@@ -141,6 +146,77 @@ export function ExportStep({
           ? translated(language, `${dates.length} confirmed date${dates.length === 1 ? "" : "s"} will be included.`, `Se incluirá${dates.length === 1 ? "" : "n"} ${dates.length} fecha${dates.length === 1 ? "" : "s"} confirmada${dates.length === 1 ? "" : "s"}.`)
           : translated(language, "Calendar export is available after you confirm a complete, unambiguous date.", "La exportación al calendario estará disponible después de confirmar una fecha completa y sin ambigüedad.")}
       </p>
+
+      {showGuidedProof ? (
+        <details
+          className="fd-competition-proof mt-6 print:hidden"
+          data-demo-proof="true"
+          key={showCompetitionProof ? "proof-open" : "proof-closed"}
+          open={showCompetitionProof}
+        >
+          <summary>
+            <span>
+              <span className="fd-proof-kicker">
+                {translated(language, "Engineering proof", "Prueba técnica")}
+              </span>
+              <strong>
+                {translated(
+                  language,
+                  "See how Lantern earns trust",
+                  "Vea cómo Lantern se gana la confianza",
+                )}
+              </strong>
+            </span>
+            <span aria-hidden="true">＋</span>
+          </summary>
+          <div className="fd-proof-body">
+            <div className="fd-proof-intro">
+              <div>
+                <p className="fd-proof-kicker">
+                  {translated(language, "The boundary", "El límite")}
+                </p>
+                <h2>
+                  {translated(
+                    language,
+                    "AI reads. Evidence constrains. Families decide. Code plans.",
+                    "La IA lee. La evidencia limita. Las familias deciden. El código planifica.",
+                  )}
+                </h2>
+              </div>
+              <div className="fd-proof-stack" aria-label={translated(language, "Tools used", "Herramientas utilizadas")}>
+                {competitionProof.stack.map((tool) => (
+                  <span key={tool}>{tool}</span>
+                ))}
+              </div>
+            </div>
+
+            <div className="fd-proof-boundaries">
+              {[
+                ["AI proposes", "La IA propone", competitionProof.aiBoundary],
+                ["Code validates", "El código valida", competitionProof.codeBoundary],
+                ["Family decides", "La familia decide", competitionProof.familyBoundary],
+              ].map(([en, es, copy]) => (
+                <article key={String(en)}>
+                  <p>{translated(language, String(en), String(es))}</p>
+                  <span>{copy}</span>
+                </article>
+              ))}
+            </div>
+
+            <dl className="fd-proof-metrics">
+              {competitionProof.metrics.map((metric) => (
+                <div key={metric.id}>
+                  <dt>{metric.label}</dt>
+                  <dd>{metric.value}</dd>
+                </div>
+              ))}
+            </dl>
+            <p className="fd-proof-limit">
+              {competitionProof.packetCount} {translated(language, "synthetic held-out packets", "paquetes sintéticos reservados")}. {competitionProof.limitation}
+            </p>
+          </div>
+        </details>
+      ) : null}
 
       <article className="fd-print-plan mt-8 rounded-[2rem] border border-[#d9dfda] bg-white p-6 shadow-[0_20px_70px_rgba(24,46,38,.08)] sm:p-10">
         <div className="flex flex-col justify-between gap-5 border-b border-[#dfe4df] pb-7 sm:flex-row sm:items-start">

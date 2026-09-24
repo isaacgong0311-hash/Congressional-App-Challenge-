@@ -90,6 +90,17 @@ test.describe("visual regression and responsive layout", () => {
 
       await page.goto("/first-day");
       await capture(page, `first-day-start-${viewport.name}`);
+
+      await page.goto("/first-day?demo=1");
+      await expect(page.getByLabel("Guided demonstration")).toBeVisible();
+      await expect(
+        page.getByRole("heading", {
+          name: "Three pages. Two languages. One family trying not to miss a step.",
+        }),
+      ).toBeVisible();
+      await expectNoHorizontalOverflow(page);
+
+      await page.goto("/first-day");
       await page.getByRole("button", { name: "Open the sample case" }).click();
       await capture(page, `first-day-documents-${viewport.name}`);
 

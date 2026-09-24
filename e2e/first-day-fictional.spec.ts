@@ -124,35 +124,117 @@ test("fictional entry and evidence review are keyboard reachable", async ({
   await expect(source).toBeFocused();
 });
 
-test("guided demo stays fictional and can be dismissed", async ({ page }) => {
+test("guided demo follows the six-beat judge story and can exit and resume", async ({
+  page,
+}) => {
+  const providerRequests: string[] = [];
+  page.on("request", (request) => {
+    if (/\/api\/(?:explain|first-day\/extract)/.test(request.url())) {
+      providerRequests.push(request.url());
+    }
+  });
+
+  await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto("/first-day?demo=1");
-  await expect(page.getByLabel("Guided demo cue")).toBeVisible();
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  const guide = page.getByLabel("Guided demonstration");
+  await expect(guide).toBeVisible();
+  await expectNoSeriousAxeViolations(page);
+  await expect(guide.getByText("Fictional demo · Beat 1 of 6")).toBeVisible();
   await expect(
     page.getByRole("heading", { name: "One case, every instruction." }),
   ).toBeVisible();
   await expect(
-    page
-      .getByLabel("Guided demo cue")
-      .getByText(/Fictional demonstration · Cue 2 of 6/i),
-  ).toBeVisible();
-  await page.getByRole("button", { name: "Exit demo mode" }).click();
-  await expect(page.getByLabel("Guided demo cue")).toBeHidden();
-  await expect(
     page.getByRole("heading", {
-      name: "School instructions, turned into a plan you can trust.",
+      name: "Three pages. Two languages. One family trying not to miss a step.",
     }),
   ).toBeVisible();
+
+  await guide.getByRole("button", { name: "Next beat" }).click();
+  await expect(guide.getByText("Fictional demo · Beat 2 of 6")).toBeVisible();
+  await expect(
+    page.getByRole("heading", {
+      name: "Check the facts that shape the plan.",
+    }),
+  ).toBeVisible();
+  await expect(
+    guide.getByRole("button", { name: "Next beat" }),
+  ).toBeDisabled();
+  await expect(guide.getByText("Review 2 facts before continuing.")).toBeVisible();
+
+  await guide.getByRole("button", { name: "Previous beat" }).click();
+  await expect(guide.getByText("Fictional demo · Beat 1 of 6")).toBeVisible();
+  await guide.getByRole("button", { name: "Next beat" }).click();
+
+  while (await page.getByRole("button", { name: "Confirm this" }).count()) {
+    await page.getByRole("button", { name: "Confirm this" }).first().click();
+  }
+  await expect(guide.getByRole("button", { name: "Next beat" })).toBeEnabled();
+  await guide.getByRole("button", { name: "Next beat" }).click();
+  await expect(guide.getByText("Fictional demo · Beat 3 of 6")).toBeVisible();
+  await expect(
+    page.getByRole("heading", {
+      name: "Two documents. One unanswered question.",
+    }),
+  ).toBeVisible();
+  await expectNoSeriousAxeViolations(page);
+  await expect(guide.getByText("Record what the school told the family.")).toBeVisible();
+
+  await page
+    .getByRole("button", { name: "Record what the school told me" })
+    .last()
+    .click();
+  await expect(guide.getByText("Fictional demo · Beat 4 of 6")).toBeVisible();
+  await expect(page.getByText("One answer · one focused update")).toBeVisible();
+  await expect(page.getByText("Only the plan steps that depended on this answer were updated.")).toBeVisible();
+  const focusedAnimation = await page
+    .locator(".fd-task-highlight")
+    .evaluate((element) => Number.parseFloat(getComputedStyle(element).animationDuration));
+  expect(focusedAnimation).toBeLessThanOrEqual(0.01);
+
+  await guide.getByRole("button", { name: "Exit demo" }).click();
+  await expect(guide).toBeHidden();
+  await expect(
+    page.getByRole("heading", { name: "What to do next, and why." }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Resume guided demo" }).click();
+  await expect(guide.getByText("Fictional demo · Beat 4 of 6")).toBeVisible();
+
+  await guide.getByRole("button", { name: "Next beat" }).click();
+  await expect(guide.getByText("Fictional demo · Beat 5 of 6")).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "A plan the family can carry." }),
+  ).toBeVisible();
+
+  await guide.getByRole("button", { name: "Next beat" }).click();
+  await expect(guide.getByText("Fictional demo · Beat 6 of 6")).toBeVisible();
+  const proof = page.locator("[data-demo-proof='true']");
+  await expect(proof).toHaveAttribute("open", "");
+  await expect(
+    proof.getByRole("heading", {
+      name: "AI reads. Evidence constrains. Families decide. Code plans.",
+    }),
+  ).toBeVisible();
+  await expect(proof.getByText("32/32")).toBeVisible();
+  await expect(guide.getByRole("button", { name: "Demo complete" })).toBeDisabled();
+  await expectNoSeriousAxeViolations(page);
+  expect(providerRequests).toEqual([]);
 });
 
-test("guided demo keeps the primary mobile action in the first viewport", async ({
+test("guided demo keeps its mobile presentation controls in the first viewport", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/first-day?demo=1");
-  const continueButton = page.getByRole("button", { name: "Continue" });
-  await expect(continueButton).toBeVisible();
-  const box = await continueButton.boundingBox();
+  const nextBeat = page.getByRole("button", { name: "Next beat" });
+  await expect(nextBeat).toBeVisible();
+  const box = await nextBeat.boundingBox();
   expect(box?.y).toBeLessThan(844);
+  const width = await page.evaluate(() => ({
+    client: document.documentElement.clientWidth,
+    scroll: document.documentElement.scrollWidth,
+  }));
+  expect(width.scroll).toBeLessThanOrEqual(width.client + 1);
 });
 
 test("task completion can be undone without deleting history", async ({ page }) => {

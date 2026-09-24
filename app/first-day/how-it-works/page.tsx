@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { ProductHeader } from "../../components/lantern/product-header";
 import { SiteFooter } from "../../components/lantern/site-footer";
+import { competitionProof } from "../../features/first-day/content/competition-proof";
 
 export const metadata: Metadata = {
   title: "How First Day works | Lantern",
@@ -184,18 +185,19 @@ export default function HowFirstDayWorksPage() {
               Measured offline
             </p>
             <h2 className="mt-3 font-serif text-3xl tracking-[-0.03em]">
-              20 synthetic held-out packets
+              {competitionProof.packetCount} synthetic held-out packets
             </h2>
             <p className="mt-4 max-w-2xl leading-7 text-[#45567f]">
-              The versioned evaluation reports 32/32 exact-quote coverage, 8/8
-              intended conflicts found with zero false positives, 0/8 date
-              normalization errors, and 34/34 ready tasks with source coverage.
-              Provider latency and cost were not measured in this offline run.
+              The versioned evaluation reports{" "}
+              {competitionProof.metrics
+                .map((metric) => `${metric.value} ${metric.label}`)
+                .join(", ")}.
+              {` `}{competitionProof.limitation}
             </p>
           </div>
           <Link
             className="mt-6 inline-flex min-h-12 shrink-0 items-center rounded-xl bg-[#3556d4] px-5 font-semibold text-white shadow-sm transition hover:bg-[#2948be] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#3556d4] sm:mt-0"
-            href="/first-day"
+            href="/first-day?demo=1"
           >
             Start the 3-minute demo →
           </Link>

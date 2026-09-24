@@ -40,13 +40,17 @@ export function FirstDayWorkspace({
   const {
     activeConflictId,
     activeStepIndex,
+    canAdvanceDemo,
     canGoForward,
+    canResumeDemo,
     caseData,
     closeSource,
     completeTask,
     confirmFact,
     correctFact,
     currentStep,
+    demoBeat,
+    demoBeatId,
     dismissDemo,
     goBack,
     goForward,
@@ -65,6 +69,7 @@ export function FirstDayWorkspace({
     presentationMode,
     providerCapability,
     resolveCaseConflict,
+    resumeDemo,
     selectStep,
     setTaskFilter,
     setToast,
@@ -127,6 +132,18 @@ export function FirstDayWorkspace({
             </div>
 
             <div className="flex shrink-0 items-center gap-2">
+              {canResumeDemo ? (
+                <button
+                  className="fd-resume-demo"
+                  onClick={resumeDemo}
+                  type="button"
+                >
+                  <span className="hidden sm:inline">
+                    {translated(language, "Resume guided demo", "Reanudar demo")}
+                  </span>
+                  <span className="sm:hidden">Demo</span>
+                </button>
+              ) : null}
               <div className="hidden sm:block">
                 <AccessibilityControls
                   compact
@@ -168,12 +185,13 @@ export function FirstDayWorkspace({
 
         {presentationMode === "guided_demo" ? (
           <DemoRibbon
-            canGoForward={canGoForward}
-            currentStep={currentStep}
+            beat={demoBeat}
+            canGoForward={canAdvanceDemo}
             language={language}
             onDismiss={dismissDemo}
             onNext={goForward}
             onPrevious={goBack}
+            snapshot={snapshot}
           />
         ) : null}
 
@@ -217,6 +235,10 @@ export function FirstDayWorkspace({
                 onOpenSource={openSource}
                 onRemove={liveCase.remove}
                 onRetry={liveCase.retry}
+                showDemoPrelude={
+                  presentationMode === "guided_demo" &&
+                  demoBeatId === "before_lantern"
+                }
                 uploadNotice={liveCase.uploadNotice}
                 uploadQueue={liveCase.uploadQueue}
               />
@@ -261,10 +283,15 @@ export function FirstDayWorkspace({
                 language={language}
                 onPrint={() => window.print()}
                 plan={plan}
+                showCompetitionProof={
+                  presentationMode === "guided_demo" &&
+                  demoBeatId === "engineering_proof"
+                }
+                showGuidedProof={presentationMode === "guided_demo"}
               />
             ) : null}
 
-            {currentStep !== "start" ? (
+            {currentStep !== "start" && presentationMode !== "guided_demo" ? (
               <ActionDock className="print:hidden">
                 <button
                   className="fd-secondary-button"

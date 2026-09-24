@@ -10,6 +10,7 @@ import {
 } from "./components/lantern/brand";
 import { ProductHeader } from "./components/lantern/product-header";
 import { SiteFooter } from "./components/lantern/site-footer";
+import { competitionProof } from "./features/first-day/content/competition-proof";
 
 export const metadata: Metadata = {
   title: "Lantern — School instructions, turned into a plan",
@@ -17,11 +18,9 @@ export const metadata: Metadata = {
     "Lantern First Day turns scattered school instructions into a source-backed plan families can inspect, correct, and carry with them.",
 };
 
-const metrics = [
-  ["32/32", "exact quotes covered"],
-  ["8/8", "intended conflicts found"],
-  ["34/34", "ready tasks sourced"],
-] as const;
+const metrics = competitionProof.metrics.filter(
+  (metric) => metric.id !== "dates",
+);
 
 const stages = [
   {
@@ -129,13 +128,13 @@ export default function HomePage() {
             <div>
               <p className="lantern-eyebrow">Measured offline</p>
               <h2 className="mt-2 text-balance font-serif text-3xl tracking-[-0.035em]" id="proof-title">Evidence, not a vague AI promise.</h2>
-              <p className="mt-3 text-sm leading-6 text-muted">Results from 20 synthetic held-out packets. Provider speed and cost were not measured in this offline run.</p>
+              <p className="mt-3 text-sm leading-6 text-muted">Results from {competitionProof.packetCount} synthetic held-out packets. {competitionProof.limitation}</p>
             </div>
             <dl className="grid gap-3 sm:grid-cols-3">
-              {metrics.map(([value, label]) => (
-                <div className="rounded-card border border-ink/10 bg-canvas px-5 py-6" key={label}>
-                  <dt className="text-sm font-semibold text-muted">{label}</dt>
-                  <dd className="mt-2 text-3xl font-black tracking-[-0.04em] text-ink">{value}</dd>
+              {metrics.map((metric) => (
+                <div className="rounded-card border border-ink/10 bg-canvas px-5 py-6" key={metric.id}>
+                  <dt className="text-sm font-semibold text-muted">{metric.label}</dt>
+                  <dd className="mt-2 text-3xl font-black tracking-[-0.04em] text-ink">{metric.value}</dd>
                 </div>
               ))}
             </dl>

@@ -15,6 +15,12 @@ import {
 import { deriveLiveCase } from "../domain/live-tasks";
 import { planCase } from "../domain/planner";
 import type { FirstDayCase } from "../domain/types";
+import {
+  DEMO_BEATS,
+  demoBeatForStep,
+  demoBeatIndex,
+  type DemoBeatId,
+} from "./demo-presentation";
 import { STEPS, type Language, type StepId } from "./first-day-copy";
 import {
   activeTaskCompletionEvent,
@@ -52,6 +58,8 @@ export function useFirstDayController({
   const [presentationMode, setPresentationMode] = useState<PresentationMode>(
     initialPresentationMode,
   );
+  const [demoBeatId, setDemoBeatId] = useState<DemoBeatId>("before_lantern");
+  const [isDemoSession] = useState(initialPresentationMode === "guided_demo");
   const sourceTriggerRef = useRef<HTMLButtonElement | null>(null);
   const eventSequence = useRef(0);
   const preferenceAppliedRef = useRef(false);
@@ -62,6 +70,15 @@ export function useFirstDayController({
   const liveCase = useLiveCase({ caseData, language, setCaseData });
   const plan = useMemo(() => planCase(caseData), [caseData]);
   const snapshot = useMemo(() => caseSnapshot(caseData, plan), [caseData, plan]);
+  const demoBeat = DEMO_BEATS[demoBeatIndex(demoBeatId)] ?? DEMO_BEATS[0];
+  const canAdvanceDemo =
+    demoBeatId === "engineering_proof"
+      ? false
+      : demoBeatId === "traceable_evidence"
+        ? snapshot.pendingFactCount === 0
+        : demoBeatId === "uncertainty_preserved"
+          ? snapshot.openConflictCount === 0
+          : true;
   const activeStepIndex = STEPS.findIndex((step) => step.id === currentStep);
   const nextStep = STEPS[activeStepIndex + 1];
   const canGoForward = nextStep
@@ -269,6 +286,9 @@ export function useFirstDayController({
           : "Only the plan steps that depended on this answer were updated.",
     });
     setCurrentStep("plan");
+    if (presentationMode === "guided_demo") {
+      setDemoBeatId("focused_update");
+    }
   }
 
   function openTaskConflict(taskId: string) {
@@ -277,6 +297,9 @@ export function useFirstDayController({
       caseData.conflicts.find((item) => item.status === "open");
     setActiveConflictId(conflict?.id ?? null);
     setCurrentStep("blocker");
+    if (presentationMode === "guided_demo") {
+      setDemoBeatId("uncertainty_preserved");
+    }
   }
 
   function showTaskSource(taskId: string, trigger: HTMLButtonElement) {
@@ -288,16 +311,62 @@ export function useFirstDayController({
   function selectStep(stepId: StepId) {
     if (!canEnterLiveStep(caseData, stepId)) return;
     setCurrentStep(stepId);
+    if (presentationMode === "guided_demo") {
+      setDemoBeatId(demoBeatForStep(stepId, snapshot, demoBeatId));
+    }
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   function goForward() {
+    if (presentationMode === "guided_demo") {
+      if (!canAdvanceDemo) return;
+      if (demoBeatId === "before_lantern") {
+        setDemoBeatId("traceable_evidence");
+        setCurrentStep("facts");
+      } else if (demoBeatId === "traceable_evidence") {
+        const conflict = caseData.conflicts.find((item) => item.status === "open");
+        setActiveConflictId(conflict?.id ?? null);
+        setDemoBeatId("uncertainty_preserved");
+        setCurrentStep("blocker");
+      } else if (demoBeatId === "focused_update") {
+        setDemoBeatId("family_outcome");
+        setCurrentStep("export");
+      } else if (demoBeatId === "uncertainty_preserved") {
+        setDemoBeatId("focused_update");
+        setCurrentStep("plan");
+      } else if (demoBeatId === "family_outcome") {
+        setDemoBeatId("engineering_proof");
+        setCurrentStep("export");
+      }
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
     const next = STEPS[Math.min(activeStepIndex + 1, STEPS.length - 1)];
     if (!next) return;
     selectStep(next.id);
   }
 
   function goBack() {
+    if (presentationMode === "guided_demo") {
+      if (demoBeatId === "traceable_evidence") {
+        setDemoBeatId("before_lantern");
+        setCurrentStep("documents");
+      } else if (demoBeatId === "uncertainty_preserved") {
+        setDemoBeatId("traceable_evidence");
+        setCurrentStep("facts");
+      } else if (demoBeatId === "focused_update") {
+        setDemoBeatId("uncertainty_preserved");
+        setCurrentStep("blocker");
+      } else if (demoBeatId === "family_outcome") {
+        setDemoBeatId("focused_update");
+        setCurrentStep("plan");
+      } else if (demoBeatId === "engineering_proof") {
+        setDemoBeatId("family_outcome");
+        setCurrentStep("export");
+      }
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
     const previous = STEPS[Math.max(activeStepIndex - 1, 0)];
     if (!previous) return;
     selectStep(previous.id);
@@ -305,21 +374,30 @@ export function useFirstDayController({
 
   function dismissDemo() {
     setPresentationMode("standard");
-    setCurrentStep("start");
-    setHighlightedTaskId(null);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function resumeDemo() {
+    setDemoBeatId(demoBeatForStep(currentStep, snapshot, demoBeatId));
+    setPresentationMode("guided_demo");
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   return {
     activeConflictId,
     activeStepIndex,
-    canGoForward,
+    canGoForward:
+      presentationMode === "guided_demo" ? canAdvanceDemo : canGoForward,
+    canAdvanceDemo,
+    canResumeDemo: isDemoSession && presentationMode === "standard",
     caseData,
     closeSource,
     completeTask,
     confirmFact,
     correctFact,
     currentStep,
+    demoBeat,
+    demoBeatId,
     dismissDemo,
     goBack,
     goForward,
@@ -338,6 +416,7 @@ export function useFirstDayController({
     presentationMode,
     providerCapability,
     resolveCaseConflict,
+    resumeDemo,
     selectStep,
     setTaskFilter,
     setToast,

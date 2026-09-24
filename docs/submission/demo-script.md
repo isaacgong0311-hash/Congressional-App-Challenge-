@@ -1,51 +1,51 @@
 # Lantern: First Day — three-minute demonstration script
 
-## 0:00–0:20 — Audience and purpose
+## 0:00–0:20 — Participant, audience, and purpose
 
-“Newcomer families often receive enrollment instructions across several letters, reminders, and office notes. Lantern: First Day turns those scattered school instructions into one source-backed plan families can check, clarify, and carry with them.”
+“I’m Isaac Gong, and I built Lantern: First Day for newcomer families navigating school enrollment. Lantern turns scattered, stressful school instructions into one clear bilingual plan a family can inspect, trust, and carry.”
 
-Show the First Day landing screen and the fictional-demo label.
+Show the homepage, the app name, and the fictional-demo label, then open the three-minute guided demo.
 
-## 0:20–0:42 — Tools and architecture
+## 0:20–0:45 — Before Lantern
 
-“I built this as an independent Next.js application using React, TypeScript, Tailwind CSS, and Zod. Vitest checks the domain rules, Playwright and axe test the real browser experience, and Vercel hosts the app. Groq can read uploaded pages in the live pilot, but AI only proposes facts and exact quotes. Deterministic TypeScript code validates, confirms, compares, and plans.”
+“This fictional family has three school pages. The enrollment date is in one letter, the health requirement is in another, and two pages disagree about where orientation begins. A family has to connect all of that while working across languages.”
 
-Open **How First Day works** briefly and point across the five-stage pipeline.
+Point to the three document identities, the facts still requiring review, and the visible blocker.
 
-## 0:42–1:24 — Source-backed fictional workflow
+## 0:45–1:10 — Traceable evidence
 
-Open the sample case.
+“Lantern keeps each page separate. AI may propose a fact, but the proposal must carry an exact quotation from that page, and nothing changes the plan until the family reviews it.”
 
-“The demo packet is entirely fictional. Every page keeps its own extracted text and identity, so one bad page cannot erase the others. On Review facts, each important value stays connected to the exact words that support it.”
+Open one **More source context** dialog, point to the highlighted passage and page identity, then close it. Confirm the two proposed facts.
 
-Open one **Show source** dialog, read the highlighted passage, then close it.
+## 1:10–1:40 — Uncertainty preserved
 
-“Nothing changes the plan until the family confirms, corrects, or marks a fact unclear. Corrections append history instead of rewriting what the page said.”
+“The hardest problem was refusing to hide uncertainty. One page says cafeteria; another says gym entrance. Lantern preserves both exact quotes, prepares the question to ask, and refuses to guess.”
 
-Confirm the two proposed demo facts and continue.
+Point to both sources and the prepared question. Record the fictional school response for the gym entrance.
 
-## 1:24–2:02 — Technical challenge: conflicting instructions
+## 1:40–2:00 — Focused update
 
-On **My plan**, select **Confirm where orientation begins**, then **Resolve this**.
+“That answer is stored as school-reported—not verified by Lantern. Deterministic TypeScript recomputes the dependencies, changes only the affected orientation task, and leaves unrelated work alone.”
 
-“The hardest problem was refusing to hide uncertainty. These two documents name different entrances. Lantern does not assume the newest message is correct. It preserves both quotes, prepares a question, and waits for the family to record what the school said.”
+Point to the before-and-after state and the highlighted task.
 
-Choose the gym entrance.
-
-“That append-only event changes the affected task. Unrelated tasks stay unchanged because every task has explicit fact, task, and procedure dependencies.”
-
-## 2:02–2:28 — Family-ready output
+## 2:00–2:25 — Family outcome
 
 Switch to Spanish and open **Llevar conmigo**.
 
-“The interface works in English and Spanish. The final view puts unresolved items first, then plan steps, confirmed facts, and procedure review details. Families can print it, download a privacy-limited JSON plan, or add only complete confirmed dates to a calendar.”
+“The result is a bilingual plan the family can print or save. It keeps confirmed dates, source references, and unresolved items visible, and it only sends complete confirmed dates to a calendar.”
 
-## 2:28–2:50 — Live pilot and reliability
+Point to the family-ready plan and export actions.
 
-Return to Start and point to **Add Round Rock ISD documents**.
+## 2:25–2:50 — Engineering proof
 
-“The live pilot processes up to five JPG or PNG pages one at a time. A failed page can be retried without losing successful pages, and removing a page also removes its facts from the usable plan. The two district procedures are narrow, source-checked enrollment records—not a claim of district review or endorsement.”
+Open **See how Lantern earns trust**.
 
-## 2:50–3:00 — Measured result and close
+“I built Lantern with Next.js, React, TypeScript, Zod, Vitest, and Playwright. AI is limited to reading assistance and structured proposals. Exact-quote validation, conflict preservation, event history, and task-state derivation are explicit code.”
 
-“Across 20 synthetic held-out packets, the versioned offline evaluation reports 32 out of 32 exact quotes covered, all 8 intended conflicts found with zero false positives, and all 34 ready tasks retaining source coverage. Lantern helps a family move forward without pretending uncertainty disappeared.”
+“Across 20 synthetic held-out packets, the versioned offline evaluation reports 32 out of 32 exact quotes covered, all 8 intended conflicts found with zero false positives, no date-normalization errors, and all 34 ready tasks retaining source coverage.”
+
+## 2:50–3:00 — Community-impact close
+
+“Lantern helps a family move from scattered instructions to a plan they can explain—without pretending uncertainty disappeared.”
