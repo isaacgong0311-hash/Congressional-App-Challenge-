@@ -6,6 +6,7 @@ const SUPPORTED_IMAGE_TYPES = new Set(["image/jpeg", "image/png"]);
 
 export type UploadStatus =
   | "queued"
+  | "retrying"
   | "processing"
   | "ready"
   | "error"
@@ -17,6 +18,11 @@ export type UploadQueueItem = {
   mimeType: string;
   size: number;
   status: UploadStatus;
+  sourceFileName?: string;
+  sourceType?: "image" | "pdf";
+  sourcePageNumber?: number;
+  startedAt?: number;
+  factCount?: number;
   requestId?: string;
   error?: string;
 };
@@ -77,8 +83,8 @@ export function validateUploadSelection<T extends UploadCandidate>(
 type UploadQueueAction =
   | { type: "reset" }
   | { type: "enqueue"; items: UploadQueueItem[] }
-  | { type: "start"; documentId: string; requestId: string }
-  | { type: "succeed"; documentId: string; requestId: string }
+  | { type: "start"; documentId: string; requestId: string; startedAt?: number }
+  | { type: "succeed"; documentId: string; requestId: string; factCount?: number }
   | { type: "fail"; documentId: string; requestId: string; error: string }
   | { type: "retry"; documentId: string }
   | { type: "remove"; documentId: string };
@@ -96,7 +102,9 @@ export function reduceUploadQueue(
   if (action.type === "start") {
     if (queue.some((item) => item.status === "processing")) return queue;
     const target = queue.find(
-      (item) => item.documentId === action.documentId && item.status === "queued",
+      (item) =>
+        item.documentId === action.documentId &&
+        (item.status === "queued" || item.status === "retrying"),
     );
     if (!target) return queue;
     return queue.map((item) =>
@@ -104,6 +112,7 @@ export function reduceUploadQueue(
         ? {
             ...item,
             status: "processing",
+            startedAt: action.startedAt ?? Date.now(),
             requestId: action.requestId,
             error: undefined,
           }
@@ -118,7 +127,13 @@ export function reduceUploadQueue(
     if (target.status === "removed") return queue;
     return queue.map((item) =>
       item === target
-        ? { ...item, status: "removed", requestId: undefined, error: undefined }
+        ? {
+            ...item,
+            status: "removed",
+            requestId: undefined,
+            error: undefined,
+            startedAt: undefined,
+          }
         : item,
     );
   }
@@ -127,7 +142,13 @@ export function reduceUploadQueue(
     if (target.status !== "error") return queue;
     return queue.map((item) =>
       item === target
-        ? { ...item, status: "queued", requestId: undefined, error: undefined }
+        ? {
+            ...item,
+            status: "retrying",
+            requestId: undefined,
+            error: undefined,
+            startedAt: undefined,
+          }
         : item,
     );
   }
@@ -142,12 +163,20 @@ export function reduceUploadQueue(
   return queue.map((item) => {
     if (item !== target) return item;
     if (action.type === "succeed") {
-      return { ...item, status: "ready", requestId: undefined, error: undefined };
+      return {
+        ...item,
+        status: "ready",
+        requestId: undefined,
+        error: undefined,
+        startedAt: undefined,
+        factCount: action.factCount ?? 0,
+      };
     }
     return {
       ...item,
       status: "error",
       requestId: undefined,
+      startedAt: undefined,
       error: action.error,
     };
   });

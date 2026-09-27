@@ -1,6 +1,19 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+import type { LanguageModelUsage } from "ai";
 
 import { createExtractionHandler } from "../../app/api/first-day/extract/route";
+
+const emptyUsage: LanguageModelUsage = {
+  inputTokens: 0,
+  inputTokenDetails: {
+    noCacheTokens: 0,
+    cacheReadTokens: 0,
+    cacheWriteTokens: 0,
+  },
+  outputTokens: 0,
+  outputTokenDetails: { textTokens: 0, reasoningTokens: 0 },
+  totalTokens: 0,
+};
 
 const providerResponse = {
   schemaVersion: "first-day-extraction-v1",
@@ -58,7 +71,7 @@ describe("First Day extraction route", () => {
   it("returns a validated response with server-controlled IDs", async () => {
     const handler = createExtractionHandler({
       providerAvailable: () => true,
-      extractPage: async () => providerResponse,
+      extractPage: async () => ({ value: providerResponse, usage: emptyUsage }),
       timeoutMs: 100,
     });
 
@@ -75,7 +88,7 @@ describe("First Day extraction route", () => {
   it("rejects unsupported files and unsafe IDs", async () => {
     const handler = createExtractionHandler({
       providerAvailable: () => true,
-      extractPage: async () => providerResponse,
+      extractPage: async () => ({ value: providerResponse, usage: emptyUsage }),
       timeoutMs: 100,
     });
 
@@ -92,14 +105,17 @@ describe("First Day extraction route", () => {
   });
 
   it("reports an unavailable provider without calling it", async () => {
-    const extractPage = vi.fn(async () => providerResponse);
+    const extractPage = vi.fn(async () => ({
+      value: providerResponse,
+      usage: emptyUsage,
+    }));
     const handler = createExtractionHandler({
       providerAvailable: () => false,
       extractPage,
       timeoutMs: 100,
     });
 
-    expect((await handler(extractionRequest())).status).toBe(500);
+    expect((await handler(extractionRequest())).status).toBe(503);
     expect(extractPage).not.toHaveBeenCalled();
   });
 
@@ -107,11 +123,18 @@ describe("First Day extraction route", () => {
     vi.spyOn(console, "error").mockImplementation(() => undefined);
     const handler = createExtractionHandler({
       providerAvailable: () => true,
-      extractPage: async () => ({ tasks: [{ title: "Invented task" }] }),
+      extractPage: async () => ({
+        value: { tasks: [{ title: "Invented task" }] },
+        usage: emptyUsage,
+      }),
       timeoutMs: 100,
     });
 
-    expect((await handler(extractionRequest())).status).toBe(502);
+    const response = await handler(extractionRequest());
+    expect(response.status).toBe(502);
+    await expect(response.json()).resolves.toEqual(
+      expect.objectContaining({ code: "malformed_output" }),
+    );
   });
 
   it("aborts and returns 504 when extraction exceeds its budget", async () => {

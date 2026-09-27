@@ -1,8 +1,17 @@
 import { z } from "zod";
 
-import { runGroqExtraction } from "../../../features/first-day/server/extract-page";
+import {
+  runGroqExtraction,
+  type FirstDayPageExtractionResult,
+} from "../../../features/first-day/server/extract-page";
 import { FirstDayExtractionSchema } from "../../../features/first-day/server/extraction-schema";
-import { providerErrorSummary } from "../../../lib/provider-error";
+import { resolveAiConfiguration } from "../../../lib/ai-config";
+import {
+  classifyProviderFailure,
+  providerDiagnostic,
+  providerFailureMessage,
+  usageDiagnostic,
+} from "../../../lib/provider-diagnostics";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -30,7 +39,7 @@ type ExtractionInput = {
 
 export type ExtractionDependencies = {
   providerAvailable: () => boolean;
-  extractPage: (input: ExtractionInput) => Promise<unknown>;
+  extractPage: (input: ExtractionInput) => Promise<FirstDayPageExtractionResult>;
   timeoutMs: number;
 };
 
@@ -83,14 +92,20 @@ export function createExtractionHandler(dependencies: ExtractionDependencies) {
       return errorResponse("Language must be English or Spanish.", 400);
     }
     if (!dependencies.providerAvailable()) {
-      return errorResponse("Live document reading is temporarily unavailable.", 500);
+      return Response.json(
+        {
+          error: "Live document reading is temporarily unavailable.",
+          code: "unavailable",
+        },
+        { status: 503 },
+      );
     }
 
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), dependencies.timeoutMs);
 
     try {
-      const providerValue = await dependencies.extractPage({
+      const generated = await dependencies.extractPage({
         bytes: new Uint8Array(await image.arrayBuffer()),
         mediaType: image.type as "image/jpeg" | "image/png",
         language: language.data,
@@ -98,6 +113,7 @@ export function createExtractionHandler(dependencies: ExtractionDependencies) {
         requestId: metadata.requestId,
         signal: controller.signal,
       });
+      const providerValue = generated.value;
       const controlledValue =
         providerValue && typeof providerValue === "object"
           ? {
@@ -110,39 +126,57 @@ export function createExtractionHandler(dependencies: ExtractionDependencies) {
       if (!parsed.success) {
         console.error(
           "first-day extraction schema error",
-          providerErrorSummary({
+          providerDiagnostic({
             requestId: logRequestId,
             route: "/api/first-day/extract",
-            kind: "schema",
+            modelRole: "vision",
+            outcome: "malformed_output",
             durationMs: Date.now() - startedAt,
             issueCount: parsed.error.issues.length,
           }),
         );
-        return errorResponse(
-          "Could not read this page. Try a clearer, well-lit photo.",
-          502,
+        return Response.json(
+          {
+            error: "Could not read this page. Try a clearer, well-lit photo.",
+            code: "malformed_output",
+          },
+          { status: 502 },
         );
       }
 
-      return Response.json(parsed.data);
-    } catch {
-      const timedOut = controller.signal.aborted;
-      console.error(
-        timedOut
-          ? "first-day extraction timeout"
-          : "first-day extraction provider error",
-        providerErrorSummary({
+      console.info(
+        "first-day extraction success",
+        providerDiagnostic({
           requestId: logRequestId,
           route: "/api/first-day/extract",
-          kind: timedOut ? "timeout" : "provider",
+          modelRole: "vision",
+          outcome: "success",
+          durationMs: Date.now() - startedAt,
+          ...usageDiagnostic(generated.usage),
+        }),
+      );
+      return Response.json(parsed.data);
+    } catch (error) {
+      const timedOut = controller.signal.aborted;
+      const failure = classifyProviderFailure(error, { timedOut });
+      console.error(
+        "first-day extraction failure",
+        providerDiagnostic({
+          requestId: logRequestId,
+          route: "/api/first-day/extract",
+          modelRole: "vision",
+          outcome: failure.kind,
           durationMs: Date.now() - startedAt,
         }),
       );
-      return errorResponse(
-        timedOut
-          ? "Reading this page took too long. Try again."
-          : "Could not read this page. Try a clearer, well-lit photo.",
-        timedOut ? 504 : 502,
+      return Response.json(
+        { error: providerFailureMessage(failure), code: failure.kind },
+        {
+          status: failure.status,
+          headers: failure.retryAfterSeconds
+            ? { "Retry-After": String(failure.retryAfterSeconds) }
+            : undefined,
+        },
       );
     } finally {
       clearTimeout(timeout);
@@ -151,7 +185,10 @@ export function createExtractionHandler(dependencies: ExtractionDependencies) {
 }
 
 export const POST = createExtractionHandler({
-  providerAvailable: () => Boolean(process.env.GROQ_API_KEY),
+  providerAvailable: () => {
+    const configuration = resolveAiConfiguration();
+    return configuration.apiKeyAvailable && configuration.visionModel !== null;
+  },
   extractPage: runGroqExtraction,
   timeoutMs: 55_000,
 });

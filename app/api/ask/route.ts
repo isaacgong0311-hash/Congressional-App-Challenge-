@@ -1,6 +1,13 @@
 import { groq } from "@ai-sdk/groq";
 import { generateText } from "ai";
 
+import { configuredGroqModel, resolveAiConfiguration } from "../../lib/ai-config";
+import {
+  classifyProviderFailure,
+  providerDiagnostic,
+  usageDiagnostic,
+} from "../../lib/provider-diagnostics";
+
 export const runtime = "nodejs";
 export const maxDuration = 30;
 
@@ -50,6 +57,8 @@ function buildContext(ctx: NonNullable<Body["context"]>): string {
 }
 
 export async function POST(req: Request) {
+  const requestId = crypto.randomUUID();
+  const startedAt = Date.now();
   let body: Body;
   try {
     body = (await req.json()) as Body;
@@ -65,8 +74,12 @@ export async function POST(req: Request) {
   if (!body.context) {
     return Response.json({ error: "Missing letter context." }, { status: 400 });
   }
-  if (!process.env.GROQ_API_KEY) {
-    return Response.json({ error: "Missing GROQ_API_KEY." }, { status: 500 });
+  const configuration = resolveAiConfiguration();
+  if (!configuration.apiKeyAvailable || !configuration.textModel) {
+    return Response.json(
+      { error: "The question helper is temporarily unavailable." },
+      { status: 503 },
+    );
   }
 
   const contextBlock = buildContext(body.context);
@@ -99,20 +112,52 @@ export async function POST(req: Request) {
           ...shared,
         ].join("\n");
 
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 25_000);
+
   try {
-    const { text } = await generateText({
-      model: groq("meta-llama/llama-4-scout-17b-16e-instruct"),
+    const { text, usage } = await generateText({
+      model: groq(configuredGroqModel("text")),
+      abortSignal: controller.signal,
       messages: [
         { role: "system", content: system },
         ...messages.map((m) => ({ role: m.role, content: m.content })),
       ],
     });
-    return Response.json({ reply: text.trim() });
-  } catch (err) {
-    console.error("ask route error:", err);
-    return Response.json(
-      { error: "Sorry, I couldn't answer just now. Please try again." },
-      { status: 502 },
+    console.info(
+      "ask success",
+      providerDiagnostic({
+        requestId,
+        route: "/api/ask",
+        modelRole: "text",
+        outcome: "success",
+        durationMs: Date.now() - startedAt,
+        ...usageDiagnostic(usage),
+      }),
     );
+    return Response.json({ reply: text.trim() });
+  } catch (error) {
+    const failure = classifyProviderFailure(error, {
+      timedOut: controller.signal.aborted,
+    });
+    console.error(
+      "ask failure",
+      providerDiagnostic({
+        requestId,
+        route: "/api/ask",
+        modelRole: "text",
+        outcome: failure.kind,
+        durationMs: Date.now() - startedAt,
+      }),
+    );
+    return Response.json(
+      {
+        error: "Sorry, I couldn't answer just now. Please try again.",
+        code: failure.kind,
+      },
+      { status: failure.status },
+    );
+  } finally {
+    clearTimeout(timeout);
   }
 }

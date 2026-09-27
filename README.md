@@ -8,7 +8,7 @@ This repository builds from the public [`TRANSLATEtheform`](https://github.com/i
 
 First Day is the flagship experience at `/`, and the general Lantern letter explanation workspace is available at `/explain`. A complete First Day fictional demo is available at `/first-day?demo=1`, with source-linked facts, deterministic task states, conflict resolution, English/Spanish interface copy, undoable task completion, JSON and calendar downloads, and printable output. A static technical walkthrough is available at `/first-day/how-it-works`, and the browser-data boundary is documented at `/privacy`.
 
-First Day also includes a live Round Rock ISD pilot for up to five JPG/PNG pages. It processes pages sequentially, preserves successful pages when another fails, supports per-page retry and removal, validates exact evidence quotes, and keeps live plans limited to versioned, source-checked enrollment procedures. This pilot is not reviewed, endorsed, or partnered with Round Rock ISD.
+First Day also includes a live Round Rock ISD pilot for up to five JPG, PNG, or PDF pages. PDFs are rendered into page images in the browser, and the original PDF is never uploaded. Lantern processes prepared pages sequentially, preserves successful pages when another fails, supports per-page retry and removal, validates exact evidence quotes, and keeps live plans limited to versioned, source-checked enrollment procedures. This pilot is not reviewed, endorsed, or partnered with Round Rock ISD.
 
 The initial First Day school and district scenario is **fictional**. It exists to test evidence handling and deterministic plan logic; it is not real district policy or proof of a school partnership.
 
@@ -27,6 +27,8 @@ Open [http://localhost:3000](http://localhost:3000).
 Provider-backed features use environment variables when available:
 
 - `GROQ_API_KEY` — document explanation and the grounded assistant
+- `GROQ_VISION_MODEL` / `GROQ_TEXT_MODEL` — optional allowlisted model overrides
+- `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`, `RATE_LIMIT_SALT`, and `RATE_LIMIT_NAMESPACE` — distributed request protection required on Vercel preview and production
 - `ELEVENLABS_API_KEY` — optional server speech
 - `PERPLEXITY_API_KEY` — optional local-help search
 
@@ -38,6 +40,7 @@ Do not commit `.env.local` or real family documents.
 npm run lint
 npm test
 npm run evaluate:first-day
+npm run evaluate:first-day:live # opt-in; requires a dedicated Groq key
 npm run build
 npm run test:e2e
 ```
@@ -46,7 +49,7 @@ The deterministic evaluation contains 20 synthetic held-out packets across five 
 
 ## Privacy boundary
 
-The application does not intentionally write uploaded images to disk or a database. When document explanation is used, the image is sent to the configured external AI provider for processing. First Day accepts no more than 10 MB per page, five pages, and 25 MB per in-memory case; only one page is sent at a time. Only language, large-text, and high-contrast preferences may be stored under the versioned `lantern.preferences.v1` local-storage key. Documents, extracted text, facts, tasks, and event history stay in page memory.
+The application does not intentionally write uploaded images or PDFs to disk or a database. PDFs are rendered locally, and only prepared page images are sent to Groq for processing. First Day accepts no more than 10 MB per rendered page, five pages, and 25 MB per in-memory case; only one page is sent at a time. Only language, large-text, and high-contrast preferences may be stored under the versioned `lantern.preferences.v1` local-storage key. Documents, extracted text, facts, tasks, and event history stay in page memory. Public AI routes use temporary Upstash counters keyed by a salted one-way network identifier; no document contents enter the limiter.
 
 Every route receives `nosniff`, frame-denial, strict referrer, and camera/microphone/geolocation permission headers. These headers reduce browser attack surface; they do not replace request validation, exact-quote evidence checks, or careful provider privacy controls.
 

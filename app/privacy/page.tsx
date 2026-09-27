@@ -17,7 +17,12 @@ const commitments = [
   {
     title: "Live uploads use an external provider",
     detail:
-      "When live reading is available, each image is sent over an encrypted connection to the configured AI provider for processing. Close or refresh the page to clear the in-memory case.",
+      "When live reading is available, each page image is sent over an encrypted connection to Groq for processing. Groq receives the page only for inference under the project's configured data controls. Close or refresh the page to clear the in-memory case.",
+  },
+  {
+    title: "PDF preparation stays in your browser",
+    detail:
+      "Lantern opens a selected PDF in this browser and turns each page into an image. The original PDF is never uploaded; only the prepared page images are sent one at a time for reading.",
   },
   {
     title: "The fictional demo needs no provider",
@@ -28,6 +33,11 @@ const commitments = [
     title: "Only interface preferences persist",
     detail:
       "Lantern stores a versioned preference containing language, large-text, and high-contrast choices. It does not place document contents or case records in local storage, session storage, or IndexedDB.",
+  },
+  {
+    title: "Short-lived abuse protection",
+    detail:
+      "AI routes use a salted one-way hash of the network address and route to count requests. The limiter stores no document data, and its longest counter expires within 24 hours.",
   },
 ] as const;
 

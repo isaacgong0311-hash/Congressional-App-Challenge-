@@ -230,8 +230,10 @@ export function FirstDayWorkspace({
             {currentStep === "documents" ? (
               <DocumentsStep
                 caseData={caseData}
+                consentGranted={liveCase.consentGranted}
                 language={language}
                 onAddFiles={liveCase.addFiles}
+                onConsentChange={liveCase.setConsentGranted}
                 onOpenSource={openSource}
                 onRemove={liveCase.remove}
                 onRetry={liveCase.retry}
@@ -239,6 +241,7 @@ export function FirstDayWorkspace({
                   presentationMode === "guided_demo" &&
                   demoBeatId === "before_lantern"
                 }
+                preparation={liveCase.preparation}
                 uploadNotice={liveCase.uploadNotice}
                 uploadQueue={liveCase.uploadQueue}
               />

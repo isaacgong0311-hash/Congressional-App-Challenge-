@@ -2,7 +2,7 @@
 
 ## Runtime AI features
 
-Lantern can send user-provided page images to Groq for document reading, grounded explanations, assistant responses, and field translation when `GROQ_API_KEY` is configured. The First Day extraction route asks the model for structured fact proposals and exact supporting quotes; Zod schema validation and an exact-quote check run before proposals enter the case.
+Lantern can send user-provided page images to Groq for document reading, grounded explanations, assistant responses, and field translation when `GROQ_API_KEY` is configured. Vision requests use an allowlisted Qwen vision model; text-only requests use an allowlisted GPT-OSS model. PDFs are rendered into page images in the browser, so the original PDF is never uploaded. The First Day extraction route asks the model for structured fact proposals and exact supporting quotes; Zod schema validation and an exact-quote check run before proposals enter the case.
 
 Optional integrations inherited from the upstream application can use ElevenLabs for server speech and Perplexity for local-help search when their separate keys are configured. Each optional integration fails independently. Provider pricing, availability, and retention terms are external and can change.
 

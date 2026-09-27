@@ -1,7 +1,8 @@
 import { groq } from "@ai-sdk/groq";
-import { generateText } from "ai";
+import { generateText, type LanguageModelUsage } from "ai";
 
 import { extractOuterJson } from "../../../lib/extract-json";
+import { configuredGroqModel } from "../../../lib/ai-config";
 
 export type FirstDayPageExtractionInput = {
   bytes: Uint8Array;
@@ -10,6 +11,11 @@ export type FirstDayPageExtractionInput = {
   documentId: string;
   requestId: string;
   signal: AbortSignal;
+};
+
+export type FirstDayPageExtractionResult = {
+  value: unknown;
+  usage: LanguageModelUsage;
 };
 
 const RESPONSE_SHAPE = `{
@@ -42,9 +48,9 @@ export async function runGroqExtraction({
   documentId,
   requestId,
   signal,
-}: FirstDayPageExtractionInput): Promise<unknown> {
-  const { text } = await generateText({
-    model: groq("meta-llama/llama-4-scout-17b-16e-instruct"),
+}: FirstDayPageExtractionInput): Promise<FirstDayPageExtractionResult> {
+  const { text, usage } = await generateText({
+    model: groq(configuredGroqModel("vision")),
     abortSignal: signal,
     messages: [
       {
@@ -76,5 +82,5 @@ export async function runGroqExtraction({
     ],
   });
 
-  return extractOuterJson(text);
+  return { value: extractOuterJson(text), usage };
 }

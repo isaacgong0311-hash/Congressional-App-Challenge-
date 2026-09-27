@@ -2,8 +2,14 @@ import { groq } from "@ai-sdk/groq";
 import { generateText } from "ai";
 import { z } from "zod";
 
+import { configuredGroqModel, resolveAiConfiguration } from "../../lib/ai-config";
 import { extractOuterJson } from "../../lib/extract-json";
-import { providerErrorSummary } from "../../lib/provider-error";
+import {
+  classifyProviderFailure,
+  providerDiagnostic,
+  providerFailureMessage,
+  usageDiagnostic,
+} from "../../lib/provider-diagnostics";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -152,8 +158,8 @@ const ResultSchema = z.object({
 });
 
 // A compact, human-readable description of the exact JSON the model must emit.
-// We describe the shape in the prompt (rather than relying on Groq's structured
-// output mode) because Llama 4 Scout echoes the JSON Schema back instead of data.
+// The route parses and validates the plain JSON response with Zod so provider
+// output cannot bypass the existing response contract.
 const JSON_SHAPE = `{
   "documentType": string,            // short label, e.g. "Medicaid denial letter"
   "category": one of "housing" | "healthcare" | "benefits" | "utilities" | "legal" | "school" | "financial" | "immigration" | "other",
@@ -213,21 +219,23 @@ export async function POST(req: Request) {
     return Response.json({ error: "Image is too large (max 10 MB)." }, { status: 400 });
   }
 
-  if (!process.env.GROQ_API_KEY) {
+  const configuration = resolveAiConfiguration();
+  if (!configuration.apiKeyAvailable || !configuration.visionModel) {
     return Response.json(
-      { error: "Missing GROQ_API_KEY. Add it to .env.local — see the README." },
-      { status: 500 },
+      { error: "Live document reading is temporarily unavailable." },
+      { status: 503 },
     );
   }
 
   const bytes = new Uint8Array(await file.arrayBuffer());
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 55_000);
 
   try {
-    // Llama 4 Scout on Groq mishandles json_schema/structured-output mode (it
-    // echoes the schema instead of data). So we use plain text generation with
-    // an explicit JSON-shape instruction, then parse and validate with Zod here.
-    const { text } = await generateText({
-      model: groq("meta-llama/llama-4-scout-17b-16e-instruct"),
+    // Use an explicit JSON-shape instruction, then parse and validate with Zod.
+    const { text, usage } = await generateText({
+      model: groq(configuredGroqModel("vision")),
+      abortSignal: controller.signal,
       messages: [
         {
           role: "system",
@@ -273,34 +281,60 @@ export async function POST(req: Request) {
     if (!parsed.success) {
       console.error(
         "explain route schema error",
-        providerErrorSummary({
+        providerDiagnostic({
           requestId,
           route: "/api/explain",
-          kind: "schema",
+          modelRole: "vision",
+          outcome: "malformed_output",
           durationMs: Date.now() - startedAt,
           issueCount: parsed.error.issues.length,
         }),
       );
       return Response.json(
-        { error: "Could not read this document. Try a clearer, well-lit photo." },
+        {
+          error: "Could not read this document. Try a clearer, well-lit photo.",
+          code: "malformed_output",
+        },
         { status: 502 },
       );
     }
 
-    return Response.json(parsed.data);
-  } catch {
-    console.error(
-      "explain route provider error",
-      providerErrorSummary({
+    console.info(
+      "explain success",
+      providerDiagnostic({
         requestId,
         route: "/api/explain",
-        kind: "provider",
+        modelRole: "vision",
+        outcome: "success",
+        durationMs: Date.now() - startedAt,
+        ...usageDiagnostic(usage),
+      }),
+    );
+    return Response.json(parsed.data);
+  } catch (error) {
+    const failure = classifyProviderFailure(error, {
+      timedOut: controller.signal.aborted,
+    });
+    console.error(
+      "explain failure",
+      providerDiagnostic({
+        requestId,
+        route: "/api/explain",
+        modelRole: "vision",
+        outcome: failure.kind,
         durationMs: Date.now() - startedAt,
       }),
     );
     return Response.json(
-      { error: "Could not read this document. Try a clearer, well-lit photo." },
-      { status: 502 },
+      { error: providerFailureMessage(failure), code: failure.kind },
+      {
+        status: failure.status,
+        headers: failure.retryAfterSeconds
+          ? { "Retry-After": String(failure.retryAfterSeconds) }
+          : undefined,
+      },
     );
+  } finally {
+    clearTimeout(timeout);
   }
 }

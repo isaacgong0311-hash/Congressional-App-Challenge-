@@ -1,3 +1,5 @@
+import { providerDiagnostic } from "../../lib/provider-diagnostics";
+
 export const runtime = "nodejs";
 export const maxDuration = 30;
 
@@ -24,6 +26,8 @@ function extractJson(text: string): LocalResource[] {
 }
 
 export async function POST(req: Request) {
+  const requestId = crypto.randomUUID();
+  const startedAt = Date.now();
   if (!process.env.PERPLEXITY_API_KEY) {
     return Response.json({ error: "Local search unavailable." }, { status: 503 });
   }
@@ -74,7 +78,16 @@ export async function POST(req: Request) {
   });
 
   if (!res.ok) {
-    console.error("Perplexity error:", res.status);
+    console.error(
+      "local-help failure",
+      providerDiagnostic({
+        requestId,
+        route: "/api/local-help",
+        modelRole: "localHelp",
+        outcome: "provider",
+        durationMs: Date.now() - startedAt,
+      }),
+    );
     return Response.json({ error: "Search failed. Try again." }, { status: 502 });
   }
 
@@ -83,6 +96,17 @@ export async function POST(req: Request) {
   };
   const content = data.choices?.[0]?.message?.content ?? "[]";
   const resources = extractJson(content);
+
+  console.info(
+    "local-help success",
+    providerDiagnostic({
+      requestId,
+      route: "/api/local-help",
+      modelRole: "localHelp",
+      outcome: "success",
+      durationMs: Date.now() - startedAt,
+    }),
+  );
 
   return Response.json({ resources });
 }

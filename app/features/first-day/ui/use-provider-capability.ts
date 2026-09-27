@@ -8,16 +8,20 @@ export type ProviderCapability =
   | "unavailable";
 
 export function providerCapabilityFromHealth(
-  responseOk: boolean,
+  _responseOk: boolean,
   payload: unknown,
 ): Exclude<ProviderCapability, "checking"> {
-  if (!responseOk || !payload || typeof payload !== "object") {
+  if (!payload || typeof payload !== "object") {
     return "unavailable";
   }
-  if (!("keys" in payload) || !payload.keys || typeof payload.keys !== "object") {
+  if (
+    !("capabilities" in payload) ||
+    !payload.capabilities ||
+    typeof payload.capabilities !== "object"
+  ) {
     return "unavailable";
   }
-  return "groq" in payload.keys && payload.keys.groq === true
+  return "vision" in payload.capabilities && payload.capabilities.vision === true
     ? "available"
     : "unavailable";
 }

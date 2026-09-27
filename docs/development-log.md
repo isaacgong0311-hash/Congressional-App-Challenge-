@@ -92,6 +92,14 @@ Provider pricing and retention terms are external and may change. The project do
 - Added runtime guarding for malformed letter-tool responses, a recoverable retry state, browser speech fallback coverage, RTL direction updates, and deferred loading for the optional practice assistant.
 - Added visual regression baselines for 10 critical states at 390, 768, 1024, and 1440 pixels with a 1% threshold, plus horizontal-overflow checks, Letter/A4 PDF checks, accessibility scans, layout-shift/transfer gates, and privacy-storage coverage.
 
+## 2026-09-27 — Live document and PDF readiness
+
+- Replaced the retired hard-coded Llama 4 Scout model with allowlisted, environment-configurable Groq vision and text roles. Added capability-based health reporting, content-free provider diagnostics, timeout and throttling classification, and a credentialed provider smoke command.
+- Added client-only PDF.js preparation. The browser renders a PDF into bounded JPEG pages, rejects encrypted, malformed, oversized, or over-capacity files as a whole, and sends only the prepared pages through the existing sequential image contract.
+- Added a session-only external-processing acknowledgement, PDF page identity, queue position, elapsed reading time, retrying and zero-fact states, and English/Spanish recovery messages without changing case persistence.
+- Replaced process-local API throttling with serverless-safe Upstash counters. Redis receives only a salted hash of the network identifier and route; document contents never enter the limiter and daily counters expire within 24 hours.
+- Added a credentialed 20-page live-provider benchmark with aggregate-only reporting. Synthetic images, extracted text, and raw model output are never written to the report.
+
 ## AI assistance disclosure
 
 OpenAI Codex assisted with:

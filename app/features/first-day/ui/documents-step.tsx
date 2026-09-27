@@ -1,4 +1,5 @@
-import { useRef, useState } from "react";
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 
 import { MetricCard } from "../../../components/lantern/primitives";
 
@@ -29,8 +30,11 @@ export type DocumentsStepProps = {
   language: Language;
   uploadQueue: UploadQueueItem[];
   uploadNotice: string | null;
+  preparation: { status: "idle" | "preparing"; fileName?: string };
+  consentGranted: boolean;
   showDemoPrelude: boolean;
   onAddFiles: (files: File[]) => void;
+  onConsentChange: (granted: boolean) => void;
   onRetry: (documentId: string) => void;
   onRemove: (documentId: string) => void;
   onOpenSource: SourceOpener;
@@ -41,7 +45,10 @@ export function DocumentsStep({
   language,
   uploadQueue,
   uploadNotice,
+  preparation,
+  consentGranted,
   onAddFiles,
+  onConsentChange,
   onRetry,
   onRemove,
   onOpenSource,
@@ -50,6 +57,7 @@ export function DocumentsStep({
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const cameraInputRef = useRef<HTMLInputElement | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [now, setNow] = useState(() => Date.now());
   const visibleDocuments = caseData.documents.filter(
     (document) => document.status !== "removed",
   );
@@ -68,6 +76,14 @@ export function DocumentsStep({
   const openConflicts = caseData.conflicts.filter(
     (conflict) => conflict.status === "open",
   ).length;
+  const isPreparing = preparation.status === "preparing";
+  const processing = uploadQueue.some((item) => item.status === "processing");
+
+  useEffect(() => {
+    if (!processing) return;
+    const timer = window.setInterval(() => setNow(Date.now()), 1_000);
+    return () => window.clearInterval(timer);
+  }, [processing]);
 
   return (
     <section className="fd-enter">
@@ -160,20 +176,21 @@ export function DocumentsStep({
           onDrop={(event) => {
             event.preventDefault();
             setIsDragging(false);
-            onAddFiles(Array.from(event.dataTransfer.files));
+            void onAddFiles(Array.from(event.dataTransfer.files));
           }}
         >
           <input
-            accept=".jpg,.jpeg,.png,image/jpeg,image/png"
+            accept=".jpg,.jpeg,.png,.pdf,image/jpeg,image/png,application/pdf"
             aria-label={translated(
               language,
-              "School page images",
-              "Imágenes de páginas escolares",
+              "School page images or PDFs",
+              "Imágenes o PDFs de páginas escolares",
             )}
             className="hidden"
+            disabled={!consentGranted || isPreparing}
             multiple
             onChange={(event) => {
-              onAddFiles(Array.from(event.currentTarget.files ?? []));
+              void onAddFiles(Array.from(event.currentTarget.files ?? []));
               event.currentTarget.value = "";
             }}
             ref={fileInputRef}
@@ -184,8 +201,9 @@ export function DocumentsStep({
             aria-label={translated(language, "Take a photo of a school page", "Tomar una foto de una página escolar")}
             capture="environment"
             className="hidden"
+            disabled={!consentGranted || isPreparing}
             onChange={(event) => {
-              onAddFiles(Array.from(event.currentTarget.files ?? []));
+              void onAddFiles(Array.from(event.currentTarget.files ?? []));
               event.currentTarget.value = "";
             }}
             ref={cameraInputRef}
@@ -203,15 +221,19 @@ export function DocumentsStep({
               <p className="mt-2 max-w-2xl text-sm leading-6 text-[#59665f]">
                 {translated(
                   language,
-                  "For this pilot, use Round Rock ISD enrollment pages. Choose up to five JPG or PNG pages. Each page can be 10 MB, with a 25 MB case limit. Lantern reads one page at a time so one failure does not erase the others.",
-                  "Para este piloto, use páginas de inscripción de Round Rock ISD. Elija hasta cinco páginas JPG o PNG. Cada página puede tener 10 MB, con un límite total de 25 MB. Lantern lee una página a la vez para que un error no borre las demás.",
+                  "For this pilot, use Round Rock ISD enrollment pages. Choose JPG, PNG, or PDF files containing up to five pages. PDFs are prepared in this browser, then Lantern sends one page image at a time so one failure does not erase the others.",
+                  "Para este piloto, use páginas de inscripción de Round Rock ISD. Elija archivos JPG, PNG o PDF con un máximo de cinco páginas. Los PDFs se preparan en este navegador y Lantern envía una imagen por vez para que un error no borre las demás.",
                 )}
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
               <button
                 className="fd-primary-button shrink-0"
-                disabled={visibleDocuments.length >= MAX_DOCUMENTS}
+                disabled={
+                  !consentGranted ||
+                  isPreparing ||
+                  visibleDocuments.length >= MAX_DOCUMENTS
+                }
                 onClick={() => fileInputRef.current?.click()}
                 type="button"
               >
@@ -220,7 +242,11 @@ export function DocumentsStep({
               </button>
               <button
                 className="fd-secondary-button shrink-0 sm:hidden"
-                disabled={visibleDocuments.length >= MAX_DOCUMENTS}
+                disabled={
+                  !consentGranted ||
+                  isPreparing ||
+                  visibleDocuments.length >= MAX_DOCUMENTS
+                }
                 onClick={() => cameraInputRef.current?.click()}
                 type="button"
               >
@@ -228,6 +254,41 @@ export function DocumentsStep({
               </button>
             </div>
           </div>
+          <label className="mt-5 flex cursor-pointer items-start gap-3 rounded-2xl border border-[#d8dfd9] bg-white/80 p-4 text-sm leading-6 text-[#44534c]">
+            <input
+              checked={consentGranted}
+              className="mt-1 h-4 w-4 shrink-0 accent-[#3556d4]"
+              onChange={(event) => onConsentChange(event.currentTarget.checked)}
+              type="checkbox"
+            />
+            <span>
+              {translated(
+                language,
+                "I understand that each page image is sent securely to Groq for reading. I have covered information Lantern does not need.",
+                "Entiendo que cada imagen de página se envía de forma segura a Groq para su lectura. He cubierto la información que Lantern no necesita.",
+              )}{" "}
+              <Link
+                className="font-bold text-cobalt underline underline-offset-2"
+                href="/privacy"
+              >
+                {translated(language, "Privacy details", "Detalles de privacidad")}
+              </Link>
+            </span>
+          </label>
+          {isPreparing ? (
+            <p
+              aria-live="polite"
+              className="mt-4 flex items-center gap-2 text-sm font-semibold text-[#44534c]"
+              role="status"
+            >
+              <ClockIcon className="h-4 w-4" />
+              {translated(
+                language,
+                `Preparing ${preparation.fileName ?? "PDF"} in this browser…`,
+                `Preparando ${preparation.fileName ?? "PDF"} en este navegador…`,
+              )}
+            </p>
+          ) : null}
           <div className="mt-5 flex flex-wrap gap-3 text-xs font-semibold text-[#53615a]">
             <span className="rounded-full bg-white px-3 py-1.5">
               {visibleDocuments.length} / {MAX_DOCUMENTS}{" "}
@@ -270,6 +331,17 @@ export function DocumentsStep({
               ),
             ),
           ).length;
+          const activeQueue = uploadQueue.filter(
+            (item) => item.status !== "removed",
+          );
+          const queuePosition = queued
+            ? activeQueue.findIndex(
+                (item) => item.documentId === queued.documentId,
+              ) + 1
+            : 0;
+          const elapsedSeconds = queued?.startedAt
+            ? Math.max(0, Math.floor((now - queued.startedAt) / 1_000))
+            : 0;
           return (
             <article className="fd-document-card" key={document.id}>
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#e9edff] font-semibold text-[#3556d4]">
@@ -284,6 +356,16 @@ export function DocumentsStep({
                         : document.label}
                     </h2>
                     <p className="mt-1 text-xs font-semibold uppercase tracking-[0.15em] text-[#5f6d66]">
+                      {queued?.sourceType === "pdf"
+                        ? translated(
+                            language,
+                            `${queued.sourceFileName} · PDF page ${queued.sourcePageNumber}`,
+                            `${queued.sourceFileName} · Página ${queued.sourcePageNumber} del PDF`,
+                          )
+                        : queued?.sourceFileName
+                          ? queued.sourceFileName
+                          : null}
+                      {queued ? " · " : null}
                       {translated(
                         language,
                         `Page ${document.pageIndex}`,
@@ -301,13 +383,23 @@ export function DocumentsStep({
                           )
                         : ""}
                     </p>
-                    <p className="mt-2 text-xs font-semibold text-cobalt">
-                      {translated(
-                        language,
-                        `${documentFactCount} proposed fact${documentFactCount === 1 ? "" : "s"}`,
-                        `${documentFactCount} dato${documentFactCount === 1 ? "" : "s"} propuesto${documentFactCount === 1 ? "" : "s"}`,
-                      )}
-                    </p>
+                    {queued?.status === "ready" && queued.factCount === 0 ? (
+                      <p className="mt-2 text-xs font-semibold text-[#6f5218]">
+                        {translated(
+                          language,
+                          "Read successfully · no actionable facts found",
+                          "Lectura correcta · no se encontraron datos para actuar",
+                        )}
+                      </p>
+                    ) : (
+                      <p className="mt-2 text-xs font-semibold text-cobalt">
+                        {translated(
+                          language,
+                          `${documentFactCount} proposed fact${documentFactCount === 1 ? "" : "s"}`,
+                          `${documentFactCount} dato${documentFactCount === 1 ? "" : "s"} propuesto${documentFactCount === 1 ? "" : "s"}`,
+                        )}
+                      </p>
+                    )}
                   </div>
                   <span
                     aria-live="polite"
@@ -323,15 +415,19 @@ export function DocumentsStep({
                       <ClockIcon className="h-4 w-4" />
                     )}
                     {document.status === "ready"
-                      ? translated(language, "Text ready", "Texto listo")
+                      ? queued?.factCount === 0
+                        ? translated(language, "Read · no facts", "Leída · sin datos")
+                        : translated(language, "Text ready", "Texto listo")
                       : document.status === "error"
                         ? translated(language, "Needs retry", "Reintentar")
                         : queued?.status === "processing"
                           ? translated(
                               language,
-                              "Reading page",
-                              "Leyendo página",
+                              `Reading ${queuePosition} of ${activeQueue.length} · ${elapsedSeconds}s`,
+                              `Leyendo ${queuePosition} de ${activeQueue.length} · ${elapsedSeconds}s`,
                             )
+                          : queued?.status === "retrying"
+                            ? translated(language, "Retrying", "Reintentando")
                           : translated(language, "Waiting", "En espera")}
                   </span>
                 </div>

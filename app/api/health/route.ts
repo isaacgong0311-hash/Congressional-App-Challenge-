@@ -1,18 +1,29 @@
+import { resolveAiConfiguration } from "../../lib/ai-config";
+import { isDistributedRateLimitingConfigured } from "../../lib/rate-limit";
+
 export const runtime = "nodejs";
 
 export async function GET() {
-  const keys = {
-    groq: !!process.env.GROQ_API_KEY,
-    elevenlabs: !!process.env.ELEVENLABS_API_KEY,
-    perplexity: !!process.env.PERPLEXITY_API_KEY,
+  const ai = resolveAiConfiguration();
+  const vision = ai.apiKeyAvailable && ai.visionModel !== null;
+  const text = ai.apiKeyAvailable && ai.textModel !== null;
+  const capabilities = {
+    vision,
+    text,
+    speech: Boolean(process.env.ELEVENLABS_API_KEY),
+    localHelp: Boolean(process.env.PERPLEXITY_API_KEY),
+    rateLimiting: isDistributedRateLimitingConfigured(),
   };
-  const allRequired = keys.groq;
+  const allRequired = capabilities.vision && capabilities.text && capabilities.rateLimiting;
   return Response.json(
     {
       status: allRequired ? "ok" : "degraded",
-      keys,
+      capabilities,
       ts: new Date().toISOString(),
     },
-    { status: allRequired ? 200 : 503 },
+    {
+      status: allRequired ? 200 : 503,
+      headers: { "Cache-Control": "no-store" },
+    },
   );
 }

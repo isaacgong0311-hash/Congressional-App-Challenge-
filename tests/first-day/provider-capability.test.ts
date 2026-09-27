@@ -7,7 +7,7 @@ describe("providerCapabilityFromHealth", () => {
     expect(
       providerCapabilityFromHealth(true, {
         status: "ok",
-        keys: { groq: true },
+        capabilities: { vision: true, text: true, rateLimiting: true },
       }),
     ).toBe("available");
   });
@@ -16,12 +16,21 @@ describe("providerCapabilityFromHealth", () => {
     expect(
       providerCapabilityFromHealth(false, {
         status: "degraded",
-        keys: { groq: false },
+        capabilities: { vision: false, text: false, rateLimiting: false },
       }),
     ).toBe("unavailable");
     expect(providerCapabilityFromHealth(true, { status: "ok" })).toBe(
       "unavailable",
     );
     expect(providerCapabilityFromHealth(true, null)).toBe("unavailable");
+  });
+
+  it("allows live reading when vision works but optional capabilities are degraded", () => {
+    expect(
+      providerCapabilityFromHealth(false, {
+        status: "degraded",
+        capabilities: { vision: true, text: true, rateLimiting: false },
+      }),
+    ).toBe("available");
   });
 });

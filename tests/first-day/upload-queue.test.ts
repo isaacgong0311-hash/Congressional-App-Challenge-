@@ -121,7 +121,43 @@ describe("First Day upload queue", () => {
 
     expect(retried[0]).toBe(ready);
     expect(retried[1]).toEqual(
-      expect.objectContaining({ status: "queued", error: undefined }),
+      expect.objectContaining({ status: "retrying", error: undefined }),
+    );
+  });
+
+  it("retains source identity and records a successful zero-fact page", () => {
+    const [queuedPdfPage] = reduceUploadQueue([], {
+      type: "enqueue",
+      items: [
+        {
+          ...queued("doc-pdf"),
+          sourceFileName: "packet.pdf",
+          sourceType: "pdf",
+          sourcePageNumber: 2,
+        },
+      ],
+    });
+    const processing = reduceUploadQueue([queuedPdfPage!], {
+      type: "start",
+      documentId: "doc-pdf",
+      requestId: "request-pdf",
+      startedAt: 1_000,
+    });
+    const ready = reduceUploadQueue(processing, {
+      type: "succeed",
+      documentId: "doc-pdf",
+      requestId: "request-pdf",
+      factCount: 0,
+    });
+
+    expect(ready[0]).toEqual(
+      expect.objectContaining({
+        status: "ready",
+        sourceFileName: "packet.pdf",
+        sourceType: "pdf",
+        sourcePageNumber: 2,
+        factCount: 0,
+      }),
     );
   });
 });

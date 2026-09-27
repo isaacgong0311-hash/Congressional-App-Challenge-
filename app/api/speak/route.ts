@@ -1,3 +1,5 @@
+import { providerDiagnostic } from "../../lib/provider-diagnostics";
+
 export const runtime = "nodejs";
 export const maxDuration = 30;
 
@@ -30,6 +32,8 @@ const LANG_CODE: Record<string, string> = {
 };
 
 export async function POST(req: Request) {
+  const requestId = crypto.randomUUID();
+  const startedAt = Date.now();
   if (!process.env.ELEVENLABS_API_KEY) {
     return new Response(null, { status: 404 });
   }
@@ -71,11 +75,30 @@ export async function POST(req: Request) {
   );
 
   if (!res.ok) {
-    console.error("ElevenLabs error:", res.status, await res.text());
+    console.error(
+      "speech failure",
+      providerDiagnostic({
+        requestId,
+        route: "/api/speak",
+        modelRole: "speech",
+        outcome: "provider",
+        durationMs: Date.now() - startedAt,
+      }),
+    );
     return new Response(null, { status: 502 });
   }
 
   const audio = await res.arrayBuffer();
+  console.info(
+    "speech success",
+    providerDiagnostic({
+      requestId,
+      route: "/api/speak",
+      modelRole: "speech",
+      outcome: "success",
+      durationMs: Date.now() - startedAt,
+    }),
+  );
   return new Response(audio, {
     headers: {
       "Content-Type": "audio/mpeg",

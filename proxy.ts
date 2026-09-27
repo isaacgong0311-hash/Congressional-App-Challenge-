@@ -1,71 +1,63 @@
 import { NextRequest, NextResponse } from "next/server";
 
-// Simple per-IP rate limiter using in-memory state.
-// Limits protect the Groq / ElevenLabs / Perplexity keys from abuse.
-// State lives per function instance (not globally coordinated) which is fine
-// for a demo; swap to Vercel KV for multi-instance production hardening.
+import { enforceRateLimit } from "./app/lib/rate-limit";
 
-const WINDOW_MS = 60_000; // 1-minute sliding window
-const LIMITS: Record<string, number> = {
-  "/api/first-day/extract": 10,
-  "/api/explain": 10,        // vision + generation — most expensive
-  "/api/speak": 30,          // ElevenLabs audio
-  "/api/local-help": 10,     // Perplexity search
-  "/api/ask": 40,            // chat turn
-  "/api/translate-field": 20, // translation
-};
-const DEFAULT_LIMIT = 60;
-
-type Entry = { count: number; reset: number };
-const store = new Map<string, Entry>();
-
-// Prune expired entries every 500 lookups to prevent unbounded growth.
-let pruneCounter = 0;
-function pruneIfNeeded() {
-  if (++pruneCounter < 500) return;
-  pruneCounter = 0;
-  const now = Date.now();
-  for (const [k, v] of store) if (now > v.reset) store.delete(k);
+function clientIdentifier(request: NextRequest) {
+  return (
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+    request.headers.get("x-real-ip") ??
+    "unknown"
+  );
 }
 
-function allow(ip: string, path: string): boolean {
-  pruneIfNeeded();
-  const prefix = Object.keys(LIMITS).find((p) => path.startsWith(p));
-  const max = prefix ? LIMITS[prefix] : DEFAULT_LIMIT;
-  const key = `${prefix ?? "misc"}:${ip}`;
-  const now = Date.now();
-  const entry = store.get(key);
-  if (!entry || now > entry.reset) {
-    store.set(key, { count: 1, reset: now + WINDOW_MS });
-    return true;
-  }
-  if (entry.count >= max) return false;
-  entry.count++;
-  return true;
-}
-
-export function proxy(req: NextRequest) {
-  const path = req.nextUrl.pathname;
-  if (!path.startsWith("/api/") || path === "/api/health") {
+export async function proxy(request: NextRequest) {
+  const pathname = request.nextUrl.pathname;
+  if (!pathname.startsWith("/api/") || pathname === "/api/health") {
     return NextResponse.next();
   }
 
-  const ip =
-    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
-    req.headers.get("x-real-ip") ??
-    "unknown";
-
-  if (!allow(ip, path)) {
+  let result;
+  try {
+    result = await enforceRateLimit({
+      pathname,
+      identifier: clientIdentifier(request),
+    });
+  } catch {
     return NextResponse.json(
-      { error: "Too many requests — please wait a moment and try again." },
+      { error: "Request protection is temporarily unavailable." },
+      { status: 503 },
+    );
+  }
+
+  if (result.status === "unavailable") {
+    return NextResponse.json(
+      { error: "Request protection is temporarily unavailable." },
+      { status: 503 },
+    );
+  }
+  if (result.status === "limited") {
+    return NextResponse.json(
+      {
+        error: "Too many requests — please wait and try again.",
+        code: "rate_limited",
+      },
       {
         status: 429,
-        headers: { "Retry-After": "60" },
+        headers: {
+          "Retry-After": String(result.retryAfterSeconds),
+          "X-RateLimit-Limit": String(result.limit),
+          "X-RateLimit-Remaining": String(result.remaining),
+          "X-RateLimit-Reset": String(result.reset),
+        },
       },
     );
   }
 
-  return NextResponse.next();
+  const response = NextResponse.next();
+  response.headers.set("X-RateLimit-Limit", String(result.limit));
+  response.headers.set("X-RateLimit-Remaining", String(result.remaining));
+  response.headers.set("X-RateLimit-Reset", String(result.reset));
+  return response;
 }
 
 export const config = {

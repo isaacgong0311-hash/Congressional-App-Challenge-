@@ -9,6 +9,32 @@
 
 The cohesive frontend overhaul was promoted from its verified preview on 2026-09-21.
 
+## Live documents and PDF readiness candidate — 2026-09-27
+
+- Release branch: `codex/live-pdf-readiness`
+- Vision model: `qwen/qwen3.8-27b`
+- Text model: `openai/gpt-oss-20b`
+- Rollback deployment: `dpl_CG7sxGEGoNAzEhRbrMkhiTBRHLVT`
+- Preview deployment: pending provider and rate-limit credentials
+- Production deployment: not promoted
+
+### Candidate gates
+
+- [x] `npm run lint`
+- [x] `npm test` — 122 tests
+- [x] `npm run evaluate:first-day` — all offline quality gates passed
+- [x] `npm run build`
+- [x] `npm run test:e2e` — 55 passed, 7 intentionally skipped
+- [x] `npm run test:lighthouse` — median scores: home 96/100/100/100; First Day 94/100/96/100
+- [x] `npm audit --omit=dev` — zero vulnerabilities
+- [x] `git diff --check`
+- [ ] `npm run smoke:provider` — blocked until a Groq credential is supplied
+- [ ] `npm run evaluate:first-day:live` — blocked until a dedicated Groq evaluation credential is supplied
+- [ ] Preview smoke journey — blocked until preview Groq/Upstash variables and salts are configured
+- [ ] Production promotion and smoke journey — requires the live benchmark and preview checks above
+
+The linked Vercel project had no configured environment variables when this candidate was prepared. Do not promote it until separate preview and production Groq projects, zero-data retention, provider quotas, Upstash namespaces, and salts are configured. The live benchmark report stores aggregate metrics only.
+
 ## Cohesive frontend release identity
 
 - Release branch: `codex/frontend-overhaul`
