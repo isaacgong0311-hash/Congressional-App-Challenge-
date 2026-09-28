@@ -12,6 +12,8 @@ The cohesive frontend overhaul was promoted from its verified preview on 2026-09
 ## Live documents and PDF readiness candidate — 2026-09-27
 
 - Release branch: `codex/live-pdf-readiness`
+- Verified code commit: `078e36f653d1e5a0af40c748519321aebc492376`
+- Passing GitHub Actions run: [`36362086844`](https://github.com/isaacgong0311-hash/Congressional-App-Challenge-/actions/runs/36362086844)
 - Vision model: `qwen/qwen3.8-27b`
 - Text model: `openai/gpt-oss-20b`
 - Rollback deployment: `dpl_CG7sxGEGoNAzEhRbrMkhiTBRHLVT`
