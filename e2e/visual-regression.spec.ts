@@ -17,7 +17,7 @@ async function expectNoHorizontalOverflow(page: Page) {
 
 async function capture(page: Page, name: string) {
   await expectNoHorizontalOverflow(page);
-  await expect(page).toHaveScreenshot(`${name}.png`, {
+  await expect.soft(page).toHaveScreenshot(`${name}.png`, {
     animations: "disabled",
     maxDiffPixelRatio: 0.01,
     timeout: 10_000,
