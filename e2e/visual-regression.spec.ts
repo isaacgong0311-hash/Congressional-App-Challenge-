@@ -98,7 +98,7 @@ test.describe("visual regression and responsive layout", () => {
           name: "Three pages. Two languages. One family trying not to miss a step.",
         }),
       ).toBeVisible();
-      await expectNoHorizontalOverflow(page);
+      await capture(page, `first-day-guided-demo-${viewport.name}`);
 
       await page.goto("/first-day");
       await page.getByRole("button", { name: "Open the sample case" }).click();
