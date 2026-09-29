@@ -19,6 +19,17 @@ The cohesive frontend overhaul was promoted from its verified preview on 2026-09
 - Production URL: `https://lantern-first-day.vercel.app`
 - Production deployment ID: `dpl_CG7sxGEGoNAzEhRbrMkhiTBRHLVT`
 
+## Guided demo release identity
+
+- Release branch: `codex/frontend-overhaul`
+- Production code commit: `6aa8cb8f797784c64a425278b5dd5d33900af55c`
+- Passing GitHub Actions run: `36508325154`
+- Preview URL: `https://lantern-first-3807em2ic-isaacgong0311-5396s-projects.vercel.app`
+- Preview deployment ID: `dpl_Deb1J34fMz4MkD1ccFPnR2Mac7Cy`
+- Production URL: `https://lantern-first-day.vercel.app`
+- Production deployment ID: `dpl_4PvjeeuuH5zmz4Jskq93G2VgMHWG`
+- Promoted and verified: `2026-09-28`
+
 ## Automated gate
 
 - [x] `npm run lint`
@@ -36,6 +47,7 @@ The cohesive frontend overhaul was promoted from its verified preview on 2026-09
 - [x] General Lantern remains available at `/explain`.
 - [x] Privacy disclosures are available at `/privacy`.
 - [x] Fictional First Day works without provider access.
+- [x] The six-beat guided demo at `/first-day?demo=1` completes without provider requests.
 - [x] Live pages process sequentially and independently.
 - [x] Every accepted proposal has an exact quote from its source page.
 - [x] Corrections preserve source records and append history.
@@ -58,6 +70,7 @@ The cohesive frontend overhaul was promoted from its verified preview on 2026-09
 - [x] `GET /first-day/how-it-works` returns 200.
 - [x] `GET /api/health` accurately reports degraded provider capability (`503`, `groq: false`).
 - [x] Fictional six-screen journey completes in English and Spanish.
+- [x] Guided demo entry renders all six judge-facing beats and remains usable at 390, 768, 1024, and 1440 pixels.
 - [x] Live synthetic upload is not applicable while provider capability is unavailable; live entry is correctly disabled.
 - [x] Letter and A4 print output contain no clipped cards or interactive controls.
 - [x] Production HTML and API responses contain the four security headers.

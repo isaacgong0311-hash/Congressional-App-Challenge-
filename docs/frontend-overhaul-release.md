@@ -29,7 +29,7 @@ Do not persist document images, extracted text, evidence, facts, conflicts, task
 - Playwright fictional and mocked-live workflows on mobile and desktop Chromium.
 - General-letter malformed response, retry, RTL preference, and speech fallback checks.
 - WCAG A/AA axe scans on public routes and critical workflow states.
-- Forty visual baselines covering 10 critical screens at 390, 768, 1024, and 1440 pixels with a 1% maximum pixel-difference threshold.
+- Forty-four visual baselines covering 11 critical screens, including guided-demo entry, at 390, 768, 1024, and 1440 pixels with a 1% maximum pixel-difference threshold.
 - Horizontal-overflow checks at all four widths.
 - Letter and A4 PDF rendering with interactive controls removed and technical source details retained.
 - Layout shift, load time, and transferred-resource budget checks on `/` and `/first-day`.
