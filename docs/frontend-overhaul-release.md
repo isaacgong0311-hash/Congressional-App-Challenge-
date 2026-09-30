@@ -2,6 +2,14 @@
 
 This record tracks the cohesive Lantern frontend release on branch `codex/frontend-overhaul`.
 
+## Homepage structure refresh — September 29, 2026
+
+The homepage now follows a family-first reading order: a plain-language introduction and fictional plan preview, three connected steps, an example of conflicting instructions, privacy and the letter tool, then evaluation results and a final demo invitation.
+
+The visual direction uses warm paper, forest green, Playfair headings, a consistent content grid, and restrained borders and shadows. Evaluation claims keep their synthetic-data caveat and are secondary to explaining the product. The preview is explicitly fictional and does not imply that a real family has confirmed its sample tasks.
+
+Homepage styles live in `app/styles/home.css` and are scoped to `home-*` classes and `.lantern-home`. The existing workspace, provider contracts, language controls, and case persistence rules are unchanged. Content renders on the server; the decorative entrance motion never hides content and respects reduced-motion preferences.
+
 ## Product contract
 
 - `/` leads with First Day and uses only static fictional evidence in its specimen.

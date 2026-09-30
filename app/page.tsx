@@ -1,248 +1,391 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-
 import {
   ArrowUpRightIcon,
   CheckCircleIcon,
   DocumentLineIcon,
+  LanternMark,
   QuoteIcon,
   ShieldCheckIcon,
 } from "./components/lantern/brand";
 import { ProductHeader } from "./components/lantern/product-header";
 import { SiteFooter } from "./components/lantern/site-footer";
 import { competitionProof } from "./features/first-day/content/competition-proof";
+import "./styles/home.css";
 
 export const metadata: Metadata = {
   title: "Lantern — School instructions, turned into a plan",
   description:
-    "Lantern First Day turns scattered school instructions into a source-backed plan families can inspect, correct, and carry with them.",
+    "Bring school letters together, check what matters, and leave with a clear plan for your family's first day.",
 };
-
-const metrics = competitionProof.metrics.filter(
-  (metric) => metric.id !== "dates",
-);
 
 const stages = [
   {
     number: "01",
-    title: "Bring instructions together",
-    copy: "Keep related letters, reminders, and office notes in one case without erasing where each instruction came from.",
+    title: "Gather the pieces.",
+    copy: "Bring school letters, reminders, and office notes into one place. Each page keeps its own identity.",
+    detail: "Your documents, together",
     icon: DocumentLineIcon,
   },
   {
     number: "02",
-    title: "Check every important fact",
-    copy: "Review dates, places, and requests beside the exact words that support them. Confirm, correct, or leave them unclear.",
+    title: "Make sense of them.",
+    copy: "Check dates, places, and requirements beside the original words. You decide what is confirmed.",
+    detail: "Every fact has a source",
     icon: QuoteIcon,
   },
   {
     number: "03",
-    title: "Carry a plan you can explain",
-    copy: "See what is ready, blocked, waiting, or done—and why—then print it or add only confirmed dates to a calendar.",
+    title: "Know your next step.",
+    copy: "Follow a clear checklist, work through unanswered questions, and take a printable plan with you.",
+    detail: "A plan you can carry",
     icon: CheckCircleIcon,
   },
 ] as const;
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-canvas text-ink">
+    <div className="lantern-home">
+      <a className="home-skip" href="#main-content">
+        Skip to content
+      </a>
       <ProductHeader />
-
-      <main>
-        <section className="relative overflow-hidden border-b border-ink/10">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_82%_12%,rgba(53,86,212,.16),transparent_28rem),radial-gradient(circle_at_14%_78%,rgba(231,178,62,.15),transparent_24rem)]" />
-          <div className="relative mx-auto grid max-w-[1440px] gap-12 px-5 py-16 sm:px-8 sm:py-24 lg:grid-cols-[1.03fr_.97fr] lg:items-center lg:px-12 lg:py-28">
-            <div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-cobalt/20 bg-white/75 px-3 py-1.5 text-xs font-extrabold uppercase tracking-[0.16em] text-cobalt shadow-sm">
-                <span className="h-2 w-2 rounded-full bg-amber" />
-                Lantern · First Day
-              </div>
-              <h1 className="mt-7 max-w-3xl text-balance font-serif text-[clamp(3.5rem,7.5vw,7.2rem)] leading-[.92] tracking-[-0.055em] text-ink">
-                A school plan you can trace back to the page.
-              </h1>
-              <p className="mt-7 max-w-2xl text-pretty text-lg leading-8 text-muted sm:text-xl">
-                Lantern turns scattered enrollment instructions into one source-backed plan families can inspect, correct, and trust.
+      <main id="main-content">
+        <section className="home-hero" aria-labelledby="home-title">
+          <div className="home-container home-hero-grid">
+            <div className="home-hero-copy">
+              <p className="home-kicker">
+                <span className="home-status-dot" /> A little clarity for a big
+                first day
               </p>
-              <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-                <Link className="lantern-primary-cta" href="/first-day?demo=1">
-                  Start the 3-minute guided demo
-                  <ArrowUpRightIcon className="h-5 w-5" />
+              <h1 id="home-title">
+                Less paperwork.
+                <br />
+                More <em>peace of mind.</em>
+              </h1>
+              <p className="home-lead">
+                School letters can be overwhelming. Lantern brings them together
+                into a clear, step-by-step plan—so your family knows what comes
+                next.
+              </p>
+              <div className="home-hero-actions">
+                <Link
+                  className="home-button"
+                  href="/first-day?demo=1"
+                >
+                  See Lantern in action <ArrowUpRightIcon />
                 </Link>
-                <Link className="lantern-secondary-cta" href="/explain">
-                  Explain a confusing letter
-                </Link>
+                <a className="home-text-link" href="#how-it-works">
+                  How it works <span aria-hidden="true">↓</span>
+                </a>
               </div>
-              <div className="mt-7 flex flex-wrap gap-x-6 gap-y-2 text-sm font-semibold text-muted">
-                <span className="inline-flex items-center gap-2"><CheckCircleIcon className="h-4 w-4 text-confirmed" /> Fictional demo data</span>
-                <span className="inline-flex items-center gap-2"><CheckCircleIcon className="h-4 w-4 text-confirmed" /> No account</span>
-                <span className="inline-flex items-center gap-2"><CheckCircleIcon className="h-4 w-4 text-confirmed" /> No cloud case history</span>
-                <span className="inline-flex items-center gap-2"><CheckCircleIcon className="h-4 w-4 text-confirmed" /> English + Spanish</span>
-              </div>
+              <p className="home-small-note">
+                <CheckCircleIcon /> 3-minute demo <span>·</span> No account or
+                upload needed
+              </p>
             </div>
-
-            <div className="relative mx-auto w-full max-w-2xl lg:mx-0">
-              <div className="absolute -inset-5 rounded-[2.5rem] bg-cobalt/10 blur-2xl" />
-              <div className="relative overflow-hidden rounded-[2rem] border border-white/60 bg-ink p-5 text-white shadow-[0_35px_90px_rgba(17,34,27,.25)] sm:p-7">
-                <div className="flex items-center justify-between gap-4 border-b border-white/10 pb-5">
-                  <div>
-                    <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber">Fictional case preview</p>
-                    <p className="mt-1 text-sm text-white/60">Mesa View · Rivera family</p>
+            <figure
+              className="home-preview"
+              aria-label="Fictional example of a school plan with source-linked instructions"
+            >
+              <figcaption className="home-preview-caption">
+                <span>
+                  <span className="home-status-dot" /> A clearer picture
+                </span>
+                <span>Fictional case preview</span>
+              </figcaption>
+              <div className="home-plan-window">
+                <div className="home-window-bar">
+                  <span>
+                    <LanternMark /> Lantern{" "}
+                    <span className="home-window-divider">/</span> First Day
+                  </span>
+                  <span
+                    className="home-family-avatar"
+                    aria-label="Rivera family"
+                  >
+                    R
+                  </span>
+                </div>
+                <div className="home-window-body">
+                  <div className="home-plan-heading">
+                    <div>
+                      <p className="home-label">MESA VIEW · RIVERA FAMILY</p>
+                      <h2>Your first day, organized.</h2>
+                    </div>
+                    <span className="home-plan-date">
+                      Sample
+                      <br />
+                      <strong>school plan</strong>
+                    </span>
                   </div>
-                  <span className="rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-bold text-white/75">3 pages</span>
-                </div>
-
-                <div className="mt-5 space-y-3">
-                  <article className="ml-5 rounded-[1.35rem] border border-white/12 bg-white/8 p-5 backdrop-blur-md">
-                    <div className="flex items-center gap-3 text-white/60">
-                      <DocumentLineIcon className="h-5 w-5 text-amber" />
-                      <span className="text-xs font-bold uppercase tracking-[0.16em]">Welcome letter · Page 1</span>
+                  <div className="home-plan-tabs" aria-hidden="true">
+                    <span>3 documents</span>
+                    <span>Review facts</span>
+                    <span className="is-selected">Your plan</span>
+                  </div>
+                  <div className="home-task">
+                    <span className="home-task-check">
+                      <CheckCircleIcon />
+                    </span>
+                    <div>
+                      <h3>Gather enrollment documents</h3>
+                      <p>Keep the required paperwork together.</p>
+                      <span className="home-source-ref">
+                        <DocumentLineIcon /> Welcome letter · Page 1
+                      </span>
                     </div>
-                    <p className="mt-4 font-serif text-xl leading-8 text-white/92">“Family orientation will be held in the school cafeteria…”</p>
-                  </article>
-
-                  <article className="mr-8 rounded-[1.35rem] border border-cobalt/20 bg-[#eef2ff] p-5 text-ink shadow-xl">
-                    <div className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-[0.15em] text-cobalt">
-                      <QuoteIcon className="h-4 w-4" /> Exact evidence
+                    <span className="home-pill">Ready</span>
+                  </div>
+                  <div className="home-task">
+                    <span className="home-task-check">
+                      <CheckCircleIcon />
+                    </span>
+                    <div>
+                      <h3>Go to the enrollment meeting</h3>
+                      <p>Mesa View Welcome Center</p>
+                      <span className="home-source-ref">
+                        <DocumentLineIcon /> Office note · Page 3
+                      </span>
                     </div>
-                    <p className="mt-3 font-semibold">Orientation location</p>
-                    <p className="mt-1 text-sm text-muted">School cafeteria · waiting for family review</p>
-                  </article>
-
-                  <article className="ml-10 rounded-[1.35rem] bg-white p-5 text-ink shadow-2xl">
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <p className="text-xs font-extrabold uppercase tracking-[0.15em] text-muted">Your next step</p>
-                        <p className="mt-2 text-lg font-bold">Confirm where orientation begins</p>
-                      </div>
-                      <span className="rounded-full bg-[#fff0ca] px-3 py-1 text-xs font-extrabold text-[#765515]">Needs clarity</span>
+                    <span className="home-pill">Ready</span>
+                  </div>
+                  <div className="home-task home-task-unclear">
+                    <span className="home-question-mark">?</span>
+                    <div>
+                      <h3>Confirm the orientation location</h3>
+                      <p>Two pages list different places. Let’s check.</p>
                     </div>
-                  </article>
+                    <span className="home-pill home-pill-amber">
+                      Ask the school
+                    </span>
+                  </div>
+                  <div className="home-plan-footnote">
+                    <ShieldCheckIcon /> Every step connects back to your
+                    documents.
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
-        </section>
-
-        <section aria-labelledby="proof-title" className="border-b border-ink/10 bg-surface">
-          <div className="mx-auto grid max-w-[1440px] gap-8 px-5 py-10 sm:px-8 lg:grid-cols-[1fr_2fr] lg:px-12">
-            <div>
-              <p className="lantern-eyebrow">Measured offline</p>
-              <h2 className="mt-2 text-balance font-serif text-3xl tracking-[-0.035em]" id="proof-title">Evidence, not a vague AI promise.</h2>
-              <p className="mt-3 text-sm leading-6 text-muted">Results from {competitionProof.packetCount} synthetic held-out packets. {competitionProof.limitation}</p>
-            </div>
-            <dl className="grid gap-3 sm:grid-cols-3">
-              {metrics.map((metric) => (
-                <div className="rounded-card border border-ink/10 bg-canvas px-5 py-6" key={metric.id}>
-                  <dt className="text-sm font-semibold text-muted">{metric.label}</dt>
-                  <dd className="mt-2 text-3xl font-black tracking-[-0.04em] text-ink">{metric.value}</dd>
+              <div className="home-evidence-note">
+                <span className="home-evidence-icon">
+                  <QuoteIcon />
+                </span>
+                <div>
+                  <strong>Clarity you can check.</strong>
+                  <p>Original words. Always one step away.</p>
                 </div>
-              ))}
-            </dl>
+                <CheckCircleIcon className="home-evidence-check" />
+              </div>
+            </figure>
           </div>
-        </section>
-
-        <section className="mx-auto max-w-[1440px] px-5 py-20 sm:px-8 lg:px-12 lg:py-28" aria-labelledby="flow-title">
-          <div className="max-w-3xl">
-            <p className="lantern-eyebrow">From scattered pages to one plan</p>
-            <h2 className="lantern-section-title" id="flow-title">Calm enough for families. Rigorous enough to inspect.</h2>
-          </div>
-          <div className="mt-12 grid gap-5 lg:grid-cols-3">
-            {stages.map((stage) => {
-              const Icon = stage.icon;
-              return (
-                <article className="group rounded-feature border border-ink/10 bg-surface p-7 shadow-[0_18px_50px_rgba(20,36,30,.06)] transition-transform hover:-translate-y-1 sm:p-8" key={stage.number}>
-                  <div className="flex items-center justify-between">
-                    <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-cobalt/10 text-cobalt"><Icon className="h-6 w-6" /></span>
-                    <span className="font-mono text-xs font-bold tracking-[0.18em] text-muted">{stage.number}</span>
-                  </div>
-                  <h3 className="mt-8 text-2xl font-bold tracking-[-0.03em]">{stage.title}</h3>
-                  <p className="mt-4 text-base leading-7 text-muted">{stage.copy}</p>
-                </article>
-              );
-            })}
-          </div>
-        </section>
-
-        <section className="border-y border-ink/10 bg-surface" aria-labelledby="families-title">
-          <div className="mx-auto max-w-[1440px] px-5 py-16 sm:px-8 lg:px-12 lg:py-20">
-            <p className="lantern-eyebrow">For real family questions</p>
-            <h2 className="mt-3 max-w-4xl text-balance font-serif text-4xl tracking-[-0.04em] sm:text-5xl" id="families-title">
-              The hard part is rarely one sentence. It is knowing what matters together.
-            </h2>
-            <div className="mt-10 grid gap-4 md:grid-cols-3">
-              {[
-                ["The date is on one page.", "The location is buried in another reminder."],
-                ["Two letters disagree.", "The family needs a question—not a silent guess."],
-                ["A requirement is still unclear.", "The next safe step should stay visible without pretending it is resolved."],
-              ].map(([problem, detail]) => (
-                <article className="rounded-card border border-ink/10 bg-canvas p-6" key={problem}>
-                  <p className="text-xl font-bold tracking-[-0.025em] text-ink">{problem}</p>
-                  <p className="mt-3 text-sm leading-6 text-muted">{detail}</p>
-                </article>
-              ))}
+          <div className="home-container">
+            <div className="home-trust-strip">
+              <span>Made for the people behind the paperwork.</span>
+              <ul>
+                <li>
+                  <ShieldCheckIcon /> No saved family account
+                </li>
+                <li>
+                  <QuoteIcon /> Source-linked instructions
+                </li>
+                <li>
+                  <span className="home-language-icon" aria-hidden="true">
+                    A / Ñ
+                  </span>{" "}
+                  English + Spanish
+                </li>
+              </ul>
             </div>
           </div>
         </section>
-
-        <section className="bg-[#10241c] text-white" aria-labelledby="difference-title">
-          <div className="mx-auto grid max-w-[1440px] gap-10 px-5 py-20 sm:px-8 lg:grid-cols-[.92fr_1.08fr] lg:items-center lg:px-12 lg:py-28">
+        <section
+          className="home-section home-container"
+          id="how-it-works"
+          aria-labelledby="flow-title"
+        >
+          <div className="home-section-heading">
             <div>
-              <p className="lantern-eyebrow is-on-dark">The difference</p>
-              <h2 className="mt-4 max-w-2xl text-balance font-serif text-5xl leading-[1.02] tracking-[-0.045em] sm:text-6xl" id="difference-title">Lantern refuses to hide uncertainty.</h2>
-              <p className="mt-6 max-w-xl text-lg leading-8 text-white/68">When two documents disagree, Lantern keeps both sources visible, prepares the question to ask, and waits for the family to record what the school said.</p>
-              <Link className="mt-8 inline-flex min-h-12 items-center gap-2 rounded-xl bg-amber px-5 font-bold text-ink transition hover:-translate-y-0.5 hover:bg-[#f0c35d] focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-white" href="/first-day/how-it-works">
-                See how decisions are made <ArrowUpRightIcon className="h-5 w-5" />
-              </Link>
+              <p className="home-kicker">A simple way forward</p>
+              <h2 id="flow-title">
+                From a stack of letters
+                <br />
+                to a little more certainty.
+              </h2>
             </div>
-            <div className="grid gap-4 sm:grid-cols-2">
-              {["School cafeteria", "Gym entrance"].map((value, index) => (
-                <article className="rounded-feature border border-white/12 bg-white/7 p-6 backdrop-blur-sm" key={value}>
-                  <p className="text-xs font-bold uppercase tracking-[0.16em] text-amber">Source {index + 1}</p>
-                  <p className="mt-5 font-serif text-3xl">{value}</p>
-                  <p className="mt-3 text-sm leading-6 text-white/60">Exact quote stays attached to its original page.</p>
-                </article>
-              ))}
-              <article className="rounded-feature border border-amber/30 bg-amber/10 p-6 sm:col-span-2">
-                <p className="text-xs font-bold uppercase tracking-[0.16em] text-amber">Prepared question</p>
-                <p className="mt-3 text-lg font-semibold leading-7 text-[#fff1c9]">“I found two different entrances. Which should our family use for orientation?”</p>
+            <p>
+              You don’t need to figure everything out at once. Just take it one
+              step at a time.
+            </p>
+          </div>
+          <div className="home-steps">
+            {stages.map(({ number, title, copy, detail, icon: Icon }) => (
+              <article className="home-step" key={number}>
+                <div className="home-step-top">
+                  <span className="home-step-icon">
+                    <Icon />
+                  </span>
+                  <span className="home-step-number">{number}</span>
+                </div>
+                <h3>{title}</h3>
+                <p>{copy}</p>
+                <div className="home-step-detail">
+                  <CheckCircleIcon /> {detail}
+                </div>
               </article>
-            </div>
+            ))}
           </div>
         </section>
-
-        <section className="mx-auto max-w-[1440px] px-5 py-20 sm:px-8 lg:px-12 lg:py-28" aria-labelledby="trust-title">
-          <div className="grid gap-8 lg:grid-cols-[1fr_1fr]">
-            <article className="rounded-feature border border-ink/10 bg-surface p-8 shadow-[0_18px_50px_rgba(20,36,30,.06)] sm:p-10">
-              <ShieldCheckIcon className="h-9 w-9 text-confirmed" />
-              <p className="lantern-eyebrow mt-7">Private by default</p>
-              <h2 className="mt-3 font-serif text-4xl tracking-[-0.04em]" id="trust-title">No account. No cloud case history.</h2>
-              <p className="mt-5 text-base leading-7 text-muted">The fictional demo stays in the page. Live images are sent to the configured external provider one at a time, and Lantern does not create a saved family account.</p>
-            </article>
-            <article className="rounded-feature border border-cobalt/20 bg-[#edf1ff] p-8 sm:p-10">
-              <DocumentLineIcon className="h-9 w-9 text-cobalt" />
-              <p className="lantern-eyebrow mt-7 text-cobalt">Another Lantern tool</p>
-              <h2 className="mt-3 font-serif text-4xl tracking-[-0.04em]">One confusing letter?</h2>
-              <p className="mt-5 text-base leading-7 text-[#52628e]">Upload a bill, benefit notice, utility letter, or official form and get a plain-language explanation, next-step checklist, and help preparing a response.</p>
-              <Link className="mt-7 inline-flex min-h-12 items-center gap-2 rounded-xl bg-cobalt px-5 font-bold text-white transition hover:-translate-y-0.5 hover:bg-cobalt-dark focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-amber" href="/explain">
-                Open the letter explainer <ArrowUpRightIcon className="h-5 w-5" />
+        <section className="home-container" aria-labelledby="difference-title">
+          <div className="home-difference">
+            <div className="home-difference-copy">
+              <p className="home-kicker">Clarity includes the unknowns</p>
+              <h2 id="difference-title">
+                When the letters disagree,
+                <br />
+                <em>you deserve to know.</em>
+              </h2>
+              <p>
+                A cafeteria on one page. A gym entrance on another. Lantern
+                keeps both sources visible and helps you prepare the right
+                question for the school.
+              </p>
+              <Link className="home-text-link" href="/first-day/how-it-works">
+                See how decisions are made <ArrowUpRightIcon />
               </Link>
-            </article>
+            </div>
+            <div className="home-comparison">
+              <div className="home-comparison-sources">
+                <article>
+                  <span className="home-label">
+                    <DocumentLineIcon /> WELCOME LETTER · P. 1
+                  </span>
+                  <p>“School cafeteria”</p>
+                </article>
+                <span
+                  className="home-conflict-symbol"
+                  aria-label="Conflicting locations"
+                >
+                  ≠
+                </span>
+                <article>
+                  <span className="home-label">
+                    <DocumentLineIcon /> REMINDER · P. 2
+                  </span>
+                  <p>“Gym entrance”</p>
+                </article>
+              </div>
+              <div className="home-question">
+                <span className="home-label">YOUR QUESTION, READY TO ASK</span>
+                <p>“Which entrance should our family use for orientation?”</p>
+                <span className="home-question-footer">
+                  <span className="home-status-dot" /> Waiting for the school’s
+                  answer
+                </span>
+              </div>
+              <p className="home-example-label">
+                Illustrative example · The family confirms the answer.
+              </p>
+            </div>
           </div>
         </section>
-
-        <section className="px-5 pb-20 sm:px-8 lg:px-12 lg:pb-28">
-          <div className="mx-auto max-w-[1344px] overflow-hidden rounded-[2.25rem] bg-cobalt px-7 py-12 text-white shadow-[0_28px_80px_rgba(53,86,212,.25)] sm:px-12 lg:flex lg:items-center lg:justify-between lg:gap-10 lg:px-16 lg:py-16">
-            <div>
-              <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-white/90">A calmer first day</p>
-              <h2 className="mt-4 max-w-3xl text-balance font-serif text-4xl leading-tight tracking-[-0.04em] sm:text-5xl">See the complete evidence-to-plan journey with no upload and no AI key.</h2>
-            </div>
-            <Link className="mt-8 inline-flex min-h-13 shrink-0 items-center gap-2 rounded-xl bg-white px-6 font-extrabold text-cobalt transition hover:-translate-y-0.5 hover:bg-[#f7f8ff] focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-amber lg:mt-0" href="/first-day?demo=1">
-              Start the guided demo <ArrowUpRightIcon className="h-5 w-5" />
+        <section
+          className="home-section home-container home-support"
+          aria-labelledby="trust-title"
+        >
+          <article className="home-privacy">
+            <span className="home-support-icon">
+              <ShieldCheckIcon />
+            </span>
+            <p className="home-kicker">Room to feel comfortable</p>
+            <h2 id="trust-title">
+              Your family’s next chapter.
+              <br />
+              Your information to control.
+            </h2>
+            <p>
+              Try the complete fictional demo without sharing a document. No
+              account, no saved cloud case history. For live documents, images
+              are sent to the reading provider only when you submit them.
+            </p>
+            <Link className="home-text-link" href="/privacy">
+              How we handle your information <ArrowUpRightIcon />
             </Link>
+          </article>
+          <article className="home-letter-card">
+            <div className="home-letter-illustration" aria-hidden="true">
+              <div className="home-mini-letter">
+                <DocumentLineIcon />
+                <span />
+                <span />
+                <span />
+              </div>
+              <span className="home-letter-badge">
+                <QuoteIcon />
+              </span>
+            </div>
+            <p className="home-kicker">Beyond the first day</p>
+            <h2>One confusing letter?</h2>
+            <p>
+              A bill, benefit notice, or official form. Get a plain-language
+              explanation and help deciding what to do next.
+            </p>
+            <Link className="home-text-link" href="/explain">
+              Explain a confusing letter <ArrowUpRightIcon />
+            </Link>
+          </article>
+        </section>
+        <section className="home-proof" aria-labelledby="proof-title">
+          <div className="home-container home-proof-grid">
+            <div>
+              <p className="home-kicker">Built to be checked</p>
+              <h2 id="proof-title">Small details. Real accountability.</h2>
+              <p>
+                Measured offline across {competitionProof.packetCount} synthetic
+                held-out packets.
+              </p>
+            </div>
+            <dl>
+              {competitionProof.metrics
+                .filter((metric) => metric.id !== "dates")
+                .map((metric) => (
+                  <div key={metric.id}>
+                    <dt>{metric.label}</dt>
+                    <dd>{metric.value}</dd>
+                  </div>
+                ))}
+            </dl>
+            <p className="home-proof-note">
+              {competitionProof.limitation} These are evaluation results on
+              fictional documents, not a guarantee for every real-world
+              document.
+            </p>
           </div>
+        </section>
+        <section
+          className="home-final home-container"
+          aria-labelledby="final-title"
+        >
+          <span className="home-final-mark">
+            <LanternMark />
+          </span>
+          <p className="home-kicker">One less thing to worry about</p>
+          <h2 id="final-title">
+            A new school.
+            <br />
+            <em>A clearer start.</em>
+          </h2>
+          <p>
+            Meet the Rivera family’s sample case and see how a few scattered
+            pages become a plan.
+          </p>
+          <Link className="home-button" href="/first-day?demo=1">
+            Start the guided demo <ArrowUpRightIcon />
+          </Link>
+          <span className="home-final-note">
+            Fictional documents. A real look at how Lantern works.
+          </span>
         </section>
       </main>
-
       <SiteFooter />
     </div>
   );
