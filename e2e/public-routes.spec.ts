@@ -1,7 +1,15 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
-for (const route of ["/", "/explain", "/first-day", "/first-day/how-it-works", "/privacy"]) {
+for (const route of [
+  "/",
+  "/explain",
+  "/first-day",
+  "/first-day/how-it-works",
+  "/about",
+  "/contact",
+  "/privacy",
+]) {
   test(`${route} renders with security headers and no serious axe violations`, async ({
     page,
   }) => {
@@ -33,13 +41,46 @@ test("mobile navigation is keyboard reachable and closes on Escape", async ({
 }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
+  await expect(page.getByRole("link", { name: "Demo", exact: true })).toBeVisible();
   const menu = page.getByRole("button", { name: "Open navigation" });
   await menu.focus();
   await page.keyboard.press("Enter");
   const navigation = page.getByRole("navigation", { name: "Mobile navigation" });
   await expect(navigation).toBeVisible();
   await expect(navigation.getByRole("link", { name: "Privacy" })).toBeVisible();
+  await expect(navigation.getByRole("link", { name: "About" })).toBeVisible();
+  await expect(navigation.getByRole("link", { name: "Contact" })).toBeVisible();
   await page.keyboard.press("Escape");
   await expect(navigation).toBeHidden();
   await expect(menu).toBeFocused();
+  const width = await page.evaluate(() => ({
+    client: document.documentElement.clientWidth,
+    scroll: document.documentElement.scrollWidth,
+  }));
+  expect(width.scroll).toBeLessThanOrEqual(width.client + 1);
+});
+
+test("unknown routes use the branded recovery page", async ({ page }) => {
+  const response = await page.goto("/about-us");
+  expect(response?.status()).toBe(404);
+  await expect(page.getByRole("heading", { name: "Page not found." })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Return home" })).toHaveAttribute("href", "/");
+  await expect(page.getByRole("link", { name: /Start guided demo/ })).toHaveAttribute(
+    "href",
+    "/first-day?demo=1",
+  );
+});
+
+test("First Day clearly separates the fictional demo from the local pilot", async ({
+  page,
+}) => {
+  await page.goto("/first-day");
+  await expect(
+    page.getByText("Mesa View is a fictional demonstration.", { exact: false }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("not affiliated with or endorsed by the district", {
+      exact: false,
+    }),
+  ).toBeVisible();
 });

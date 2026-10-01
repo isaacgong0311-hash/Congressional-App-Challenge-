@@ -114,8 +114,20 @@ export function DocumentsStep({
               )}
             </p>
             <div className="fd-before-signals">
-              <span>{proposedFacts} {translated(language, "facts to check", "datos por revisar")}</span>
-              <span>{openConflicts} {translated(language, "contradiction", "contradicción")}</span>
+              <span>
+                {translated(
+                  language,
+                  `${proposedFacts} ${proposedFacts === 1 ? "fact" : "facts"} to check`,
+                  `${proposedFacts} ${proposedFacts === 1 ? "dato" : "datos"} por revisar`,
+                )}
+              </span>
+              <span>
+                {translated(
+                  language,
+                  `${openConflicts} ${openConflicts === 1 ? "contradiction" : "contradictions"}`,
+                  `${openConflicts} ${openConflicts === 1 ? "contradicción" : "contradicciones"}`,
+                )}
+              </span>
               <span>{translated(language, "English pages → bilingual plan", "Páginas en inglés → plan bilingüe")}</span>
             </div>
           </div>
@@ -203,8 +215,8 @@ export function DocumentsStep({
               <p className="mt-2 max-w-2xl text-sm leading-6 text-[#59665f]">
                 {translated(
                   language,
-                  "For this pilot, use Round Rock ISD enrollment pages. Choose up to five JPG or PNG pages. Each page can be 10 MB, with a 25 MB case limit. Lantern reads one page at a time so one failure does not erase the others.",
-                  "Para este piloto, use páginas de inscripción de Round Rock ISD. Elija hasta cinco páginas JPG o PNG. Cada página puede tener 10 MB, con un límite total de 25 MB. Lantern lee una página a la vez para que un error no borre las demás.",
+                  "For this source-checked local pilot, use Round Rock ISD enrollment pages. Lantern is an independent student project and is not affiliated with or endorsed by the district. Choose up to five JPG or PNG pages. Each page can be 10 MB, with a 25 MB case limit.",
+                  "Para este piloto local con fuentes revisadas, use páginas de inscripción de Round Rock ISD. Lantern es un proyecto estudiantil independiente y no está afiliado ni respaldado por el distrito. Elija hasta cinco páginas JPG o PNG. Cada página puede tener 10 MB, con un límite total de 25 MB.",
                 )}
               </p>
             </div>
@@ -230,16 +242,25 @@ export function DocumentsStep({
           </div>
           <div className="mt-5 flex flex-wrap gap-3 text-xs font-semibold text-[#53615a]">
             <span className="rounded-full bg-white px-3 py-1.5">
-              {visibleDocuments.length} / {MAX_DOCUMENTS}{" "}
-              {translated(language, "pages", "páginas")}
+              {translated(
+                language,
+                `${visibleDocuments.length} / ${MAX_DOCUMENTS} pages`,
+                `${visibleDocuments.length} / ${MAX_DOCUMENTS} páginas`,
+              )}
             </span>
             <span className="rounded-full bg-white px-3 py-1.5">
-              {Math.round(MAX_DOCUMENT_BYTES / 1024 / 1024)} MB /{` `}
-              {translated(language, "page", "página")}
+              {translated(
+                language,
+                `${Math.round(MAX_DOCUMENT_BYTES / 1024 / 1024)} MB / page`,
+                `${Math.round(MAX_DOCUMENT_BYTES / 1024 / 1024)} MB / página`,
+              )}
             </span>
             <span className="rounded-full bg-white px-3 py-1.5">
-              {Math.round(MAX_CASE_BYTES / 1024 / 1024)} MB{` `}
-              {translated(language, "total", "en total")}
+              {translated(
+                language,
+                `${Math.round(MAX_CASE_BYTES / 1024 / 1024)} MB total`,
+                `${Math.round(MAX_CASE_BYTES / 1024 / 1024)} MB en total`,
+              )}
             </span>
           </div>
           {uploadNotice ? (

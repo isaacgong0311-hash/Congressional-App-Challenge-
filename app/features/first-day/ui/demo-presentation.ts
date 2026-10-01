@@ -119,6 +119,16 @@ export function demoBeatForStep(
   return "family_outcome";
 }
 
+function countLabel(
+  count: number,
+  language: Language,
+  english: [singular: string, plural: string],
+  spanish: [singular: string, plural: string],
+) {
+  const [singular, plural] = language === "Español" ? spanish : english;
+  return `${count} ${count === 1 ? singular : plural}`;
+}
+
 export function demoOutcome(
   beatId: DemoBeatId,
   snapshot: CaseSnapshotView,
@@ -127,29 +137,39 @@ export function demoOutcome(
   const es = language === "Español";
   switch (beatId) {
     case "before_lantern":
-      return es
-        ? `${snapshot.processedDocumentCount} páginas separadas · ${snapshot.pendingFactCount} datos por revisar · ${snapshot.openConflictCount} bloqueo`
-        : `${snapshot.processedDocumentCount} separate pages · ${snapshot.pendingFactCount} facts to check · ${snapshot.openConflictCount} blocker`;
+      return [
+        countLabel(snapshot.processedDocumentCount, language, ["separate page", "separate pages"], ["página separada", "páginas separadas"]),
+        countLabel(snapshot.pendingFactCount, language, ["fact to check", "facts to check"], ["dato por revisar", "datos por revisar"]),
+        countLabel(snapshot.openConflictCount, language, ["blocker", "blockers"], ["bloqueo", "bloqueos"]),
+      ].join(" · ");
     case "traceable_evidence":
       return snapshot.pendingFactCount > 0
-        ? es
-          ? `${snapshot.pendingFactCount} datos aún necesitan revisión familiar`
-          : `${snapshot.pendingFactCount} facts still need family review`
+        ? `${countLabel(snapshot.pendingFactCount, language, ["fact", "facts"], ["dato", "datos"])} ${
+            es
+              ? snapshot.pendingFactCount === 1
+                ? "aún necesita revisión familiar"
+                : "aún necesitan revisión familiar"
+              : snapshot.pendingFactCount === 1
+                ? "still needs family review"
+                : "still need family review"
+          }`
         : es
           ? "Todos los datos propuestos fueron revisados por la familia"
           : "Every proposed fact has been reviewed by the family";
     case "uncertainty_preserved":
-      return es
-        ? `${snapshot.openConflictCount} conflicto permanece visible hasta que una persona decida`
-        : `${snapshot.openConflictCount} conflict stays visible until a person decides`;
+      return `${countLabel(snapshot.openConflictCount, language, ["conflict", "conflicts"], ["conflicto", "conflictos"])} ${
+        es
+          ? snapshot.openConflictCount === 1
+            ? "permanece visible hasta que una persona decida"
+            : "permanecen visibles hasta que una persona decida"
+          : snapshot.openConflictCount === 1
+            ? "stays visible until a person decides"
+            : "stay visible until a person decides"
+      }`;
     case "focused_update":
-      return es
-        ? `${snapshot.readyTaskCount} pasos listos · ${snapshot.openConflictCount} bloqueos abiertos`
-        : `${snapshot.readyTaskCount} steps ready · ${snapshot.openConflictCount} open blockers`;
+      return `${countLabel(snapshot.readyTaskCount, language, ["step ready", "steps ready"], ["paso listo", "pasos listos"])} · ${countLabel(snapshot.openConflictCount, language, ["open blocker", "open blockers"], ["bloqueo abierto", "bloqueos abiertos"])}`;
     case "family_outcome":
-      return es
-        ? `${snapshot.readyTaskCount} pasos listos · ${snapshot.completedTaskCount} terminados`
-        : `${snapshot.readyTaskCount} steps ready · ${snapshot.completedTaskCount} completed`;
+      return `${countLabel(snapshot.readyTaskCount, language, ["step ready", "steps ready"], ["paso listo", "pasos listos"])} · ${countLabel(snapshot.completedTaskCount, language, ["completed", "completed"], ["terminado", "terminados"])}`;
     case "engineering_proof":
       return es
         ? "20 paquetes de prueba · límites de IA y código visibles"
@@ -165,8 +185,8 @@ export function demoBlocker(
   const es = language === "Español";
   if (beatId === "traceable_evidence" && snapshot.pendingFactCount > 0) {
     return es
-      ? `Revise ${snapshot.pendingFactCount} datos antes de continuar.`
-      : `Review ${snapshot.pendingFactCount} facts before continuing.`;
+      ? `Revise ${countLabel(snapshot.pendingFactCount, language, ["fact", "facts"], ["dato", "datos"])} antes de continuar.`
+      : `Review ${countLabel(snapshot.pendingFactCount, language, ["fact", "facts"], ["dato", "datos"])} before continuing.`;
   }
   if (beatId === "uncertainty_preserved" && snapshot.openConflictCount > 0) {
     return es

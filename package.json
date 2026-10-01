@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "node scripts/check-production-env.mjs && tsx scripts/check-reading-provider.ts",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",

@@ -51,5 +51,5 @@ export const competitionProof: CompetitionProof = {
   familyBoundary:
     "A person confirms facts and records what the school said before the plan changes.",
   limitation:
-    "Provider latency and cost were not measured in the offline run.",
+    "These are synthetic regression checks, not independently measured accuracy. No real-family document study has been completed. Provider latency and cost were not measured in the offline run.",
 };

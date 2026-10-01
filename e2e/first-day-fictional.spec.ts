@@ -1,3 +1,5 @@
+import { readFile } from "node:fs/promises";
+
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
@@ -9,6 +11,24 @@ async function expectNoSeriousAxeViolations(page: Page) {
     violation.impact === "serious" || violation.impact === "critical",
   );
   expect(violations).toEqual([]);
+}
+
+async function answerFamilyQuestions(page: Page) {
+  const immunization = page.getByRole("article").filter({
+    has: page.getByRole("heading", {
+      name: "Do you have Maya's immunization record?",
+    }),
+  });
+  await immunization.getByRole("button", { name: "Yes", exact: true }).click();
+  await expect(immunization.getByText("Yes", { exact: true })).toBeVisible();
+
+  const interpreter = page.getByRole("article").filter({
+    has: page.getByRole("heading", {
+      name: "Would an interpreter help your family?",
+    }),
+  });
+  await interpreter.getByRole("button", { name: "No", exact: true }).click();
+  await expect(interpreter.getByText("No", { exact: true })).toBeVisible();
 }
 
 test("fictional case completes all six screens with sources and Spanish output", async ({
@@ -58,9 +78,7 @@ test("fictional case completes all six screens with sources and Spanish output",
     page.getByRole("heading", { name: "Check the facts that shape the plan." }),
   ).toBeVisible();
   await expectNoSeriousAxeViolations(page);
-  while (await page.getByRole("button", { name: "Confirm this" }).count()) {
-    await page.getByRole("button", { name: "Confirm this" }).first().click();
-  }
+  await answerFamilyQuestions(page);
 
   await page.getByRole("button", { name: "Continue" }).click();
   await expect(
@@ -166,9 +184,24 @@ test("guided demo follows the six-beat judge story and can exit and resume", asy
   await expect(guide.getByText("Fictional demo · Beat 1 of 6")).toBeVisible();
   await guide.getByRole("button", { name: "Next beat" }).click();
 
-  while (await page.getByRole("button", { name: "Confirm this" }).count()) {
-    await page.getByRole("button", { name: "Confirm this" }).first().click();
-  }
+  const immunization = page.getByRole("article").filter({
+    has: page.getByRole("heading", {
+      name: "Do you have Maya's immunization record?",
+    }),
+  });
+  await immunization.getByRole("button", { name: "Yes", exact: true }).click();
+  await expect(guide.getByText("Review 1 fact before continuing.")).toBeVisible();
+  await expect(guide.getByRole("button", { name: "Next beat" })).toBeDisabled();
+
+  const interpreter = page.getByRole("article").filter({
+    has: page.getByRole("heading", {
+      name: "Would an interpreter help your family?",
+    }),
+  });
+  await interpreter.getByRole("button", { name: "No", exact: true }).click();
+  await expect(
+    guide.getByText("Every proposed fact has been reviewed by the family"),
+  ).toBeVisible();
   await expect(guide.getByRole("button", { name: "Next beat" })).toBeEnabled();
   await guide.getByRole("button", { name: "Next beat" }).click();
   await expect(guide.getByText("Fictional demo · Beat 3 of 6")).toBeVisible();
@@ -187,6 +220,7 @@ test("guided demo follows the six-beat judge story and can exit and resume", asy
   await expect(guide.getByText("Fictional demo · Beat 4 of 6")).toBeVisible();
   await expect(page.getByText("One answer · one focused update")).toBeVisible();
   await expect(page.getByText("Only the plan steps that depended on this answer were updated.")).toBeVisible();
+  await expect(page.getByText("School answer: Gym entrance")).toBeVisible();
   const focusedAnimation = await page
     .locator(".fd-task-highlight")
     .evaluate((element) => Number.parseFloat(getComputedStyle(element).animationDuration));
@@ -205,6 +239,9 @@ test("guided demo follows the six-beat judge story and can exit and resume", asy
   await expect(
     page.getByRole("heading", { name: "A plan the family can carry." }),
   ).toBeVisible();
+  await expect(page.getByText("0 unresolved items")).toBeVisible();
+  const confirmedFacts = page.getByRole("heading", { name: "Confirmed facts" }).locator("..");
+  await expect(confirmedFacts.getByText("Gym entrance", { exact: true })).toBeVisible();
 
   await guide.getByRole("button", { name: "Next beat" }).click();
   await expect(guide.getByText("Fictional demo · Beat 6 of 6")).toBeVisible();
@@ -218,6 +255,13 @@ test("guided demo follows the six-beat judge story and can exit and resume", asy
   await expect(proof.getByText("32/32")).toBeVisible();
   await expect(guide.getByRole("button", { name: "Demo complete" })).toBeDisabled();
   await expectNoSeriousAxeViolations(page);
+  await page.getByRole("button", { name: "ES", exact: true }).click();
+  await expect(proof.getByText("citas exactas cubiertas")).toBeVisible();
+  await expect(
+    proof.getByText("No se ha completado un estudio con documentos de familias reales.", {
+      exact: false,
+    }),
+  ).toBeVisible();
   expect(providerRequests).toEqual([]);
 });
 
@@ -237,13 +281,34 @@ test("guided demo keeps its mobile presentation controls in the first viewport",
   expect(width.scroll).toBeLessThanOrEqual(width.client + 1);
 });
 
+test("confirmed dates download as a real calendar file", async ({ page }) => {
+  await page.goto("/first-day");
+  await page.getByRole("button", { name: "Open the sample case" }).click();
+  await page.getByRole("button", { name: "Continue" }).click();
+  await answerFamilyQuestions(page);
+  await page.getByRole("button", { name: "Continue" }).click();
+  const compactProgress = page.locator(".fd-mobile-progress summary");
+  if (await compactProgress.isVisible()) await compactProgress.click();
+  await page.getByRole("button", { name: /Take it with me/ }).click();
+
+  const downloadPromise = page.waitForEvent("download");
+  await page.getByRole("button", { name: /Add dates to calendar/ }).click();
+  const download = await downloadPromise;
+  expect(download.suggestedFilename()).toBe("lantern-confirmed-dates.ics");
+  const path = await download.path();
+  expect(path).not.toBeNull();
+  const contents = await readFile(path!, "utf8");
+  expect(contents).toContain("BEGIN:VCALENDAR");
+  expect(contents).toContain("UID:lantern-fact-registration-date");
+  expect(contents).toContain("DTSTART;VALUE=DATE:20270812");
+  await expect(page.getByText("Calendar file downloaded.", { exact: false })).toBeVisible();
+});
+
 test("task completion can be undone without deleting history", async ({ page }) => {
   await page.goto("/first-day");
   await page.getByRole("button", { name: "Open the sample case" }).click();
   await page.getByRole("button", { name: "Continue" }).click();
-  while (await page.getByRole("button", { name: "Confirm this" }).count()) {
-    await page.getByRole("button", { name: "Confirm this" }).first().click();
-  }
+  await answerFamilyQuestions(page);
   await page.getByRole("button", { name: "Continue" }).click();
 
   const registrationTask = page.getByRole("article").filter({

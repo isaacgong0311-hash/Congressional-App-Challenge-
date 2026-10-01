@@ -50,6 +50,9 @@ function FactReviewCard({
     : undefined;
   const factLabel =
     language === "Español" ? FACT_ES[fact.id] ?? fact.label : fact.label;
+  const familyQuestion =
+    fact.id === "fact-immunization-record" ||
+    fact.id === "fact-interpreter-preference";
 
   function saveCorrection() {
     const value = correctedValue.trim();
@@ -65,20 +68,14 @@ function FactReviewCard({
           <div className="flex items-start justify-between gap-3">
             <div>
           <p className="text-xs font-bold uppercase tracking-[0.15em] text-[#5f6d66]">
-            {fact.kind.replace("_", " ")}
+            {familyQuestion
+              ? translated(language, "Family question", "Pregunta para la familia")
+              : fact.kind.replace("_", " ")}
           </p>
           <h2 className="mt-2 text-base font-semibold">{factLabel}</h2>
-          {fact.semanticKey || typeof fact.confidence === "number" ? (
+          {!familyQuestion && typeof fact.confidence === "number" ? (
             <p className="mt-2 text-xs text-[#68756e]">
-              {[fact.semanticKey, fact.confidence === undefined
-                ? null
-                : translated(
-                    language,
-                    `${fact.confidence}% extraction confidence`,
-                    `${fact.confidence}% de confianza de extracción`,
-                  )]
-                .filter(Boolean)
-                .join(" · ")}
+              {translated(language, `${fact.confidence}% extraction confidence`, `${fact.confidence}% de confianza de extracción`)}
             </p>
           ) : null}
             </div>
@@ -86,9 +83,13 @@ function FactReviewCard({
               {language === "Español" ? meta.es : meta.en}
             </span>
           </div>
-          <p className="mt-5 font-serif text-xl leading-7 text-[#203029]">
-            {view.value}
-          </p>
+          {familyQuestion && view.state === "proposed" ? (
+            <p className="mt-5 text-sm leading-6 text-[#53628b]">
+              {translated(language, "The document asks about this; it does not answer for your family.", "El documento pregunta sobre esto; no responde por su familia.")}
+            </p>
+          ) : (
+            <p className="mt-5 font-serif text-xl leading-7 text-[#203029]">{view.value}</p>
+          )}
 
           {isCorrecting ? (
         <div className="mt-5 rounded-2xl border border-[#d9dfda] bg-white p-4">
@@ -132,7 +133,19 @@ function FactReviewCard({
           ) : null}
 
           <div className="mt-5 flex flex-wrap items-center gap-3">
-            {view.state === "proposed" ? (
+            {view.state === "proposed" && familyQuestion ? (
+              <>
+                <button className="fd-confirm-button" onClick={() => onCorrectFact(fact.id, language === "Español" ? "Sí" : "Yes")} type="button">
+                  {translated(language, "Yes", "Sí")}
+                </button>
+                <button className="fd-secondary-button" onClick={() => onCorrectFact(fact.id, language === "Español" ? "No" : "No")} type="button">
+                  {translated(language, "No", "No")}
+                </button>
+                <button className="fd-remove-button" onClick={() => onMarkUnclear(fact.id)} type="button">
+                  {translated(language, "Not sure yet", "Aún no sé")}
+                </button>
+              </>
+            ) : view.state === "proposed" ? (
               <>
                 <button className="fd-confirm-button" onClick={() => onConfirmFact(fact.id)} type="button">
                   <CheckIcon className="h-4 w-4" />
@@ -175,17 +188,15 @@ function FactReviewCard({
 export function FactsStep(props: FactsStepProps) {
   const { caseData, language } = props;
   const facts = caseData.facts.filter((fact) => factHasActiveSource(caseData, fact));
-  const rank = { conflicted: 0, proposed: 1, unclear: 2, confirmed: 3, superseded: 4 } as const;
+  const rank = { proposed: 0, conflicted: 1, unclear: 2, confirmed: 3, superseded: 4 } as const;
   const ordered = [...facts].sort(
     (left, right) => rank[currentFactView(caseData, left).state] - rank[currentFactView(caseData, right).state],
   );
   const currentFacts = ordered.filter((fact) => currentFactView(caseData, fact).state !== "superseded");
   const historyFacts = ordered.filter((fact) => currentFactView(caseData, fact).state === "superseded");
   const nextUnresolved = ordered.find((fact) => currentFactView(caseData, fact).state === "proposed");
-  const reviewed = facts.filter((fact) => {
-    const state = currentFactView(caseData, fact).state;
-    return state === "confirmed" || state === "unclear" || state === "superseded";
-  }).length;
+  const pending = facts.filter((fact) => currentFactView(caseData, fact).state === "proposed").length;
+  const conflicts = facts.filter((fact) => currentFactView(caseData, fact).state === "conflicted").length;
 
   return (
     <section className="fd-enter">
@@ -214,7 +225,11 @@ export function FactsStep(props: FactsStepProps) {
       <div className="mt-7 flex flex-col gap-4 rounded-feature border border-cobalt/15 bg-[#eef2ff] p-5 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-lg font-black tracking-[-0.025em] text-ink">
-            {translated(language, `${reviewed} of ${facts.length} reviewed`, `${reviewed} de ${facts.length} revisados`)}
+            {translated(
+              language,
+              `${pending} ${pending === 1 ? "question needs" : "questions need"} your answer · ${conflicts} ${conflicts === 1 ? "source conflict" : "source conflicts"}`,
+              `${pending} ${pending === 1 ? "pregunta necesita" : "preguntas necesitan"} respuesta · ${conflicts} ${conflicts === 1 ? "conflicto entre fuentes" : "conflictos entre fuentes"}`,
+            )}
           </p>
           <p className="mt-1 text-sm leading-6 text-[#53628b]">
             {translated(language, "Extraction confidence describes the reading quality—not whether the fact is true.", "La confianza de extracción describe la calidad de lectura, no si el dato es verdadero.")}

@@ -340,8 +340,7 @@ export default function HomePage() {
               <p className="home-kicker">Built to be checked</p>
               <h2 id="proof-title">Small details. Real accountability.</h2>
               <p>
-                Measured offline across {competitionProof.packetCount} synthetic
-                held-out packets.
+                {`Measured offline across ${competitionProof.packetCount} synthetic held-out packets.`}
               </p>
             </div>
             <dl>

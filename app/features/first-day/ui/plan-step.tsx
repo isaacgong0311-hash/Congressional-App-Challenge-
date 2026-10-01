@@ -55,6 +55,17 @@ export function PlanStep({
   const highlightedTask = highlightedTaskId
     ? plan.tasks.find((task) => task.id === highlightedTaskId)
     : undefined;
+  const highlightedAnswer = highlightedTaskId
+    ? [...caseData.events]
+        .reverse()
+        .find(
+          (event) =>
+            event.type === "school_confirmation_recorded" &&
+            caseData.conflicts
+              .find((conflict) => conflict.id === event.conflictId)
+              ?.relatedTaskIds.includes(highlightedTaskId),
+        )
+    : undefined;
   const summary = {
     attention: plan.tasks.filter(
       (task) =>
@@ -109,6 +120,15 @@ export function PlanStep({
                 "La respuesta informada por la escuela cambió este paso dependiente. El trabajo no relacionado conservó su estado anterior.",
               )}
             </p>
+            {highlightedAnswer?.type === "school_confirmation_recorded" ? (
+              <p className="mt-3 inline-flex rounded-full bg-white px-3 py-1.5 text-sm font-bold text-cobalt ring-1 ring-cobalt/15">
+                {translated(
+                  language,
+                  `School answer: ${highlightedAnswer.reportedValue}`,
+                  `Respuesta de la escuela: ${highlightedAnswer.reportedValue}`,
+                )}
+              </p>
+            ) : null}
           </div>
           <div className="fd-focused-transition" aria-label={translated(language, "Task status changed", "El estado del paso cambió")}>
             <span>{translated(language, "Needs clarification", "Necesita aclaración")}</span>

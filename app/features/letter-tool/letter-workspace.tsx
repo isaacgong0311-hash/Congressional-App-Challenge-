@@ -71,6 +71,7 @@ export default function LetterWorkspace() {
   const [preview, setPreview] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
+  const [sampleLoading, setSampleLoading] = useState(false);
   const [loadingMsg, setLoadingMsg] = useState(0);
   const [result, setResult] = useState<Result | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -230,8 +231,11 @@ export default function LetterWorkspace() {
   }
 
   async function loadSample() {
+    if (sampleLoading) return;
+    setSampleLoading(true);
     try {
       const res = await fetch("/sample-letter.png");
+      if (!res.ok) throw new Error("Sample unavailable");
       const blob = await res.blob();
       const f = new File([blob], "sample-letter.png", { type: "image/png" });
       if (previewUrl.current) URL.revokeObjectURL(previewUrl.current);
@@ -243,6 +247,8 @@ export default function LetterWorkspace() {
       setPreview(url);
     } catch {
       setError("Could not load the sample. Please upload your own photo.");
+    } finally {
+      setSampleLoading(false);
     }
   }
 
@@ -417,7 +423,7 @@ export default function LetterWorkspace() {
               onToggleLargeText={toggleLT}
             />
             <span className="hidden items-center gap-1 rounded-full bg-[#e4f4e8] px-2.5 py-1 text-xs font-bold text-confirmed ring-1 ring-[#bbdec5] sm:inline-flex">
-              <LockIcon /> Private
+              <LockIcon /> No saved history
             </span>
           </>
         }
@@ -453,6 +459,7 @@ export default function LetterWorkspace() {
             language={language}
             languages={LANGUAGES}
             loading={loading}
+            sampleLoading={sampleLoading}
             loadingLabel={LOADING_STEPS[loadingMsg].label}
             onChooseLanguage={chooseLanguage}
             onExplain={() => void explain()}
@@ -483,7 +490,7 @@ export default function LetterWorkspace() {
                 <p className="mt-1 text-sm text-muted">{LOADING_STEPS[loadingMsg].label}</p>
               </div>
               <span className="rounded-full border border-cobalt/20 bg-white px-3 py-1 text-xs font-extrabold text-cobalt">
-                {loadingMsg + 1} of {LOADING_STEPS.length}
+                {`${loadingMsg + 1} of ${LOADING_STEPS.length}`}
               </span>
             </div>
             <progress className="mt-4 h-2 w-full accent-cobalt" max={LOADING_STEPS.length} value={loadingMsg + 1} />

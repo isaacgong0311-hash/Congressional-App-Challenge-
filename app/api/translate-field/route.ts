@@ -1,5 +1,8 @@
 import { groq } from "@ai-sdk/groq";
 import { generateText } from "ai";
+import { readingUnavailable } from "../../lib/reading-service";
+import { READING_MODEL } from "../../lib/reading-model";
+import { providerErrorSummary } from "../../lib/provider-error";
 
 export const runtime = "nodejs";
 export const maxDuration = 20;
@@ -9,10 +12,8 @@ export const maxDuration = 20;
 // Bracketed placeholders like [Your name] are preserved verbatim.
 
 export async function POST(req: Request) {
-  if (!process.env.GROQ_API_KEY) {
-    return Response.json({ error: "Missing GROQ_API_KEY." }, { status: 500 });
-  }
-
+  const requestId = crypto.randomUUID();
+  const startedAt = Date.now();
   let body: { text?: string; language?: string };
   try {
     body = (await req.json()) as typeof body;
@@ -27,9 +28,15 @@ export async function POST(req: Request) {
   if (language === "English")
     return Response.json({ translation: text }); // no-op
 
+  if (!process.env.GROQ_API_KEY?.trim()) {
+    return Response.json({ error: readingUnavailable(language) }, { status: 503 });
+  }
+
   try {
     const { text: translation } = await generateText({
-      model: groq("meta-llama/llama-4-scout-17b-16e-instruct"),
+      abortSignal: AbortSignal.timeout(15_000),
+      model: groq(READING_MODEL),
+      providerOptions: { groq: { reasoningEffort: "none" } },
       messages: [
         {
           role: "system",
@@ -44,8 +51,8 @@ export async function POST(req: Request) {
       ],
     });
     return Response.json({ translation: translation.trim() });
-  } catch (err) {
-    console.error("translate-field error:", err);
+  } catch {
+    console.error("translate-field error", providerErrorSummary({ requestId, route: "/api/translate-field", kind: "provider", durationMs: Date.now() - startedAt }));
     return Response.json({ error: "Translation failed." }, { status: 502 });
   }
 }

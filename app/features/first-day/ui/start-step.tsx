@@ -87,6 +87,13 @@ export function StartStep({
                 )}
               </button>
             </div>
+            <p className="mt-4 max-w-xl text-xs leading-5 text-[#65716b]">
+              {translated(
+                language,
+                "Mesa View is a fictional demonstration. Round Rock ISD is the source-checked local pilot; Lantern is an independent student project and is not affiliated with or endorsed by the district.",
+                "Mesa View es una demostración ficticia. Round Rock ISD es el piloto local con fuentes revisadas; Lantern es un proyecto estudiantil independiente y no está afiliado ni respaldado por el distrito.",
+              )}
+            </p>
             {!allowLive || providerCapability !== "available" ? (
               <p aria-live="polite" className="mt-4 text-sm text-[#65716b]">
                 {!allowLive

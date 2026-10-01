@@ -49,10 +49,10 @@ export function CaseSnapshot({
           language,
           caseData.mode === "fictional"
             ? "No account or cloud case history. Mesa View is not a real district."
-            : "Pages are processed externally one at a time. No cloud case history is created.",
+            : "Round Rock ISD is the source-checked local pilot. Lantern is independent and is not affiliated with or endorsed by the district.",
           caseData.mode === "fictional"
             ? "Sin cuenta ni historial en la nube. Mesa View no es un distrito real."
-            : "Las páginas se procesan externamente una por una. No se crea un historial en la nube.",
+            : "Round Rock ISD es el piloto local con fuentes revisadas. Lantern es independiente y no está afiliado ni respaldado por el distrito.",
         )}
       </p>
     </section>

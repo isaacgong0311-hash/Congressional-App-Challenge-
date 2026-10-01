@@ -20,10 +20,12 @@ export function SiteFooter() {
             Lantern helps families understand documents and prepare questions. It is not legal, school, or official advice. Always confirm critical instructions with the office named in the source.
           </p>
         </div>
-        <nav aria-label="Footer navigation" className="grid grid-cols-2 gap-x-8 gap-y-3 text-sm font-semibold text-white/75 sm:grid-cols-4 md:grid-cols-2">
+        <nav aria-label="Footer navigation" className="grid grid-cols-2 gap-x-8 gap-y-3 text-sm font-semibold text-white/75 sm:grid-cols-3 md:grid-cols-2">
           <Link className="hover:text-white" href="/first-day">First Day</Link>
           <Link className="hover:text-white" href="/explain">Explain a letter</Link>
           <Link className="hover:text-white" href="/first-day/how-it-works">How it works</Link>
+          <Link className="hover:text-white" href="/about">About the project</Link>
+          <Link className="hover:text-white" href="/contact">Contact / pilot interest</Link>
           <Link className="hover:text-white" href="/privacy">Privacy</Link>
           <a className="hover:text-white" href="https://github.com/isaacgong0311-hash/Congressional-App-Challenge-" rel="noreferrer" target="_blank">Source code</a>
         </nav>

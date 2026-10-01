@@ -83,6 +83,7 @@ export function BlockerStep({
       {
         factId: fact.id,
         title: document?.label ?? fact.label,
+        pageIndex: document?.pageIndex,
         value: fact.originalValue,
         evidenceId,
         quote: evidence?.quote,
@@ -131,13 +132,13 @@ export function BlockerStep({
       </div>
 
       <div className="mt-8 grid gap-4 lg:grid-cols-2">
-        {options.map((option, optionIndex) => {
+        {options.map((option) => {
           const selected = resolution?.selectedFactId === option.factId;
           return (
             <article className="fd-conflict-card" key={option.factId}>
               <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.15em] text-[#8a6721]">
                 <WarningIcon className="h-4 w-4" />
-                {translated(language, `Page ${optionIndex + 1}`, `Página ${optionIndex + 1}`)} · {option.title}
+                {option.pageIndex ? translated(language, `Page ${option.pageIndex}`, `Página ${option.pageIndex}`) : translated(language, "Source", "Fuente")} · {option.title}
               </div>
               <p className="mt-5 font-serif text-3xl tracking-[-0.03em]">
                 {option.value}

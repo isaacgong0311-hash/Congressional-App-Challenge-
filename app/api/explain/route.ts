@@ -4,6 +4,8 @@ import { z } from "zod";
 
 import { extractOuterJson } from "../../lib/extract-json";
 import { providerErrorSummary } from "../../lib/provider-error";
+import { readingUnavailable } from "../../lib/reading-service";
+import { READING_MODEL } from "../../lib/reading-model";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -213,21 +215,22 @@ export async function POST(req: Request) {
     return Response.json({ error: "Image is too large (max 10 MB)." }, { status: 400 });
   }
 
-  if (!process.env.GROQ_API_KEY) {
+  if (!process.env.GROQ_API_KEY?.trim()) {
     return Response.json(
-      { error: "Missing GROQ_API_KEY. Add it to .env.local — see the README." },
-      { status: 500 },
+      { error: readingUnavailable(language) },
+      { status: 503 },
     );
   }
 
   const bytes = new Uint8Array(await file.arrayBuffer());
 
   try {
-    // Llama 4 Scout on Groq mishandles json_schema/structured-output mode (it
-    // echoes the schema instead of data). So we use plain text generation with
-    // an explicit JSON-shape instruction, then parse and validate with Zod here.
+    // Parse and validate the proposed JSON locally before returning it to the UI.
     const { text } = await generateText({
-      model: groq("meta-llama/llama-4-scout-17b-16e-instruct"),
+      abortSignal: AbortSignal.timeout(45_000),
+      model: groq(READING_MODEL),
+      providerOptions: { groq: { reasoningEffort: "none" } },
+      maxOutputTokens: 6000,
       messages: [
         {
           role: "system",
@@ -243,6 +246,8 @@ export async function POST(req: Request) {
             "- Never state that the reader definitely qualifies or is definitely denied benefits — explain what the letter says and tell them to confirm with the listed office.",
             "- Copy deadlines, dates, amounts, and account numbers exactly as written; do not calculate or assume them.",
             "- Only set deadlineISO when a complete, unambiguous calendar date is visible. If only a relative term like 'within 10 days' appears, leave deadlineISO null.",
+            "- If a table lists several events or schools with different dates and the reader has not identified their event, do not select one date as their deadline. Set deadlineISO to null and explain that they must identify the relevant row.",
+            `- Today is ${new Date().toISOString().slice(0, 10)}. If a visible event date has already passed, say so; do not describe it as upcoming or tell the reader to attend a past event. Never change the printed date.`,
             "- For scam detection, only flag real warning signs you can see; do not accuse legitimate official letters of being scams. When unsure, set isPossibleScam to false but you may still mention caution in a next step.",
             "- The phone script must be polite, simple, and something a nervous, non-native speaker could read aloud.",
             "- The responseLetter.body must be written in ENGLISH (the receiving office reads English), even though everything else is in the chosen language. Only fill in facts visible in the document; use [bracketed blanks] for anything the reader must supply. Set applicable to false (and use empty strings) when no written reply makes sense.",
@@ -261,7 +266,7 @@ export async function POST(req: Request) {
           content: [
             {
               type: "text",
-              text: "Here is a photo of a letter or form I received. Explain it and tell me what to do. Reply with only the JSON object described above.",
+              text: `Explain this document in ${language}. The language of all generated explanations, document labels, steps, and reasons MUST be ${language}; English JSON property names are not instructions to write English values. Preserve originalText and copied source facts in the original language. Return only the JSON object described above.`,
             },
             { type: "image", image: bytes, mediaType: file.type },
           ],
@@ -299,7 +304,7 @@ export async function POST(req: Request) {
       }),
     );
     return Response.json(
-      { error: "Could not read this document. Try a clearer, well-lit photo." },
+      { error: readingUnavailable(language) },
       { status: 502 },
     );
   }

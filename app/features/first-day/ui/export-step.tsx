@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import type { FirstDayCase, PlannerResult } from "../domain/types";
 import { competitionProof } from "../content/competition-proof";
 import {
@@ -9,6 +11,7 @@ import {
   effectiveConfirmedFacts,
 } from "../export/plan-document";
 import {
+  FACT_ES,
   localizedTaskCopy,
   STATE_META,
   translated,
@@ -40,6 +43,16 @@ const TASK_ORDER = {
   done: 4,
 } as const;
 
+const PROOF_METRIC_ES = {
+  quotes: "citas exactas cubiertas",
+  conflicts: "conflictos previstos encontrados",
+  dates: "errores de fecha",
+  tasks: "pasos listos con fuente",
+} as const;
+
+const PROOF_LIMITATION_ES =
+  "Estas son comprobaciones de regresión sintéticas, no una medición independiente de precisión. No se ha completado un estudio con documentos de familias reales. La latencia y el costo del proveedor no se midieron en la prueba sin conexión.";
+
 function downloadFile(contents: string, type: string, fileName: string) {
   const url = URL.createObjectURL(new Blob([contents], { type }));
   const link = document.createElement("a");
@@ -57,6 +70,9 @@ export function ExportStep({
   showCompetitionProof,
   showGuidedProof,
 }: ExportStepProps) {
+  const [calendarStatus, setCalendarStatus] = useState<
+    "idle" | "success" | "error"
+  >("idle");
   const confirmedFacts = effectiveConfirmedFacts(caseData);
   const dates = calendarEvents(caseData);
   const unresolved = caseData.conflicts.filter(
@@ -94,11 +110,16 @@ export function ExportStep({
 
   function downloadCalendar() {
     if (dates.length === 0) return;
-    downloadFile(
-      createCalendarFile(dates),
-      "text/calendar;charset=utf-8",
-      "lantern-confirmed-dates.ics",
-    );
+    try {
+      downloadFile(
+        createCalendarFile(dates),
+        "text/calendar;charset=utf-8",
+        "lantern-confirmed-dates.ics",
+      );
+      setCalendarStatus("success");
+    } catch {
+      setCalendarStatus("error");
+    }
   }
 
   return (
@@ -141,8 +162,24 @@ export function ExportStep({
           <span><strong>{translated(language, "Download technical JSON", "Descargar JSON técnico")}</strong><small>{translated(language, "Portable event history", "Historial portátil de eventos")}</small></span>
         </button>
       </div>
-      <p className="mt-3 text-sm text-muted print:hidden" id="fd-calendar-note">
-        {dates.length > 0
+      <p
+        aria-live="polite"
+        className="mt-3 text-sm text-muted print:hidden"
+        id="fd-calendar-note"
+      >
+        {calendarStatus === "success"
+          ? translated(
+              language,
+              "Calendar file downloaded. Open it to add the confirmed dates.",
+              "Archivo de calendario descargado. Ábralo para añadir las fechas confirmadas.",
+            )
+          : calendarStatus === "error"
+            ? translated(
+                language,
+                "The calendar file could not be downloaded. Please try again.",
+                "No se pudo descargar el archivo de calendario. Inténtelo de nuevo.",
+              )
+          : dates.length > 0
           ? translated(language, `${dates.length} confirmed date${dates.length === 1 ? "" : "s"} will be included.`, `Se incluirá${dates.length === 1 ? "" : "n"} ${dates.length} fecha${dates.length === 1 ? "" : "s"} confirmada${dates.length === 1 ? "" : "s"}.`)
           : translated(language, "Calendar export is available after you confirm a complete, unambiguous date.", "La exportación al calendario estará disponible después de confirmar una fecha completa y sin ambigüedad.")}
       </p>
@@ -192,13 +229,13 @@ export function ExportStep({
 
             <div className="fd-proof-boundaries">
               {[
-                ["AI proposes", "La IA propone", competitionProof.aiBoundary],
-                ["Code validates", "El código valida", competitionProof.codeBoundary],
-                ["Family decides", "La familia decide", competitionProof.familyBoundary],
-              ].map(([en, es, copy]) => (
+                ["AI proposes", "La IA propone", competitionProof.aiBoundary, "La IA puede leer una página y proponer datos estructurados con citas de apoyo."],
+                ["Code validates", "El código valida", competitionProof.codeBoundary, "El código tipado valida las citas exactas, conserva los conflictos y deriva los estados a partir de dependencias explícitas."],
+                ["Family decides", "La familia decide", competitionProof.familyBoundary, "Una persona confirma los datos y registra lo que dijo la escuela antes de que cambie el plan."],
+              ].map(([en, es, copyEn, copyEs]) => (
                 <article key={String(en)}>
                   <p>{translated(language, String(en), String(es))}</p>
-                  <span>{copy}</span>
+                  <span>{translated(language, String(copyEn), String(copyEs))}</span>
                 </article>
               ))}
             </div>
@@ -206,13 +243,19 @@ export function ExportStep({
             <dl className="fd-proof-metrics">
               {competitionProof.metrics.map((metric) => (
                 <div key={metric.id}>
-                  <dt>{metric.label}</dt>
+                  <dt>
+                    {language === "Español" ? PROOF_METRIC_ES[metric.id] : metric.label}
+                  </dt>
                   <dd>{metric.value}</dd>
                 </div>
               ))}
             </dl>
             <p className="fd-proof-limit">
-              {competitionProof.packetCount} {translated(language, "synthetic held-out packets", "paquetes sintéticos reservados")}. {competitionProof.limitation}
+              {translated(
+                language,
+                `${competitionProof.packetCount} synthetic held-out packets. ${competitionProof.limitation}`,
+                `${competitionProof.packetCount} paquetes sintéticos reservados. ${PROOF_LIMITATION_ES}`,
+              )}
             </p>
           </div>
         </details>
@@ -223,7 +266,13 @@ export function ExportStep({
           <div>
             <div className="flex items-center gap-2 text-[#2f50c9]">
               <LanternIcon />
-              <span className="text-sm font-bold">Lantern · First Day</span>
+              <span className="text-sm font-bold">
+                {translated(
+                  language,
+                  "Lantern · First Day",
+                  "Lantern · Primer Día",
+                )}
+              </span>
             </div>
             <h2 className="mt-5 font-serif text-4xl tracking-[-0.04em]">
               {planTitle}
@@ -339,7 +388,9 @@ export function ExportStep({
               {confirmedFacts.map(({ fact, value }) => (
                 <div className="rounded-2xl bg-[#f4f6f2] p-4" key={fact.id}>
                   <dt className="text-xs font-bold uppercase tracking-[0.12em] text-[#536159]">
-                    {fact.label}
+                    {language === "Español"
+                      ? FACT_ES[fact.id] ?? fact.label
+                      : fact.label}
                   </dt>
                   <dd className="mt-2 font-semibold text-[#23342d]">{value}</dd>
                 </div>

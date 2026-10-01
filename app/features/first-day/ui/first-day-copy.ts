@@ -157,11 +157,11 @@ export function localizedTaskCopy(task: DerivedTask, language: Language) {
 export const FACT_ES: Record<string, string> = {
   "fact-registration-date": "Reunión de inscripción",
   "fact-registration-location": "Lugar de inscripción",
-  "fact-immunization-record": "Registro de vacunas disponible",
+  "fact-immunization-record": "¿Tiene el registro de vacunas de Maya?",
   "fact-nurse-review": "Revisión con la enfermera",
   "fact-orientation-cafeteria": "Lugar de orientación",
   "fact-orientation-gym": "Lugar de orientación",
-  "fact-interpreter-preference": "Intérprete solicitado",
+  "fact-interpreter-preference": "¿Necesita un intérprete?",
 };
 
 export const DOCUMENT_ES: Record<string, string> = {

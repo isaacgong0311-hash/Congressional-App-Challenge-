@@ -17,7 +17,7 @@ const commitments = [
   {
     title: "Live uploads use an external provider",
     detail:
-      "When live reading is available, each image is sent over an encrypted connection to the configured AI provider for processing. Close or refresh the page to clear the in-memory case.",
+      "Live reading sends each image to Groq over an encrypted connection. Follow-up questions and translations also send text to Groq. Closing the page clears Lantern’s in-memory case, not any provider logs.",
   },
   {
     title: "The fictional demo needs no provider",
@@ -53,6 +53,12 @@ export default function PrivacyPage() {
           ))}
         </div>
 
+        <section className="mt-8 rounded-feature border border-amber/35 bg-[#fff8df] p-7">
+          <h2 className="text-xl font-bold">What the reading provider retains</h2>
+          <p className="mt-3 text-sm leading-7 text-[#584719]">
+            Groq says inference inputs and outputs are not retained by default, but reliability and abuse-monitoring logs may contain them for up to 30 days, or longer where legally required. Usage metadata is retained. Zero Data Retention is an account setting; we have not verified it for this deployment. No saved history in Lantern does not mean no third-party retention. See <a className="underline" href="https://console.groq.com/docs/your-data" target="_blank" rel="noreferrer">Groq’s data policy</a>.
+          </p>
+        </section>
         <section className="mt-8 rounded-feature border border-amber/35 bg-[#fff8df] p-7">
           <h2 className="text-xl font-bold">Before using a real document</h2>
           <p className="mt-3 text-sm leading-7 text-[#584719]">

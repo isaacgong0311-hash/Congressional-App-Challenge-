@@ -1,5 +1,8 @@
 import { groq } from "@ai-sdk/groq";
 import { generateText } from "ai";
+import { readingUnavailable } from "../../lib/reading-service";
+import { READING_MODEL } from "../../lib/reading-model";
+import { providerErrorSummary } from "../../lib/provider-error";
 
 export const runtime = "nodejs";
 export const maxDuration = 30;
@@ -50,6 +53,8 @@ function buildContext(ctx: NonNullable<Body["context"]>): string {
 }
 
 export async function POST(req: Request) {
+  const requestId = crypto.randomUUID();
+  const startedAt = Date.now();
   let body: Body;
   try {
     body = (await req.json()) as Body;
@@ -65,8 +70,8 @@ export async function POST(req: Request) {
   if (!body.context) {
     return Response.json({ error: "Missing letter context." }, { status: 400 });
   }
-  if (!process.env.GROQ_API_KEY) {
-    return Response.json({ error: "Missing GROQ_API_KEY." }, { status: 500 });
+  if (!process.env.GROQ_API_KEY?.trim()) {
+    return Response.json({ error: readingUnavailable(language) }, { status: 503 });
   }
 
   const contextBlock = buildContext(body.context);
@@ -101,15 +106,17 @@ export async function POST(req: Request) {
 
   try {
     const { text } = await generateText({
-      model: groq("meta-llama/llama-4-scout-17b-16e-instruct"),
+      abortSignal: AbortSignal.timeout(25_000),
+      model: groq(READING_MODEL),
+      providerOptions: { groq: { reasoningEffort: "none" } },
       messages: [
         { role: "system", content: system },
         ...messages.map((m) => ({ role: m.role, content: m.content })),
       ],
     });
     return Response.json({ reply: text.trim() });
-  } catch (err) {
-    console.error("ask route error:", err);
+  } catch {
+    console.error("ask route error", providerErrorSummary({ requestId, route: "/api/ask", kind: "provider", durationMs: Date.now() - startedAt }));
     return Response.json(
       { error: "Sorry, I couldn't answer just now. Please try again." },
       { status: 502 },

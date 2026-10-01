@@ -1,0 +1,91 @@
+.info-page {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: 70vh;
+  background:
+    radial-gradient(circle at 8% 0%, rgba(231, 178, 62, 0.2), transparent 28rem),
+    radial-gradient(circle at 92% 8%, rgba(53, 86, 212, 0.14), transparent 30rem),
+    var(--lantern-canvas);
+}
+
+.info-page::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background-image: linear-gradient(rgba(20, 36, 30, 0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(20, 36, 30, 0.035) 1px, transparent 1px);
+  background-size: 48px 48px;
+  content: "";
+  mask-image: linear-gradient(to bottom, black, transparent 72%);
+}
+
+.info-shell {
+  width: min(100% - 2.5rem, 72rem);
+  margin-inline: auto;
+}
+
+.info-hero {
+  padding-block: clamp(4rem, 9vw, 8rem) clamp(3rem, 6vw, 5rem);
+}
+
+.info-display {
+  max-width: 60rem;
+  margin-top: 1rem;
+  color: var(--lantern-ink);
+  font-family: var(--font-playfair), Georgia, serif;
+  font-size: clamp(3rem, 8vw, 6.5rem);
+  line-height: 0.94;
+  letter-spacing: -0.055em;
+  text-wrap: balance;
+}
+
+.info-lead {
+  max-width: 46rem;
+  margin-top: 1.75rem;
+  color: var(--lantern-muted);
+  font-size: clamp(1.05rem, 2vw, 1.3rem);
+  line-height: 1.7;
+}
+
+.info-grid {
+  display: grid;
+  gap: 1rem;
+  padding-bottom: clamp(4rem, 8vw, 7rem);
+}
+
+.info-card {
+  border: 1px solid rgba(20, 36, 30, 0.11);
+  border-radius: 1.75rem;
+  background: rgba(255, 254, 250, 0.82);
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+  box-shadow: 0 24px 70px rgba(20, 36, 30, 0.07);
+  backdrop-filter: blur(16px);
+}
+
+.info-card h2,
+.info-card h3 {
+  color: var(--lantern-ink);
+  font-family: var(--font-playfair), Georgia, serif;
+  letter-spacing: -0.035em;
+}
+
+.info-card p {
+  color: var(--lantern-muted);
+  line-height: 1.75;
+}
+
+.info-card a:focus-visible,
+.info-page a:focus-visible {
+  outline: 3px solid var(--lantern-amber);
+  outline-offset: 3px;
+}
+
+@media (min-width: 768px) {
+  .info-grid.two-column {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .info-grid.three-column {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

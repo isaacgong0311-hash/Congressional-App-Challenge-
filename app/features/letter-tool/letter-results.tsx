@@ -128,7 +128,7 @@ export function LetterResults({
           >
             {/* Human-in-loop banner + FK grade */}
             <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-ink/10 bg-surface px-4 py-2.5 text-xs text-muted">
-              <span><span className="font-semibold">Lantern explains — it doesn&apos;t decide.</span> Always confirm with the office named on your letter before taking action.</span>
+              <span><span className="font-semibold">Lantern explains — it doesn&apos;t decide.</span>{" "}Always confirm with the office named on your letter before taking action.</span>
               {result.originalText && (() => {
                 const before = fleschKincaidGrade(result.originalText);
                 const after = fleschKincaidGrade(result.meaning);
@@ -360,7 +360,7 @@ export function LetterResults({
                       <div>
                         <div className="flex flex-wrap items-baseline justify-between gap-2">
                           <h2 className="font-bold text-ink">Documents to gather</h2>
-                          <span className="text-sm font-medium text-muted">{checked.size} of {result.documentChecklist.length} ready</span>
+                          <span className="text-sm font-medium text-muted">{`${checked.size} of ${result.documentChecklist.length} ready`}</span>
                         </div>
                         <ul className="mt-2 space-y-2">
                           {result.documentChecklist.map((c, i) => {
@@ -465,8 +465,7 @@ export function LetterResults({
 
             <div className="flex items-start gap-2 rounded-xl border border-amber/35 bg-[#fff8df] p-3 text-xs text-[#795a18]">
               <ShieldAlertIcon className="mt-0.5 h-4 w-4 shrink-0" />
-              <p><span className="font-semibold">AI can make mistakes.</span>{" "}
-              Always verify critical dates, amounts, and requirements directly on
+              <p><span className="font-semibold">AI can make mistakes.</span>{" "}Always verify critical dates, amounts, and requirements directly on
               your original letter before acting. For legal or immigration
               matters, consult a qualified professional.</p>
             </div>

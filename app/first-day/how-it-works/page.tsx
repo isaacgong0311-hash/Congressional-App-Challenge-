@@ -185,14 +185,12 @@ export default function HowFirstDayWorksPage() {
               Measured offline
             </p>
             <h2 className="mt-3 font-serif text-3xl tracking-[-0.03em]">
-              {competitionProof.packetCount} synthetic held-out packets
+              {`${competitionProof.packetCount} synthetic held-out packets`}
             </h2>
             <p className="mt-4 max-w-2xl leading-7 text-[#45567f]">
-              The versioned evaluation reports{" "}
-              {competitionProof.metrics
+              {`The versioned evaluation reports ${competitionProof.metrics
                 .map((metric) => `${metric.value} ${metric.label}`)
-                .join(", ")}.
-              {` `}{competitionProof.limitation}
+                .join(", ")}. ${competitionProof.limitation}`}
             </p>
           </div>
           <Link

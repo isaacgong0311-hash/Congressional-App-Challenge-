@@ -20,6 +20,7 @@ export function LetterIntake({
   language,
   languages,
   loading,
+  sampleLoading,
   loadingLabel,
   photoQuality,
   preview,
@@ -39,6 +40,7 @@ export function LetterIntake({
   language: string;
   languages: readonly LanguageOption[];
   loading: boolean;
+  sampleLoading: boolean;
   loadingLabel: string;
   photoQuality: "ok" | "dark" | null;
   preview: string | null;
@@ -68,6 +70,7 @@ export function LetterIntake({
       />
 
       <div className="p-5">
+        <p className="mb-4 text-sm leading-6 text-muted">When you choose Explain, your image is sent to Groq for AI processing. <a className="underline" href="/privacy">Read about provider retention</a>. Cover sensitive details that are not needed.</p>
         {formTab === 0 ? (
           <div className="space-y-4">
             {!preview ? (
@@ -85,13 +88,15 @@ export function LetterIntake({
                     capture="environment"
                     className="sr-only"
                     onChange={onPick}
+                    disabled={sampleLoading}
                     type="file"
                   />
                 </label>
                 <div className="text-center">
-                  <button className="rounded-lg text-sm font-bold text-cobalt underline decoration-cobalt/30 underline-offset-4 hover:text-cobalt-dark focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-amber" onClick={onSample} type="button">
-                    Don&apos;t have a letter? Try a sample
+                  <button aria-busy={sampleLoading} disabled={sampleLoading} className="rounded-lg text-sm font-bold text-cobalt underline decoration-cobalt/30 underline-offset-4 hover:text-cobalt-dark focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-amber" onClick={onSample} type="button">
+                    {sampleLoading ? "Loading sample…" : "Don't have a letter? Try a sample"}
                   </button>
+                  {sampleLoading ? <p role="status" className="mt-2 text-sm text-muted">Preparing your sample photo…</p> : null}
                   <span aria-hidden="true" className="mx-2 text-ink/25">·</span>
                   <button className="rounded-lg text-sm font-bold text-muted underline decoration-ink/20 underline-offset-4 hover:text-ink focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-amber" onClick={onFindHelp} type="button">
                     Find help without a letter

@@ -126,7 +126,10 @@ export function FirstDayWorkspace({
                   <LanternIcon className="h-5 w-5" />
                 </span>
                 <span className="truncate">
-                  Lantern <span className="font-medium text-muted">/ First Day</span>
+                  {translated(language, "Lantern", "Lantern")}{" "}
+                  <span className="font-medium text-muted">
+                    {translated(language, "/ First Day", "/ Primer Día")}
+                  </span>
                 </span>
               </div>
             </div>

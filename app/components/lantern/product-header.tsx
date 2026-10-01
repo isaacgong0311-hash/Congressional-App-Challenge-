@@ -5,7 +5,14 @@ import { LanternMark } from "./brand";
 import { MobileNavigation } from "./mobile-navigation";
 
 type ProductHeaderProps = {
-  active?: "home" | "explain" | "first-day" | "how" | "privacy";
+  active?:
+    | "home"
+    | "explain"
+    | "first-day"
+    | "how"
+    | "about"
+    | "contact"
+    | "privacy";
   controls?: ReactNode;
 };
 
@@ -13,6 +20,8 @@ const links = [
   { href: "/first-day", label: "First Day", id: "first-day" },
   { href: "/explain", label: "Explain a letter", id: "explain" },
   { href: "/first-day/how-it-works", label: "How it works", id: "how" },
+  { href: "/about", label: "About", id: "about" },
+  { href: "/contact", label: "Contact", id: "contact" },
   { href: "/privacy", label: "Privacy", id: "privacy" },
 ] as const;
 
@@ -56,10 +65,11 @@ export function ProductHeader({ active = "home", controls }: ProductHeaderProps)
             <div className="flex items-center gap-2">{controls}</div>
           ) : (
             <Link
-              className="hidden min-h-11 items-center justify-center rounded-xl bg-cobalt px-4 text-sm font-bold text-white shadow-[0_10px_25px_rgba(53,86,212,.2)] transition hover:-translate-y-0.5 hover:bg-cobalt-dark focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-amber sm:inline-flex"
+              className="inline-flex min-h-11 items-center justify-center rounded-xl bg-cobalt px-3 text-sm font-bold text-white shadow-[0_10px_25px_rgba(53,86,212,.2)] transition hover:-translate-y-0.5 hover:bg-cobalt-dark focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-amber sm:px-4"
               href="/first-day?demo=1"
             >
-              Start demo
+              <span className="sm:hidden">Demo</span>
+              <span className="hidden sm:inline">Start demo</span>
             </Link>
           )}
           <MobileNavigation active={active} links={links} />

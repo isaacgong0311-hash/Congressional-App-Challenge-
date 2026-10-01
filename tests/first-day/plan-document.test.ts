@@ -89,7 +89,7 @@ describe("portable First Day plan", () => {
     expect(
       changed.facts.find((fact) => fact.id === "fact-registration-date")
         ?.originalValue,
-    ).toBe("August 12, 2026 at 9:00 a.m.");
+    ).toBe("August 12, 2027 at 9:00 a.m.");
   });
 
   it("never exports extracted page text or document payloads", () => {

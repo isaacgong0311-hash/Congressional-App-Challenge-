@@ -1,4 +1,5 @@
 import { groq } from "@ai-sdk/groq";
+import { READING_MODEL } from "../../../lib/reading-model";
 import { generateText } from "ai";
 
 import { extractOuterJson } from "../../../lib/extract-json";
@@ -44,7 +45,8 @@ export async function runGroqExtraction({
   signal,
 }: FirstDayPageExtractionInput): Promise<unknown> {
   const { text } = await generateText({
-    model: groq("meta-llama/llama-4-scout-17b-16e-instruct"),
+    model: groq(READING_MODEL),
+    providerOptions: { groq: { reasoningEffort: "none" } },
     abortSignal: signal,
     messages: [
       {

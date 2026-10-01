@@ -5,6 +5,7 @@ import {
   DEMO_BEATS,
   demoBeatForStep,
   demoBlocker,
+  demoOutcome,
 } from "../../app/features/first-day/ui/demo-presentation";
 import type { CaseSnapshotView } from "../../app/features/first-day/ui/first-day-view";
 
@@ -64,6 +65,30 @@ describe("guided competition presentation", () => {
         "English",
       ),
     ).toBeNull();
+  });
+
+  it("uses grammatical state-derived counts", () => {
+    expect(
+      demoOutcome(
+        "traceable_evidence",
+        { ...snapshot, pendingFactCount: 1 },
+        "English",
+      ),
+    ).toBe("1 fact still needs family review");
+    expect(
+      demoBlocker(
+        "traceable_evidence",
+        { ...snapshot, pendingFactCount: 1 },
+        "English",
+      ),
+    ).toBe("Review 1 fact before continuing.");
+    expect(
+      demoOutcome(
+        "uncertainty_preserved",
+        { ...snapshot, openConflictCount: 1 },
+        "English",
+      ),
+    ).toBe("1 conflict stays visible until a person decides");
   });
 
   it("uses the versioned evaluation proof expected by every frontend surface", () => {

@@ -15,7 +15,7 @@ export const fictionalCase: FirstDayCase = {
       status: "ready",
       sourceVersion: "demo-packet-v1",
       extractedText:
-        "Welcome to Mesa View Community Schools. Bring Maya and this letter to the Mesa View Welcome Center, 145 Oak Street, on August 12, 2026 at 9:00 a.m. Family orientation will be held in the school cafeteria on August 14, 2026 at 5:30 p.m. Please bring a parent or guardian photo ID and proof of address.",
+        "Welcome to Mesa View Community Schools. Bring Maya and this letter to the Mesa View Welcome Center, 145 Oak Street, on August 12, 2027 at 9:00 a.m. Family orientation will be held in the school cafeteria on August 14, 2027 at 5:30 p.m. Please bring a parent or guardian photo ID and proof of address.",
     },
     {
       id: "doc-health-note",
@@ -24,7 +24,7 @@ export const fictionalCase: FirstDayCase = {
       status: "ready",
       sourceVersion: "demo-packet-v1",
       extractedText:
-        "Please bring Maya's immunization record. If the record is not available, speak with the school nurse before the first day so the nurse can review the next step with you. A nurse review is reserved for August 13, 2026 at 1:30 p.m. at the Welcome Center.",
+        "Please bring Maya's immunization record. If the record is not available, speak with the school nurse before the first day so the nurse can review the next step with you. A nurse review is reserved for August 13, 2027 at 1:30 p.m. at the Welcome Center.",
     },
     {
       id: "doc-follow-up-message",
@@ -33,7 +33,7 @@ export const fictionalCase: FirstDayCase = {
       status: "ready",
       sourceVersion: "demo-packet-v1",
       extractedText:
-        "Reminder for the Rivera family: orientation is August 14 at 5:30 p.m. Please enter through the gym entrance. Reply to this message if you need an interpreter for enrollment or orientation.",
+        "Reminder for the Rivera family: orientation is August 14, 2027 at 5:30 p.m. Please enter through the gym entrance. Reply to this message if you need an interpreter for enrollment or orientation.",
     },
   ],
   procedures: [
@@ -64,7 +64,7 @@ export const fictionalCase: FirstDayCase = {
     {
       id: "evidence-registration-date",
       documentId: "doc-welcome-letter",
-      quote: "on August 12, 2026 at 9:00 a.m.",
+      quote: "on August 12, 2027 at 9:00 a.m.",
       location: "Page 1, enrollment paragraph",
     },
     {
@@ -90,14 +90,14 @@ export const fictionalCase: FirstDayCase = {
       id: "evidence-nurse-review",
       documentId: "doc-health-note",
       quote:
-        "A nurse review is reserved for August 13, 2026 at 1:30 p.m. at the Welcome Center.",
+        "A nurse review is reserved for August 13, 2027 at 1:30 p.m. at the Welcome Center.",
       location: "Page 2, final sentence",
     },
     {
       id: "evidence-orientation-cafeteria",
       documentId: "doc-welcome-letter",
       quote:
-        "Family orientation will be held in the school cafeteria on August 14, 2026 at 5:30 p.m.",
+        "Family orientation will be held in the school cafeteria on August 14, 2027 at 5:30 p.m.",
       location: "Page 1, orientation paragraph",
     },
     {
@@ -133,8 +133,8 @@ export const fictionalCase: FirstDayCase = {
       id: "fact-registration-date",
       kind: "date",
       label: "Enrollment meeting",
-      originalValue: "August 12, 2026 at 9:00 a.m.",
-      normalizedValue: "2026-08-12T09:00:00",
+      originalValue: "August 12, 2027 at 9:00 a.m.",
+      normalizedValue: "2027-08-12T09:00:00",
       evidenceIds: ["evidence-registration-date"],
       confirmationState: "confirmed",
     },
@@ -149,7 +149,7 @@ export const fictionalCase: FirstDayCase = {
     {
       id: "fact-immunization-record",
       kind: "requested_item",
-      label: "Immunization record available",
+      label: "Do you have Maya's immunization record?",
       originalValue: "Availability not confirmed",
       evidenceIds: ["evidence-immunization-request"],
       confirmationState: "proposed",
@@ -158,8 +158,8 @@ export const fictionalCase: FirstDayCase = {
       id: "fact-nurse-review",
       kind: "appointment",
       label: "Nurse review",
-      originalValue: "August 13, 2026 at 1:30 p.m. at the Welcome Center",
-      normalizedValue: "2026-08-13T13:30:00",
+      originalValue: "August 13, 2027 at 1:30 p.m. at the Welcome Center",
+      normalizedValue: "2027-08-13T13:30:00",
       evidenceIds: ["evidence-nurse-alternative", "evidence-nurse-review"],
       confirmationState: "confirmed",
     },
@@ -184,7 +184,7 @@ export const fictionalCase: FirstDayCase = {
     {
       id: "fact-interpreter-preference",
       kind: "preference",
-      label: "Interpreter requested",
+      label: "Would an interpreter help your family?",
       originalValue: "Not answered yet",
       evidenceIds: ["evidence-interpreter-offer"],
       confirmationState: "proposed",
