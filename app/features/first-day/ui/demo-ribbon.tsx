@@ -15,6 +15,7 @@ export function DemoRibbon({
   onDismiss,
   onNext,
   onPrevious,
+  onReset,
   snapshot,
 }: {
   beat: DemoBeat;
@@ -23,6 +24,7 @@ export function DemoRibbon({
   onDismiss: () => void;
   onNext: () => void;
   onPrevious: () => void;
+  onReset: () => void;
   snapshot: CaseSnapshotView;
 }) {
   const index = DEMO_BEATS.findIndex((item) => item.id === beat.id);
@@ -90,6 +92,13 @@ export function DemoRibbon({
                 {index === DEMO_BEATS.length - 1
                   ? translated(language, "Demo complete", "Demo terminada")
                   : translated(language, "Next beat", "Siguiente momento")}
+              </button>
+              <button
+                className="fd-demo-dismiss"
+                onClick={onReset}
+                type="button"
+              >
+                {translated(language, "Reset demo", "Reiniciar demo")}
               </button>
               <button
                 className="fd-demo-dismiss"

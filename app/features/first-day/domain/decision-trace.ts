@@ -277,7 +277,7 @@ export function buildDecisionTrace(
     path: string,
     parentId: string,
   ) {
-    const id = `dependency:${task.id}:${path}`;
+    const id = `dependency:${taskId}:${path}`;
     const label =
       dependency.type === "allOf"
         ? "All requirements"

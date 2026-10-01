@@ -221,6 +221,32 @@ test("guided demo follows the six-beat judge story and can exit and resume", asy
   await expect(page.getByText("One answer · one focused update")).toBeVisible();
   await expect(page.getByText("Only the plan steps that depended on this answer were updated.")).toBeVisible();
   await expect(page.getByText("School answer: Gym entrance")).toBeVisible();
+  const trace = page.getByLabel(
+    "Decision trace: Confirm where orientation begins",
+  );
+  await expect(trace).toBeVisible();
+  await expect(trace.getByText("School confirmation recorded")).toBeVisible();
+  await expect(trace.getByText("Gym entrance", { exact: true })).toHaveCount(2);
+  await expect(trace.getByText("confirmed", { exact: true })).toBeVisible();
+  await expect(trace.getByText("superseded", { exact: true })).toBeVisible();
+  await expect(
+    trace.getByText("Please enter through the gym entrance.", {
+      exact: false,
+    }),
+  ).toBeVisible();
+  await trace.getByRole("button", { name: "Close decision trace" }).click();
+  await expect(trace).toBeHidden();
+  const orientationTask = page.getByRole("article").filter({
+    has: page.getByRole("heading", {
+      name: "Confirm where orientation begins",
+    }),
+  });
+  const traceButton = orientationTask.getByRole("button", {
+    name: "Trace this decision",
+  });
+  await traceButton.focus();
+  await page.keyboard.press("Enter");
+  await expect(trace).toBeVisible();
   const focusedAnimation = await page
     .locator(".fd-task-highlight")
     .evaluate((element) => Number.parseFloat(getComputedStyle(element).animationDuration));
@@ -263,6 +289,24 @@ test("guided demo follows the six-beat judge story and can exit and resume", asy
     }),
   ).toBeVisible();
   expect(providerRequests).toEqual([]);
+
+  const spanishGuide = page.getByLabel("Demostración guiada");
+  await spanishGuide.getByRole("button", { name: "Reiniciar demo" }).click();
+  await expect(
+    spanishGuide.getByText("Demo ficticia · Momento 1 de 6"),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Un caso, todas las instrucciones." }),
+  ).toBeVisible();
+  await expect(page.getByLabel(/Rastro de decisión:/)).toHaveCount(0);
+  const blockerMetric = page
+    .getByRole("region", { name: "Resumen del caso" })
+    .getByText("bloqueos", { exact: true })
+    .locator("..");
+  await expect(blockerMetric.getByText("1", { exact: true })).toBeVisible();
+  await expect(
+    spanishGuide.getByRole("button", { name: "Siguiente momento" }),
+  ).toBeEnabled();
 });
 
 test("guided demo keeps its mobile presentation controls in the first viewport", async ({

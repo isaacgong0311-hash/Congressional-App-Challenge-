@@ -998,6 +998,7 @@
 
 .fd-task-card {
   display: flex;
+  flex-wrap: wrap;
   align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
@@ -1007,6 +1008,251 @@
   background: rgba(255, 255, 255, 0.9);
   padding: 1.25rem;
   box-shadow: 0 8px 30px rgba(20, 39, 31, 0.045);
+}
+
+.fd-task-trace-open {
+  border-color: rgba(53, 86, 212, 0.36);
+  box-shadow: 0 18px 50px rgba(35, 60, 148, 0.1);
+}
+
+.fd-trace-panel {
+  flex: 1 0 100%;
+  min-width: 0;
+  margin-top: 0.35rem;
+  overflow: hidden;
+  border: 1px solid rgba(53, 86, 212, 0.2);
+  border-radius: 1.2rem;
+  background:
+    radial-gradient(circle at 100% 0, rgba(231, 186, 75, 0.16), transparent 16rem),
+    linear-gradient(145deg, #f9faff, #f5f7ff 58%, #fffdf7);
+}
+
+.fd-trace-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid rgba(53, 86, 212, 0.14);
+  padding: 1.25rem;
+}
+
+.fd-trace-kicker {
+  color: #3556d4;
+  font-size: 0.68rem;
+  font-weight: 850;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.fd-trace-header h4 {
+  margin-top: 0.35rem;
+  font-size: 1.1rem;
+  font-weight: 780;
+  letter-spacing: -0.02em;
+}
+
+.fd-trace-header > div > p:last-child {
+  margin-top: 0.35rem;
+  color: #55645d;
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.fd-trace-close {
+  display: inline-flex;
+  min-height: 44px;
+  min-width: 44px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(20, 36, 30, 0.12);
+  border-radius: 0.8rem;
+  background: rgba(255, 255, 255, 0.78);
+  color: #4d5a54;
+}
+
+.fd-trace-flow {
+  padding: 1.25rem;
+}
+
+.fd-trace-stage {
+  position: relative;
+  display: flex;
+  gap: 0.9rem;
+  padding-bottom: 1.25rem;
+}
+
+.fd-trace-stage:last-child {
+  padding-bottom: 0;
+}
+
+.fd-trace-stage:not(:last-child)::before {
+  position: absolute;
+  top: 2rem;
+  bottom: 0;
+  left: 0.93rem;
+  width: 1px;
+  background: linear-gradient(#8fa2ea, #d5dcef);
+  content: "";
+}
+
+.fd-trace-index {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  height: 1.9rem;
+  width: 1.9rem;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(53, 86, 212, 0.28);
+  border-radius: 999px;
+  background: #fff;
+  color: #3556d4;
+  font-size: 0.72rem;
+  font-weight: 850;
+  box-shadow: 0 4px 14px rgba(53, 86, 212, 0.1);
+}
+
+.fd-trace-stage-title {
+  padding-top: 0.35rem;
+  color: #324139;
+  font-size: 0.72rem;
+  font-weight: 850;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.fd-trace-stage-body {
+  margin-top: 0.65rem;
+}
+
+.fd-trace-grid {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.fd-trace-node,
+.fd-trace-empty,
+.fd-trace-rules,
+.fd-trace-dependencies {
+  border: 1px solid rgba(45, 61, 54, 0.12);
+  border-radius: 0.9rem;
+  background: rgba(255, 255, 255, 0.82);
+  padding: 0.85rem;
+}
+
+.fd-trace-node.is-decision {
+  border-color: rgba(53, 86, 212, 0.25);
+  background: rgba(237, 241, 255, 0.9);
+}
+
+.fd-trace-node.is-result {
+  border-color: rgba(48, 126, 71, 0.22);
+  background: rgba(238, 249, 241, 0.92);
+}
+
+.fd-trace-node-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.65rem;
+}
+
+.fd-trace-node-label {
+  color: #283a31;
+  font-size: 0.78rem;
+  font-weight: 780;
+}
+
+.fd-trace-node blockquote,
+.fd-trace-value {
+  margin-top: 0.4rem;
+  color: #46564e;
+  font-size: 0.8rem;
+  line-height: 1.55;
+}
+
+.fd-trace-provenance {
+  margin-top: 0.55rem;
+  color: #6a7770;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.64rem;
+  line-height: 1.45;
+}
+
+.fd-trace-state {
+  display: inline-flex;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  padding: 0.25rem 0.5rem;
+  background: #edf0ed;
+  color: #46534d;
+  font-size: 0.62rem;
+  font-weight: 850;
+  text-transform: capitalize;
+}
+
+.fd-trace-rules {
+  margin-top: 0.65rem;
+  color: #526159;
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+.fd-trace-rules summary {
+  min-height: 32px;
+  cursor: pointer;
+  font-weight: 750;
+}
+
+.fd-trace-rules p + p {
+  margin-top: 0.5rem;
+}
+
+.fd-trace-dependencies {
+  display: grid;
+  gap: 0.55rem;
+  color: #526159;
+  font-size: 0.75rem;
+}
+
+.fd-trace-dependencies li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.55rem;
+}
+
+.fd-trace-dependencies b {
+  color: #2e3d35;
+}
+
+.fd-trace-warnings {
+  margin-top: 0.65rem;
+  border: 1px solid #e6c36b;
+  border-radius: 0.8rem;
+  background: #fff8e5;
+  padding: 0.75rem;
+  color: #725415;
+  font-size: 0.75rem;
+}
+
+.fd-trace-warnings ul {
+  margin-top: 0.35rem;
+  padding-left: 1rem;
+  list-style: disc;
+}
+
+@media (min-width: 700px) {
+  .fd-trace-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media print {
+  .fd-trace-close {
+    display: none;
+  }
 }
 
 .fd-task-icon {

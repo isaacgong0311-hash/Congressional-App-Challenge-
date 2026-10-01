@@ -55,6 +55,7 @@ export function useFirstDayController({
   const [taskFilter, setTaskFilter] = useState<TaskFilter>("all");
   const [toast, setToast] = useState<ToastState>(null);
   const [highlightedTaskId, setHighlightedTaskId] = useState<string | null>(null);
+  const [traceTaskId, setTraceTaskId] = useState<string | null>(null);
   const [presentationMode, setPresentationMode] = useState<PresentationMode>(
     initialPresentationMode,
   );
@@ -163,6 +164,7 @@ export function useFirstDayController({
       events: [],
     });
     setActiveConflictId(null);
+    setTraceTaskId(null);
     setCurrentStep("documents");
   }
 
@@ -170,6 +172,7 @@ export function useFirstDayController({
     liveCase.reset();
     setCaseData({ ...structuredClone(initialCase), language });
     setActiveConflictId(null);
+    setTraceTaskId(null);
     setCurrentStep("documents");
   }
 
@@ -279,6 +282,7 @@ export function useFirstDayController({
       ),
     );
     setHighlightedTaskId(relatedTaskId ?? null);
+    setTraceTaskId(relatedTaskId ?? null);
     setToast({
       message:
         language === "Español"
@@ -308,9 +312,18 @@ export function useFirstDayController({
     if (evidenceId) openSource(evidenceId, trigger);
   }
 
+  function openDecisionTrace(taskId: string) {
+    setTraceTaskId(taskId);
+  }
+
+  function closeDecisionTrace() {
+    setTraceTaskId(null);
+  }
+
   function selectStep(stepId: StepId) {
     if (!canEnterLiveStep(caseData, stepId)) return;
     setCurrentStep(stepId);
+    if (stepId !== "plan") setTraceTaskId(null);
     if (presentationMode === "guided_demo") {
       setDemoBeatId(demoBeatForStep(stepId, snapshot, demoBeatId));
     }
@@ -331,6 +344,7 @@ export function useFirstDayController({
       } else if (demoBeatId === "focused_update") {
         setDemoBeatId("family_outcome");
         setCurrentStep("export");
+        setTraceTaskId(null);
       } else if (demoBeatId === "uncertainty_preserved") {
         setDemoBeatId("focused_update");
         setCurrentStep("plan");
@@ -357,6 +371,7 @@ export function useFirstDayController({
       } else if (demoBeatId === "focused_update") {
         setDemoBeatId("uncertainty_preserved");
         setCurrentStep("blocker");
+        setTraceTaskId(null);
       } else if (demoBeatId === "family_outcome") {
         setDemoBeatId("focused_update");
         setCurrentStep("plan");
@@ -377,6 +392,23 @@ export function useFirstDayController({
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
+  function resetDemo() {
+    liveCase.reset();
+    sourceTriggerRef.current = null;
+    eventSequence.current = 0;
+    setCaseData({ ...structuredClone(initialCase), language });
+    setCurrentStep("documents");
+    setSourceId(null);
+    setActiveConflictId(null);
+    setTaskFilter("all");
+    setToast(null);
+    setHighlightedTaskId(null);
+    setTraceTaskId(null);
+    setDemoBeatId("before_lantern");
+    setPresentationMode("guided_demo");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
   function resumeDemo() {
     setDemoBeatId(demoBeatForStep(currentStep, snapshot, demoBeatId));
     setPresentationMode("guided_demo");
@@ -392,6 +424,7 @@ export function useFirstDayController({
     canResumeDemo: isDemoSession && presentationMode === "standard",
     caseData,
     closeSource,
+    closeDecisionTrace,
     completeTask,
     confirmFact,
     correctFact,
@@ -406,6 +439,7 @@ export function useFirstDayController({
     liveCase,
     markFactUnclear,
     openDocument,
+    openDecisionTrace,
     openEvidence,
     openProcedure,
     openSampleCase,
@@ -416,6 +450,7 @@ export function useFirstDayController({
     presentationMode,
     providerCapability,
     resolveCaseConflict,
+    resetDemo,
     resumeDemo,
     selectStep,
     setTaskFilter,
@@ -424,6 +459,7 @@ export function useFirstDayController({
     snapshot,
     startLiveCase,
     taskFilter,
+    traceTaskId,
     toast,
     toggleHighContrast,
     toggleLargeText,

@@ -44,6 +44,7 @@ export function FirstDayWorkspace({
     canGoForward,
     canResumeDemo,
     caseData,
+    closeDecisionTrace,
     closeSource,
     completeTask,
     confirmFact,
@@ -59,6 +60,7 @@ export function FirstDayWorkspace({
     liveCase,
     markFactUnclear,
     openDocument,
+    openDecisionTrace,
     openEvidence,
     openProcedure,
     openSampleCase,
@@ -69,6 +71,7 @@ export function FirstDayWorkspace({
     presentationMode,
     providerCapability,
     resolveCaseConflict,
+    resetDemo,
     resumeDemo,
     selectStep,
     setTaskFilter,
@@ -77,6 +80,7 @@ export function FirstDayWorkspace({
     snapshot,
     startLiveCase,
     taskFilter,
+    traceTaskId,
     toast,
     toggleHighContrast,
     toggleLargeText,
@@ -194,6 +198,7 @@ export function FirstDayWorkspace({
             onDismiss={dismissDemo}
             onNext={goForward}
             onPrevious={goBack}
+            onReset={resetDemo}
             snapshot={snapshot}
           />
         ) : null}
@@ -261,7 +266,9 @@ export function FirstDayWorkspace({
                 caseData={caseData}
                 highlightedTaskId={highlightedTaskId}
                 language={language}
+                onCloseTrace={closeDecisionTrace}
                 onCompleteTask={completeTask}
+                onOpenTrace={openDecisionTrace}
                 onResolveTask={openTaskConflict}
                 onShowTaskSource={showTaskSource}
                 onTaskFilterChange={setTaskFilter}
@@ -269,6 +276,7 @@ export function FirstDayWorkspace({
                 plan={plan}
                 presentationMode={presentationMode}
                 taskFilter={taskFilter}
+                traceTaskId={traceTaskId}
               />
             ) : null}
             {currentStep === "blocker" ? (

@@ -1,4 +1,6 @@
+import { buildDecisionTrace } from "../domain/decision-trace";
 import type { FirstDayCase, PlannerResult } from "../domain/types";
+import { DecisionTracePanel } from "./decision-trace-panel";
 import {
   STATE_META,
   localizedTaskCopy,
@@ -12,7 +14,7 @@ import {
   type TaskFilter,
 } from "./first-day-view";
 import { currentFactView, Eyebrow, SourceButton } from "./first-day-shared";
-import { CheckIcon, MessageIcon } from "./icons";
+import { CheckIcon, EyeIcon, MessageIcon } from "./icons";
 
 export type PlanStepProps = {
   caseData: FirstDayCase;
@@ -20,12 +22,15 @@ export type PlanStepProps = {
   plan: PlannerResult;
   taskFilter: TaskFilter;
   highlightedTaskId: string | null;
+  traceTaskId: string | null;
   presentationMode: PresentationMode;
   onTaskFilterChange: (filter: TaskFilter) => void;
   onCompleteTask: (taskId: string) => void;
   onUndoTask: (taskId: string) => void;
   onShowTaskSource: (taskId: string, trigger: HTMLButtonElement) => void;
   onResolveTask: (taskId: string) => void;
+  onOpenTrace: (taskId: string) => void;
+  onCloseTrace: () => void;
 };
 
 const FILTERS: Array<{ id: TaskFilter; en: string; es: string }> = [
@@ -39,7 +44,9 @@ export function PlanStep({
   caseData,
   highlightedTaskId,
   language,
+  onCloseTrace,
   onCompleteTask,
+  onOpenTrace,
   onResolveTask,
   onShowTaskSource,
   onTaskFilterChange,
@@ -47,6 +54,7 @@ export function PlanStep({
   plan,
   presentationMode,
   taskFilter,
+  traceTaskId,
 }: PlanStepProps) {
   const sourceLabel = translated(language, "Show source", "Ver fuente");
   const ordered = prioritizedPlanTasks(plan.tasks);
@@ -245,7 +253,7 @@ export function PlanStep({
                       : undefined;
                     return (
                       <article
-                        className={`fd-task-card ${meta.className} ${highlightedTaskId === task.id ? "fd-task-highlight" : ""}`}
+                        className={`fd-task-card ${meta.className} ${highlightedTaskId === task.id ? "fd-task-highlight" : ""} ${traceTaskId === task.id ? "fd-task-trace-open" : ""}`}
                         key={task.id}
                       >
                         <div className="flex min-w-0 flex-1 gap-4">
@@ -286,6 +294,23 @@ export function PlanStep({
                             </details>
                             <div className="mt-4 flex flex-wrap gap-2">
                               <SourceButton label={sourceLabel} onClick={(button) => onShowTaskSource(task.id, button)} />
+                              <button
+                                aria-expanded={traceTaskId === task.id}
+                                className="fd-secondary-button"
+                                onClick={() =>
+                                  traceTaskId === task.id
+                                    ? onCloseTrace()
+                                    : onOpenTrace(task.id)
+                                }
+                                type="button"
+                              >
+                                <EyeIcon className="h-4 w-4" />
+                                {translated(
+                                  language,
+                                  "Trace this decision",
+                                  "Rastrear esta decisión",
+                                )}
+                              </button>
                               {task.state === "ready" ? (
                                 <button className="fd-confirm-button" onClick={() => onCompleteTask(task.id)} type="button">
                                   <CheckIcon className="h-4 w-4" />
@@ -306,6 +331,14 @@ export function PlanStep({
                             </div>
                           </div>
                         </div>
+                        {traceTaskId === task.id ? (
+                          <DecisionTracePanel
+                            language={language}
+                            onClose={onCloseTrace}
+                            trace={buildDecisionTrace(caseData, plan, task.id)}
+                            title={taskCopy.title}
+                          />
+                        ) : null}
                       </article>
                     );
                   })}
