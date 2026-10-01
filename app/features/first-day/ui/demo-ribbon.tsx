@@ -93,6 +93,8 @@ export function DemoRibbon({
                   ? translated(language, "Demo complete", "Demo terminada")
                   : translated(language, "Next beat", "Siguiente momento")}
               </button>
+            </div>
+            <div className="fd-demo-utility-actions">
               <button
                 className="fd-demo-dismiss"
                 onClick={onReset}

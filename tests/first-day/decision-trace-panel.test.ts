@@ -43,6 +43,7 @@ describe("DecisionTracePanel", () => {
     expect(html).toContain("<blockquote");
     expect(html).toContain("Enrollment welcome letter");
     expect(html).toContain("School follow-up message");
+    expect(html).not.toContain("fact-orientation-");
 
     const source = html.indexOf("Source evidence");
     const facts = html.indexOf("Proposed facts");

@@ -264,6 +264,13 @@
   color: #f4c969;
 }
 
+.fd-demo-utility-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.25rem;
+}
+
 .fd-action-dock {
   position: fixed;
   z-index: 25;
@@ -414,6 +421,11 @@
 
   .fd-demo-actions > div {
     justify-content: flex-start;
+  }
+
+  .fd-demo-utility-actions {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 0.15rem;
   }
 }
 
@@ -1191,6 +1203,10 @@
   font-size: 0.62rem;
   font-weight: 850;
   text-transform: capitalize;
+}
+
+.fd-trace-state.fd-fact-superseded {
+  text-decoration: none;
 }
 
 .fd-trace-rules {

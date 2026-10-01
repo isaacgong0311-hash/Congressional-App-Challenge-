@@ -227,8 +227,8 @@ test("guided demo follows the six-beat judge story and can exit and resume", asy
   await expect(trace).toBeVisible();
   await expect(trace.getByText("School confirmation recorded")).toBeVisible();
   await expect(trace.getByText("Gym entrance", { exact: true })).toHaveCount(2);
-  await expect(trace.getByText("confirmed", { exact: true })).toBeVisible();
-  await expect(trace.getByText("superseded", { exact: true })).toBeVisible();
+  await expect(trace.getByText("Confirmed", { exact: true })).toBeVisible();
+  await expect(trace.getByText("Not selected", { exact: true })).toBeVisible();
   await expect(
     trace.getByText("Please enter through the gym entrance.", {
       exact: false,

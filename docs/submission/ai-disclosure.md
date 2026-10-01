@@ -6,7 +6,7 @@ Lantern can send user-provided page images to Groq for document reading, grounde
 
 Optional integrations inherited from the upstream application can use ElevenLabs for server speech and Perplexity for local-help search when their separate keys are configured. Each optional integration fails independently. Provider pricing, availability, and retention terms are external and can change.
 
-AI does not decide which source is correct, confirm a family fact, resolve a conflict, mark a task done, or derive a task state. The fictional workflow, domain planner, exports, held-out evaluation, and automated browser journeys run without a provider request.
+AI does not decide which source is correct, confirm a family fact, resolve a conflict, mark a task done, or derive a task state. Decision Trace is also not a second AI explanation: it is a deterministic, read-only projection of the cited sources, immutable case events, explicit dependency rules, and planner result. The fictional workflow, domain planner, Decision Trace, exports, held-out evaluation, and automated browser journeys run without a provider request.
 
 ## Development assistance
 

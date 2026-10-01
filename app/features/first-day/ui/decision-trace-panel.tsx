@@ -104,6 +104,48 @@ export function DecisionTracePanel({
     (node) => node.kind === "task" && node.sourceId === trace.taskId,
   );
 
+  function dependencyCopy(node: DecisionTraceNode) {
+    if (node.label === "Fact requirement") {
+      const fact = facts.find((item) => item.sourceId === node.detail);
+      const label =
+        language === "Español" && fact?.sourceId
+          ? FACT_ES[fact.sourceId] ?? fact.label
+          : fact?.label;
+      return {
+        label: translated(language, "Fact requirement", "Dato necesario"),
+        detail: label ?? translated(language, "Missing fact", "Dato no encontrado"),
+      };
+    }
+    if (node.label === "Task requirement") {
+      const requiredTask = trace.nodes.find(
+        (item) => item.kind === "task" && item.sourceId === node.detail,
+      );
+      return {
+        label: translated(language, "Task requirement", "Paso necesario"),
+        detail: requiredTask?.label ??
+          translated(language, "Missing task", "Paso no encontrado"),
+      };
+    }
+    if (node.label === "All requirements") {
+      return {
+        label: translated(language, "All requirements", "Todos los requisitos"),
+        detail: translated(
+          language,
+          node.detail,
+          "Se deben cumplir todos los requisitos siguientes.",
+        ),
+      };
+    }
+    return {
+      label: translated(language, "Any requirement", "Cualquier requisito"),
+      detail: translated(
+        language,
+        node.detail,
+        "Se debe cumplir al menos uno de los requisitos siguientes.",
+      ),
+    };
+  }
+
   function documentFor(evidenceNode: DecisionTraceNode) {
     const edge = trace.edges.find(
       (item) =>
@@ -248,12 +290,15 @@ export function DecisionTracePanel({
           title={translated(language, "Dependency logic", "Lógica de dependencia")}
         >
           <ul className="fd-trace-dependencies">
-            {dependencies.map((node) => (
-              <li key={node.id}>
-                <b>{node.label}</b>
-                <span>{node.detail}</span>
-              </li>
-            ))}
+            {dependencies.map((node) => {
+              const copy = dependencyCopy(node);
+              return (
+                <li key={node.id}>
+                  <b>{copy.label}</b>
+                  <span>{copy.detail}</span>
+                </li>
+              );
+            })}
           </ul>
         </Stage>
 

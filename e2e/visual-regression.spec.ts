@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 
 const viewports = [
   { name: "mobile-390", width: 390, height: 844 },
@@ -18,6 +18,14 @@ async function expectNoHorizontalOverflow(page: Page) {
 async function capture(page: Page, name: string) {
   await expectNoHorizontalOverflow(page);
   await expect.soft(page).toHaveScreenshot(`${name}.png`, {
+    animations: "disabled",
+    maxDiffPixelRatio: 0.01,
+    timeout: 10_000,
+  });
+}
+
+async function captureElement(locator: Locator, name: string) {
+  await expect.soft(locator).toHaveScreenshot(`${name}.png`, {
     animations: "disabled",
     maxDiffPixelRatio: 0.01,
     timeout: 10_000,
@@ -124,6 +132,24 @@ test.describe("visual regression and responsive layout", () => {
         .getByRole("button", { name: "Record what the school told me" })
         .last()
         .click();
+      const decisionTrace = page.getByLabel(
+        "Decision trace: Confirm where orientation begins",
+      );
+      await expect(decisionTrace).toBeVisible();
+      await page.getByRole("button", { name: "Dismiss message" }).click();
+      const actionDock = page.locator(".fd-action-dock");
+      await actionDock.evaluate((element) => {
+        element.setAttribute("data-visual-hidden", "true");
+        (element as HTMLElement).style.visibility = "hidden";
+      });
+      await captureElement(
+        decisionTrace,
+        `first-day-decision-trace-${viewport.name}`,
+      );
+      await actionDock.evaluate((element) => {
+        element.removeAttribute("data-visual-hidden");
+        (element as HTMLElement).style.removeProperty("visibility");
+      });
       const compactProgress = page.locator(".fd-mobile-progress summary");
       if (await compactProgress.isVisible()) await compactProgress.click();
       await page.getByRole("button", { name: /Take it with me/ }).click();

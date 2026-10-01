@@ -24,6 +24,10 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
+### Judge demo
+
+Open [http://localhost:3000/first-day?demo=1](http://localhost:3000/first-day?demo=1). The six-beat guide runs entirely from fictional data and requires no provider key. Review the two family facts, advance to the orientation conflict, and record the school answer. Lantern will update the affected task and automatically open its **Decision Trace**, showing the path from both original quotes through the human confirmation and dependency rule to the new plan state. Use **Reset demo** at any point to restore the untouched case without reloading the page.
+
 Provider-backed features use environment variables when available:
 
 - `GROQ_API_KEY` — document explanation and the grounded assistant
@@ -50,6 +54,6 @@ The application does not intentionally write uploaded images to disk or a databa
 
 Every route receives `nosniff`, frame-denial, strict referrer, and camera/microphone/geolocation permission headers. These headers reduce browser attack surface; they do not replace request validation, exact-quote evidence checks, or careful provider privacy controls.
 
-Review [the approved design](docs/superpowers/specs/2026-09-15-lantern-first-day-design.md), [competition upgrade plan](docs/superpowers/plans/2026-09-16-lantern-competition-upgrade.md), [held-out evaluation](evaluation/first-day/report.md), and [AI disclosure](docs/submission/ai-disclosure.md) for scope, architecture, and measured limitations.
+Review [the approved design](docs/superpowers/specs/2026-09-15-lantern-first-day-design.md), [competition upgrade plan](docs/superpowers/plans/2026-09-16-lantern-competition-upgrade.md), [Decision Trace code tour](docs/submission/decision-trace-code-tour.md), [held-out evaluation](evaluation/first-day/report.md), and [AI disclosure](docs/submission/ai-disclosure.md) for scope, architecture, and measured limitations.
 
 Provider pricing and free-tier limits can change. Verify the current provider terms before deployment; First Day's deterministic fictional demo does not require provider keys.
