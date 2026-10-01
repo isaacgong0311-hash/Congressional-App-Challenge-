@@ -84,3 +84,27 @@ The cohesive frontend overhaul was promoted from its verified preview on 2026-09
 - Provider latency and cost were not measured in the offline held-out evaluation.
 - School procedures can change. The deterministic freshness gate requires re-review rather than treating an old snapshot as current.
 - Production currently has no `GROQ_API_KEY`, so live document intake is disabled and `/api/health` intentionally returns a degraded response. The complete fictional workflow remains available without a provider.
+
+## 2026 final submission gates
+
+The historical deployment identities above predate the current Decision Trace release. They remain useful records, but they are not evidence that the newest code is deployed.
+
+- [x] Decision Trace domain projection implemented and tested.
+- [x] Decision Trace UI verified at mobile, tablet, desktop, and wide layouts.
+- [x] Guided-demo reset restores the untouched fictional case.
+- [x] Judge quick start and Decision Trace code tour documented.
+- [x] Privacy-safe adult usability protocol and denominator-safe report generator prepared.
+- [ ] Approximately five consenting adult usability sessions completed with fictional documents.
+- [ ] Repeated or severe usability findings reviewed and any accepted fixes verified.
+- [x] Updated 2:50 demonstration script drafted around Decision Trace.
+- [x] Written application answers drafted with bounded evidence claims.
+- [x] Video production checklist and truthful submission manifest created.
+- [ ] Current Decision Trace release deployed and verified at the public URL.
+- [ ] Final release commit selected and annotated submission tag created.
+- [ ] Final 1–3 minute video recorded from that exact release.
+- [ ] Captions reviewed against the accepted final take.
+- [ ] Transcript created from the accepted final take.
+- [ ] Public video link tested while signed out.
+- [ ] Official form field lengths checked and written answers adapted without changing claims.
+- [ ] Submission manifest updated with exact commit, tag, deployment, video, captions, and transcript.
+- [ ] Congressional App Challenge submission completed and confirmation saved.
