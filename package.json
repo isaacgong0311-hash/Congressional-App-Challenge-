@@ -11,6 +11,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "evaluate:first-day": "tsx evaluation/first-day/run.ts",
+    "evaluate:usability": "tsx evaluation/usability/run.ts",
     "test:e2e": "playwright test",
     "test:e2e:headed": "playwright test --headed",
     "test:lighthouse": "CHROME_PATH=$(node -e 'process.stdout.write(require(\"@playwright/test\").chromium.executablePath())') npx --yes @lhci/cli@0.15.1 autorun"

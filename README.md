@@ -42,11 +42,14 @@ Do not commit `.env.local` or real family documents.
 npm run lint
 npm test
 npm run evaluate:first-day
+npm run evaluate:usability
 npm run build
 npm run test:e2e
 ```
 
 The deterministic evaluation contains 20 synthetic held-out packets across five scenarios. The current versioned report records 32/32 fact precision and recall, 32/32 exact-quote coverage, 8/8 intended conflicts with zero false positives, 0/8 date-normalization errors, and 34/34 ready tasks with source coverage. Provider latency and cost are not measured because the evaluation replays stored responses without making provider calls.
+
+The [formative usability protocol](evaluation/usability/protocol.md) is prepared for approximately five consenting adults using fictional documents only. **No participant sessions have been recorded yet.** The [generated usability report](evaluation/usability/report.md) therefore remains explicitly marked “Not started”; it must not be presented as completed user research.
 
 ## Privacy boundary
 
