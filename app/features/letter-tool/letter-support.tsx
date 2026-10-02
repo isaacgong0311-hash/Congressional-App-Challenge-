@@ -3,6 +3,7 @@
 import { useState, type ReactNode } from "react";
 
 import { PhoneIcon, SearchIcon } from "../../components/lantern/icons";
+import { publicApiError } from "../../lib/api-error";
 import type { Category, Resource } from "../../resources";
 
 type LocalResource = {
@@ -32,19 +33,20 @@ export function LocalHelpFinder({ category }: { category: Category }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ category, city: city.trim(), state: state.trim() }),
       });
-      const data = (await response.json()) as {
-        resources?: LocalResource[];
-        error?: string;
-      };
+      const data: unknown = await response.json();
       if (response.status === 503) {
         setUnavailable(true);
         return;
       }
       if (!response.ok) {
-        setError(data.error ?? "Search failed.");
+        setError(publicApiError(data, "Search failed.").message);
         return;
       }
-      setResources(data.resources ?? []);
+      setResources(
+        data && typeof data === "object" && "resources" in data && Array.isArray(data.resources)
+          ? (data.resources as LocalResource[])
+          : [],
+      );
     } catch {
       setError("Could not reach the server. Please try again.");
     } finally {

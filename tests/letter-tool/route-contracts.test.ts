@@ -1,6 +1,8 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { createAskHandler } from "../../app/features/letter-tool/server/ask";
+import { createLocalHelpHandler } from "../../app/features/letter-tool/server/local-help";
+import { createSpeechHandler } from "../../app/features/letter-tool/server/speech";
 import { createTranslateHandler } from "../../app/features/letter-tool/server/translate";
 
 function jsonRequest(path: string, body: unknown) {
@@ -143,5 +145,39 @@ describe("translation route contract", () => {
     await expect(response.json()).resolves.toEqual({
       translation: "Guarde [Your name] aquí.",
     });
+  });
+});
+
+describe("optional support service contracts", () => {
+  it("validates and bounds local-help results", async () => {
+    const search = vi.fn(async () => [
+      { name: "Library", phone: null, address: null, url: "https://example.org", desc: "Local help" },
+      { name: "Unsafe", phone: null, address: null, url: "javascript:alert(1)", desc: "Bad URL" },
+    ]);
+    const handler = createLocalHelpHandler({ available: () => true, search, timeoutMs: 100 });
+    const response = await handler(jsonRequest("/api/local-help", { category: "school", city: "Round Rock", state: "TX", language: "English" }));
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toEqual({ resources: [
+      { name: "Library", phone: null, address: null, url: "https://example.org", desc: "Local help" },
+    ] });
+  });
+
+  it("returns 503 before optional local search is called", async () => {
+    const search = vi.fn(async () => []);
+    const handler = createLocalHelpHandler({ available: () => false, search, timeoutMs: 100 });
+    const response = await handler(jsonRequest("/api/local-help", { category: "school", city: "", state: "TX" }));
+    expect(response.status).toBe(503);
+    expect(search).not.toHaveBeenCalled();
+  });
+
+  it("rejects oversized speech and returns bounded audio", async () => {
+    const synthesize = vi.fn(async () => new Uint8Array([1, 2, 3]).buffer);
+    const handler = createSpeechHandler({ available: () => true, synthesize, timeoutMs: 100 });
+    expect((await handler(jsonRequest("/api/speak", { text: "x".repeat(2_501), bcp47: "en-US" }))).status).toBe(400);
+    expect(synthesize).not.toHaveBeenCalled();
+    const response = await handler(jsonRequest("/api/speak", { text: "Read this", bcp47: "es-MX" }));
+    expect(response.status).toBe(200);
+    expect(response.headers.get("content-type")).toBe("audio/mpeg");
+    expect(response.headers.get("cache-control")).toBe("no-store");
   });
 });
