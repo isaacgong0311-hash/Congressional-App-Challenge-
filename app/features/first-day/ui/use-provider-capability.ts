@@ -27,11 +27,14 @@ export function providerCapabilityFromHealth(
     : "unavailable";
 }
 
-export function useProviderCapability(): ProviderCapability {
+export function useProviderCapability(enabled = true): ProviderCapability {
   const [capability, setCapability] =
-    useState<ProviderCapability>("checking");
+    useState<ProviderCapability>(enabled ? "checking" : "unavailable");
 
   useEffect(() => {
+    if (!enabled) {
+      return;
+    }
     const controller = new AbortController();
 
     async function checkHealth() {
@@ -50,7 +53,7 @@ export function useProviderCapability(): ProviderCapability {
 
     void checkHealth();
     return () => controller.abort();
-  }, []);
+  }, [enabled]);
 
   return capability;
 }

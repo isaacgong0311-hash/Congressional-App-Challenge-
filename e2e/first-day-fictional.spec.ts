@@ -147,7 +147,7 @@ test("guided demo follows the six-beat judge story and can exit and resume", asy
 }) => {
   const providerRequests: string[] = [];
   page.on("request", (request) => {
-    if (/\/api\/(?:explain|first-day\/extract)/.test(request.url())) {
+    if (new URL(request.url()).pathname.startsWith("/api/")) {
       providerRequests.push(request.url());
     }
   });

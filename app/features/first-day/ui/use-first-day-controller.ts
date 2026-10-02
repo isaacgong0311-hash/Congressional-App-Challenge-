@@ -67,7 +67,9 @@ export function useFirstDayController({
   const { preferences, ready: preferencesReady, setPreferences } =
     useLanternPreferences();
   const language: Language = caseData.language;
-  const providerCapability = useProviderCapability();
+  const providerCapability = useProviderCapability(
+    initialPresentationMode !== "guided_demo",
+  );
   const liveCase = useLiveCase({ caseData, language, setCaseData });
   const plan = useMemo(() => planCase(caseData), [caseData]);
   const snapshot = useMemo(() => caseSnapshot(caseData, plan), [caseData, plan]);
