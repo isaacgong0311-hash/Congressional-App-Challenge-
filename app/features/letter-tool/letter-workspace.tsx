@@ -213,9 +213,12 @@ export default function LetterWorkspace() {
       body.append("language", language);
       body.append("readingLevel", simplify ? "simple" : "standard");
       const res = await fetch("/api/explain", { method: "POST", body });
-      const data = await res.json();
+      const data: unknown = await res.json();
       if (!res.ok) {
-        setError(data.error || "Something went wrong. Please try again.");
+        setError(
+          publicApiError(data, "Something went wrong. Please try again.")
+            .message,
+        );
       } else if (!isLetterResult(data)) {
         setError(
           "We couldn't safely read that response. Please try the photo again.",

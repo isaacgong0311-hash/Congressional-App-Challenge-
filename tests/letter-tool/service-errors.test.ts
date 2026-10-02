@@ -28,14 +28,14 @@ describe("public reading errors", () => {
   });
   it("localizes missing-service feedback for Spanish", async () => {
     vi.stubEnv("GROQ_API_KEY", "");
-    expect((await (await explain(imageRequest("Spanish"))).json()).error).toContain("no está disponible");
+    expect((await (await explain(imageRequest("Spanish"))).json()).error.message).toContain("no está disponible");
   });
   it("does not leak provider errors or blame the photo on an outage", async () => {
     vi.stubEnv("GROQ_API_KEY", "test-only");
     const log = vi.spyOn(console, "error").mockImplementation(() => {});
     const response = await explain(imageRequest());
     expect(response.status).toBe(502);
-    expect((await response.json()).error).toContain("service is unavailable");
+    expect((await response.json()).error.message).toContain("service is unavailable");
     expect(JSON.stringify(log.mock.calls)).not.toContain("private-provider-payload");
   });
 });

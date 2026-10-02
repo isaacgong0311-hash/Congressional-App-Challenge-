@@ -6,6 +6,7 @@ import { extractOuterJson } from "../../lib/extract-json";
 import { providerErrorSummary } from "../../lib/provider-error";
 import { readingUnavailable } from "../../lib/reading-service";
 import { READING_MODEL } from "../../lib/reading-model";
+import { apiError, apiJson, requestIdFrom, type ApiErrorCode } from "../../lib/server/http";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -192,13 +193,15 @@ const JSON_SHAPE = `{
 }`;
 
 export async function POST(req: Request) {
-  const requestId = crypto.randomUUID();
+  const requestId = requestIdFrom(req.headers);
   const startedAt = Date.now();
+  const fail = (code: ApiErrorCode, message: string, status: number, retryable: boolean) =>
+    apiError({ code, message, requestId, retryable, status });
   let form: FormData;
   try {
     form = await req.formData();
   } catch {
-    return Response.json({ error: "Invalid form data." }, { status: 400 });
+    return fail("INVALID_REQUEST", "Invalid form data.", 400, false);
   }
 
   const file = form.get("image");
@@ -206,20 +209,17 @@ export async function POST(req: Request) {
   const simplify = form.get("readingLevel") === "simple";
 
   if (!(file instanceof File)) {
-    return Response.json({ error: "No image was uploaded." }, { status: 400 });
+    return fail("INVALID_REQUEST", "No image was uploaded.", 400, false);
   }
-  if (!file.type.startsWith("image/")) {
-    return Response.json({ error: "Uploaded file is not an image." }, { status: 400 });
+  if (file.type !== "image/jpeg" && file.type !== "image/png") {
+    return fail("UNSUPPORTED_MEDIA", "Use a JPG or PNG image.", 400, false);
   }
-  if (file.size > 10 * 1024 * 1024) {
-    return Response.json({ error: "Image is too large (max 10 MB)." }, { status: 400 });
+  if (file.size <= 0 || file.size > 10 * 1024 * 1024) {
+    return fail("PAYLOAD_TOO_LARGE", "Image must be between 1 byte and 10 MB.", 400, false);
   }
 
   if (!process.env.GROQ_API_KEY?.trim()) {
-    return Response.json(
-      { error: readingUnavailable(language) },
-      { status: 503 },
-    );
+    return fail("PROVIDER_UNAVAILABLE", readingUnavailable(language), 503, true);
   }
 
   const bytes = new Uint8Array(await file.arrayBuffer());
@@ -286,13 +286,10 @@ export async function POST(req: Request) {
           issueCount: parsed.error.issues.length,
         }),
       );
-      return Response.json(
-        { error: "Could not read this document. Try a clearer, well-lit photo." },
-        { status: 502 },
-      );
+      return fail("INVALID_PROVIDER_RESPONSE", "Could not read this document. Try a clearer, well-lit photo.", 502, true);
     }
 
-    return Response.json(parsed.data);
+    return apiJson(parsed.data);
   } catch {
     console.error(
       "explain route provider error",
@@ -303,9 +300,6 @@ export async function POST(req: Request) {
         durationMs: Date.now() - startedAt,
       }),
     );
-    return Response.json(
-      { error: readingUnavailable(language) },
-      { status: 502 },
-    );
+    return fail("PROVIDER_REJECTED", readingUnavailable(language), 502, true);
   }
 }
