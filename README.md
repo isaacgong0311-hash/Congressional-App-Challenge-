@@ -59,4 +59,6 @@ Every route receives `nosniff`, frame-denial, strict referrer, and camera/microp
 
 Review [the approved design](docs/superpowers/specs/2026-09-15-lantern-first-day-design.md), [competition upgrade plan](docs/superpowers/plans/2026-09-16-lantern-competition-upgrade.md), [Decision Trace code tour](docs/submission/decision-trace-code-tour.md), [held-out evaluation](evaluation/first-day/report.md), and [AI disclosure](docs/submission/ai-disclosure.md) for scope, architecture, and measured limitations.
 
+The [backend code tour](docs/submission/backend-code-tour.md) explains the validated server boundary, provider adapters, safe failure contract, privacy-safe logs, and the tested handoff from AI proposals to deterministic planning code.
+
 Provider pricing and free-tier limits can change. Verify the current provider terms before deployment; First Day's deterministic fictional demo does not require provider keys.

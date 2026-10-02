@@ -56,6 +56,15 @@ const stages = [
   },
 ] as const;
 
+const serverStages = [
+  "Browser checks page count, file type, and total size",
+  "Server validates one ephemeral image request",
+  "AI proposes structured facts with exact quotations",
+  "Runtime schemas and quote checks reject unsupported output",
+  "Deterministic rules compute task state",
+  "Decision Trace explains the result",
+] as const;
+
 export default function HowFirstDayWorksPage() {
   return (
     <div className="min-h-screen bg-canvas text-ink">
@@ -177,6 +186,26 @@ export default function HowFirstDayWorksPage() {
               from explicit facts, dependencies, and eligible procedure records.
             </p>
           </div>
+        </section>
+
+        <section className="mt-16 rounded-[2rem] border border-[#dbe1dc] bg-white p-7 shadow-[0_18px_55px_rgba(24,46,38,.06)] sm:p-10" aria-labelledby="server-title">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#4960ba]">
+            Server trust boundary
+          </p>
+          <h2 className="mt-3 max-w-3xl font-serif text-4xl tracking-[-0.035em]" id="server-title">
+            Live pages cross one narrow, testable path.
+          </h2>
+          <ol className="mt-8 grid gap-3 md:grid-cols-2" aria-label="Backend request stages">
+            {serverStages.map((stage, index) => (
+              <li className="flex gap-4 rounded-2xl border border-[#e2e7e3] bg-[#fbfcf9] p-5" key={stage}>
+                <span className="font-mono text-sm font-bold text-[#3556d4]">{String(index + 1).padStart(2, "0")}</span>
+                <span className="font-semibold leading-6">{stage}</span>
+              </li>
+            ))}
+          </ol>
+          <p className="mt-6 max-w-3xl text-sm leading-7 text-[#56645d]">
+            Lantern does not intentionally save uploads or live case data. A configured provider processes live requests, while the fictional judge demo stays local and makes no API request at all.
+          </p>
         </section>
 
         <section className="mt-16 rounded-[2rem] border border-[#ccd6ff] bg-[#edf1ff] p-7 sm:flex sm:items-center sm:justify-between sm:gap-8 sm:p-10">
