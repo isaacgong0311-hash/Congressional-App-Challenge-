@@ -14,10 +14,15 @@ export function providerCapabilityFromHealth(
   if (!responseOk || !payload || typeof payload !== "object") {
     return "unavailable";
   }
-  if (!("keys" in payload) || !payload.keys || typeof payload.keys !== "object") {
+  if (
+    !("capabilities" in payload) ||
+    !payload.capabilities ||
+    typeof payload.capabilities !== "object"
+  ) {
     return "unavailable";
   }
-  return "groq" in payload.keys && payload.keys.groq === true
+  return "liveDocumentReading" in payload.capabilities &&
+    payload.capabilities.liveDocumentReading === true
     ? "available"
     : "unavailable";
 }

@@ -3,20 +3,26 @@ import { describe, expect, it } from "vitest";
 import { providerCapabilityFromHealth } from "../../app/features/first-day/ui/use-provider-capability";
 
 describe("providerCapabilityFromHealth", () => {
-  it("accepts an explicitly healthy Groq capability", () => {
+  it("accepts an explicitly available live-reading capability", () => {
     expect(
       providerCapabilityFromHealth(true, {
         status: "ok",
-        keys: { groq: true },
+        capabilities: { liveDocumentReading: true },
       }),
     ).toBe("available");
   });
 
-  it("treats degraded, malformed, and rejected responses as unavailable", () => {
+  it("treats unavailable, malformed, and rejected responses as unavailable", () => {
     expect(
       providerCapabilityFromHealth(false, {
-        status: "degraded",
-        keys: { groq: false },
+        status: "ok",
+        capabilities: { liveDocumentReading: false },
+      }),
+    ).toBe("unavailable");
+    expect(
+      providerCapabilityFromHealth(true, {
+        status: "ok",
+        capabilities: { liveDocumentReading: false },
       }),
     ).toBe("unavailable");
     expect(providerCapabilityFromHealth(true, { status: "ok" })).toBe(
