@@ -6,6 +6,7 @@ import { ProductHeader } from "../../components/lantern/product-header";
 import { CheckIcon, ShieldAlertIcon } from "../../components/lantern/icons";
 import { AccessibilityControls } from "../../components/lantern/primitives";
 import { useLanternPreferences } from "../../components/lantern/use-lantern-preferences";
+import { publicApiError } from "../../lib/api-error";
 import {
   deriveLetterToolView,
   isLetterResult,
@@ -391,8 +392,12 @@ export default function LetterWorkspace() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: body, language: lang.label }),
       });
-      const data = (await res.json()) as { translation?: string; error?: string };
-      if (res.ok && data.translation) setTranslatedLetter(data.translation);
+      const data: unknown = await res.json();
+      if (res.ok && data && typeof data === "object" && "translation" in data && typeof data.translation === "string") {
+        setTranslatedLetter(data.translation);
+      } else if (!res.ok) {
+        publicApiError(data, "Translation failed.");
+      }
     } catch { /* silent — original still shown */ } finally {
       setTranslatingLetter(false);
     }

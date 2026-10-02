@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { publicApiError } from "./lib/api-error";
 
 // Minimal typings for the Web Speech API (not in the standard DOM lib).
 type SpeechRecognitionResultLike = {
@@ -97,8 +98,10 @@ export default function Assistant({
           messages: history.map(({ role, content }) => ({ role, content })),
         }),
       });
-      const data = await res.json();
-      const reply = res.ok ? data.reply : data.error || "Sorry, please try again.";
+      const data: unknown = await res.json();
+      const reply = res.ok && data && typeof data === "object" && "reply" in data && typeof data.reply === "string"
+        ? data.reply
+        : publicApiError(data, "Sorry, please try again.").message;
       setMessages((m) => [...m, { role: "assistant", content: reply }]);
       speak(reply);
     } catch {
