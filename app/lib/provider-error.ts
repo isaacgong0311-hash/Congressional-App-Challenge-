@@ -4,6 +4,8 @@ export type ProviderErrorSummary = {
   kind: "schema" | "provider" | "timeout";
   durationMs: number;
   issueCount?: number;
+  status?: number;
+  providerStatus?: number;
 };
 
 export function providerErrorSummary({
@@ -12,6 +14,16 @@ export function providerErrorSummary({
   kind,
   durationMs,
   issueCount,
+  status,
+  providerStatus,
 }: ProviderErrorSummary): ProviderErrorSummary {
-  return { requestId, route, kind, durationMs, issueCount };
+  return {
+    requestId,
+    route,
+    kind,
+    durationMs,
+    issueCount,
+    status,
+    providerStatus,
+  };
 }
