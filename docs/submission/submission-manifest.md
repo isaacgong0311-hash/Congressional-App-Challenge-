@@ -1,7 +1,7 @@
 # Lantern submission manifest
 
 **Manifest status:** Preparation in progress  
-**Last verified:** 2026-10-01
+**Last verified:** 2026-10-02
 **Submission target:** 2026-10-24, ahead of the official deadline
 
 This file is the alignment record between code, deployment, video, captions, transcript, written answers, evidence, and the final form. A status changes only after its evidence exists.
@@ -9,7 +9,7 @@ This file is the alignment record between code, deployment, video, captions, tra
 | Artifact | Current status | Evidence or next gate |
 | --- | --- | --- |
 | Decision Trace code | Implemented and locally verified | Commits `05218e2`, `0ba9527`, and `5f4f0bf` |
-| Backend trust boundary | Implemented; deterministic verification in progress | Shared contracts, capability reporting, bounded provider routes, and zero-API judge-path test |
+| Backend trust boundary | Implemented and locally verified | Release-candidate code commit `7c55e22`; shared contracts, capability reporting, bounded provider routes, safe diagnostics, zero-API judge-path test, and live synthetic Groq smoke evidence |
 | Usability protocol | Ready; zero sessions recorded | `evaluation/usability/report.md` says Not started |
 | Written answers | Drafted; awaiting adaptation to official form limits | `docs/submission/written-answers.md` |
 | Demo script | Drafted for a 2:45–2:55 take | `docs/submission/demo-script.md` |
@@ -29,9 +29,15 @@ This file is the alignment record between code, deployment, video, captions, tra
 - Lint passes.
 - 146 unit tests pass.
 - Production build passes.
+- The live Groq First Day extraction route passed a synthetic document smoke test on 2026-10-02 (`status=pass`, valid response schema, 3,994 ms).
+- The general letter explanation route also passed a separate live synthetic Groq check during the same backend release pass. It is kept opt-in in the combined smoke runner to avoid treating free-tier token-window contention as an application failure.
+- The focused First Day and Explain browser suite passes all 32 mobile and desktop tests against the release candidate.
+- The preceding complete browser gate passes 65 tests with 7 intentional skips, and all 6 Lighthouse runs pass.
 - The provider-free fictional journey and Decision Trace passed mobile and desktop browser verification in the preceding release gate.
 - Synthetic held-out evaluation remains versioned separately from human usability evidence.
 - AI assistance, reused code, runtime providers, and student responsibility are disclosed.
+
+Optional server speech and local-help search were not exercised because their provider credentials are not configured. The app reports those capabilities as unavailable and retains its documented fallbacks; they are not required for the judge demo or the verified First Day journey.
 
 These checks do not prove that the current branch is deployed, the video exists, or the application has been submitted.
 
