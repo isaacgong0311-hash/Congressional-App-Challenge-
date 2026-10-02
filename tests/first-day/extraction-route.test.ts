@@ -32,12 +32,18 @@ function extractionRequest(
     documentId?: string;
     requestId?: string;
     type?: string;
+    bytes?: Uint8Array;
   } = {},
 ) {
+  const bytes = overrides.bytes ?? new Uint8Array([1, 2, 3]);
+  const imageBuffer = bytes.buffer.slice(
+    bytes.byteOffset,
+    bytes.byteOffset + bytes.byteLength,
+  ) as ArrayBuffer;
   const form = new FormData();
   form.append(
     "image",
-    new File([new Uint8Array([1, 2, 3])], "page.jpg", {
+    new File([imageBuffer], "page.jpg", {
       type: overrides.type ?? "image/jpeg",
     }),
   );
@@ -65,6 +71,7 @@ describe("First Day extraction route", () => {
     const response = await handler(extractionRequest());
 
     expect(response.status).toBe(200);
+    expect(response.headers.get("cache-control")).toBe("no-store");
     await expect(response.json()).resolves.toEqual({
       ...providerResponse,
       documentId: "doc-browser-1",
@@ -72,23 +79,34 @@ describe("First Day extraction route", () => {
     });
   });
 
-  it("rejects unsupported files and unsafe IDs", async () => {
+  it("rejects unsupported files, oversized files, and unsafe IDs", async () => {
     const handler = createExtractionHandler({
       providerAvailable: () => true,
       extractPage: async () => providerResponse,
       timeoutMs: 100,
     });
 
-    expect((await handler(extractionRequest({ type: "text/plain" }))).status).toBe(
-      400,
+    const unsupported = await handler(extractionRequest({ type: "text/plain" }));
+    expect(unsupported.status).toBe(400);
+    await expect(unsupported.json()).resolves.toMatchObject({
+      error: { code: "UNSUPPORTED_MEDIA", retryable: false },
+    });
+
+    const oversized = await handler(
+      extractionRequest({ bytes: new Uint8Array(10 * 1024 * 1024 + 1) }),
     );
-    expect(
-      (
-        await handler(
-          extractionRequest({ documentId: "../private", requestId: "" }),
-        )
-      ).status,
-    ).toBe(400);
+    expect(oversized.status).toBe(400);
+    await expect(oversized.json()).resolves.toMatchObject({
+      error: { code: "PAYLOAD_TOO_LARGE", retryable: false },
+    });
+
+    const unsafe = await handler(
+      extractionRequest({ documentId: "../private", requestId: "" }),
+    );
+    expect(unsafe.status).toBe(400);
+    await expect(unsafe.json()).resolves.toMatchObject({
+      error: { code: "INVALID_REQUEST", retryable: false },
+    });
   });
 
   it("reports an unavailable provider without calling it", async () => {
@@ -99,7 +117,16 @@ describe("First Day extraction route", () => {
       timeoutMs: 100,
     });
 
-    expect((await handler(extractionRequest())).status).toBe(500);
+    const response = await handler(extractionRequest());
+    expect(response.status).toBe(503);
+    expect(response.headers.get("cache-control")).toBe("no-store");
+    await expect(response.json()).resolves.toMatchObject({
+      error: {
+        code: "PROVIDER_UNAVAILABLE",
+        requestId: "request-browser-1",
+        retryable: true,
+      },
+    });
     expect(extractPage).not.toHaveBeenCalled();
   });
 
@@ -111,7 +138,15 @@ describe("First Day extraction route", () => {
       timeoutMs: 100,
     });
 
-    expect((await handler(extractionRequest())).status).toBe(502);
+    const response = await handler(extractionRequest());
+    expect(response.status).toBe(502);
+    await expect(response.json()).resolves.toMatchObject({
+      error: {
+        code: "INVALID_PROVIDER_RESPONSE",
+        requestId: "request-browser-1",
+        retryable: true,
+      },
+    });
   });
 
   it("aborts and returns 504 when extraction exceeds its budget", async () => {
@@ -127,7 +162,15 @@ describe("First Day extraction route", () => {
       timeoutMs: 5,
     });
 
-    expect((await handler(extractionRequest())).status).toBe(504);
+    const response = await handler(extractionRequest());
+    expect(response.status).toBe(504);
+    await expect(response.json()).resolves.toMatchObject({
+      error: {
+        code: "PROVIDER_TIMEOUT",
+        requestId: "request-browser-1",
+        retryable: true,
+      },
+    });
   });
 
   it("logs metadata without document text or provider errors", async () => {

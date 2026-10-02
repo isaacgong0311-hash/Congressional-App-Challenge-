@@ -65,7 +65,10 @@ test("live intake preserves partial success, retry, removal, and late-response r
     route.fulfill({
       status: 200,
       contentType: "application/json",
-      body: JSON.stringify({ status: "ok", keys: { groq: true } }),
+      body: JSON.stringify({
+        status: "ok",
+        capabilities: { liveDocumentReading: true },
+      }),
     }),
   );
 
@@ -91,7 +94,14 @@ test("live intake preserves partial success, retry, removal, and late-response r
       await route.fulfill({
         status: 502,
         contentType: "application/json",
-        body: JSON.stringify({ error: "Synthetic provider interruption." }),
+        body: JSON.stringify({
+          error: {
+            code: "PROVIDER_REJECTED",
+            message: "Synthetic provider interruption.",
+            requestId,
+            retryable: true,
+          },
+        }),
       });
       return;
     }
@@ -197,17 +207,17 @@ test("live intake preserves partial success, retry, removal, and late-response r
   await expectNoSeriousAxeViolations(page);
 });
 
-test("live entry explains a missing key and recovers after capability returns", async ({
+test("live entry explains an unavailable provider and recovers after capability returns", async ({
   page,
 }) => {
   let available = false;
   await page.route("**/api/health", (route) =>
     route.fulfill({
-      status: available ? 200 : 503,
+      status: 200,
       contentType: "application/json",
       body: JSON.stringify({
-        status: available ? "ok" : "degraded",
-        keys: { groq: available },
+        status: "ok",
+        capabilities: { liveDocumentReading: available },
       }),
     }),
   );

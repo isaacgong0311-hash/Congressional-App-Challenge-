@@ -9,6 +9,7 @@ import {
   type SetStateAction,
 } from "react";
 
+import { publicApiError } from "../../../lib/api-error";
 import { adaptLiveExtraction } from "../adapters/live-extraction";
 import { appendSourceRemoval } from "../domain/events";
 import { mergeExtraction } from "../domain/extraction";
@@ -143,14 +144,11 @@ export function useLiveCase({
         });
         const payload: unknown = await response.json();
         if (!response.ok) {
-          const message =
-            payload &&
-            typeof payload === "object" &&
-            "error" in payload &&
-            typeof payload.error === "string"
-              ? payload.error
-              : "Could not read this page.";
-          throw new Error(message);
+          const failure = publicApiError(
+            payload,
+            "Could not read this page.",
+          );
+          throw new Error(failure.message);
         }
 
         const parsed = FirstDayExtractionSchema.safeParse(payload);
