@@ -6,6 +6,8 @@ export type ProviderErrorSummary = {
   issueCount?: number;
   status?: number;
   providerStatus?: number;
+  issuePaths?: string[];
+  issueCodes?: string[];
 };
 
 export function providerErrorSummary({
@@ -16,6 +18,8 @@ export function providerErrorSummary({
   issueCount,
   status,
   providerStatus,
+  issuePaths,
+  issueCodes,
 }: ProviderErrorSummary): ProviderErrorSummary {
   return {
     requestId,
@@ -25,5 +29,7 @@ export function providerErrorSummary({
     issueCount,
     status,
     providerStatus,
+    issuePaths,
+    issueCodes,
   };
 }

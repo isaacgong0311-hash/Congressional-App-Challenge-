@@ -229,12 +229,10 @@ export async function POST(req: Request) {
     const { text } = await generateText({
       abortSignal: AbortSignal.timeout(45_000),
       model: groq(READING_MODEL),
+      maxRetries: 0,
       providerOptions: { groq: { reasoningEffort: "none" } },
       maxOutputTokens: 6000,
-      messages: [
-        {
-          role: "system",
-          content: [
+      system: [
             "You help people understand confusing official letters and forms (government benefits, healthcare, housing, school, legal).",
             "Many readers are stressed, low-literacy, or non-native speakers. Be calm, clear, and kind.",
             `Write ALL human-readable output (meaning, steps, scripts, reasons) in ${language}, at a ${
@@ -260,7 +258,7 @@ export async function POST(req: Request) {
             "Respond with ONLY a single valid JSON object — no markdown, no code fences, no text before or after. Use EXACTLY these keys and value types:",
             JSON_SHAPE,
           ].join("\n"),
-        },
+      messages: [
         {
           role: "user",
           content: [
@@ -284,13 +282,20 @@ export async function POST(req: Request) {
           kind: "schema",
           durationMs: Date.now() - startedAt,
           issueCount: parsed.error.issues.length,
+          issuePaths: parsed.error.issues.map((issue) => issue.path.join(".")),
+          issueCodes: parsed.error.issues.map((issue) => issue.code),
         }),
       );
       return fail("INVALID_PROVIDER_RESPONSE", "Could not read this document. Try a clearer, well-lit photo.", 502, true);
     }
 
     return apiJson(parsed.data);
-  } catch {
+  } catch (error) {
+    const providerStatus =
+      error && typeof error === "object" && "statusCode" in error &&
+      typeof error.statusCode === "number"
+        ? error.statusCode
+        : undefined;
     console.error(
       "explain route provider error",
       providerErrorSummary({
@@ -298,8 +303,11 @@ export async function POST(req: Request) {
         route: "/api/explain",
         kind: "provider",
         durationMs: Date.now() - startedAt,
+        providerStatus,
       }),
     );
-    return fail("PROVIDER_REJECTED", readingUnavailable(language), 502, true);
+    return providerStatus === 429
+      ? fail("PROVIDER_UNAVAILABLE", readingUnavailable(language), 503, true)
+      : fail("PROVIDER_REJECTED", readingUnavailable(language), 502, true);
   }
 }

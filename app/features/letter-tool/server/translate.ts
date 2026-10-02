@@ -25,6 +25,6 @@ export function createTranslateHandler(deps: TranslateDependencies) {
 }
 
 export async function translateWithGroq(input: Input) {
-  const result = await generateText({ abortSignal: input.signal, model: groq(READING_MODEL), providerOptions: { groq: { reasoningEffort: "none" } }, messages: [{ role: "system", content: `Translate to ${input.language}. Preserve formatting and every bracketed placeholder exactly. Output only the translation.` }, { role: "user", content: input.text }] });
+  const result = await generateText({ abortSignal: input.signal, model: groq(READING_MODEL), maxRetries: 0, providerOptions: { groq: { reasoningEffort: "none" } }, system: `Translate to ${input.language}. Preserve formatting and every bracketed placeholder exactly. Output only the translation.`, messages: [{ role: "user", content: input.text }] });
   return result.text;
 }

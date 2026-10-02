@@ -182,6 +182,8 @@ export function createExtractionHandler(dependencies: ExtractionDependencies) {
             kind: "schema",
             durationMs: Date.now() - startedAt,
             issueCount: parsed.error.issues.length,
+            issuePaths: parsed.error.issues.map((issue) => issue.path.join(".")),
+            issueCodes: parsed.error.issues.map((issue) => issue.code),
           }),
         );
         return errorResponse(
@@ -193,8 +195,13 @@ export function createExtractionHandler(dependencies: ExtractionDependencies) {
       }
 
       return apiJson(parsed.data);
-    } catch {
+    } catch (error) {
       const timedOut = controller.signal.aborted;
+      const providerStatus =
+        error && typeof error === "object" && "statusCode" in error &&
+        typeof error.statusCode === "number"
+          ? error.statusCode
+          : undefined;
       console.error(
         timedOut
           ? "first-day extraction timeout"
@@ -204,6 +211,7 @@ export function createExtractionHandler(dependencies: ExtractionDependencies) {
           route: "/api/first-day/extract",
           kind: timedOut ? "timeout" : "provider",
           durationMs: Date.now() - startedAt,
+          providerStatus,
         }),
       );
       return timedOut
@@ -213,12 +221,19 @@ export function createExtractionHandler(dependencies: ExtractionDependencies) {
             504,
             true,
           )
-        : errorResponse(
-            "PROVIDER_REJECTED",
-            "Could not read this page right now. Please try again.",
-            502,
-            true,
-          );
+        : providerStatus === 429
+          ? errorResponse(
+              "PROVIDER_UNAVAILABLE",
+              "Live document reading is busy right now. Please try again shortly.",
+              503,
+              true,
+            )
+          : errorResponse(
+              "PROVIDER_REJECTED",
+              "Could not read this page right now. Please try again.",
+              502,
+              true,
+            );
     } finally {
       clearTimeout(timeout);
     }

@@ -37,6 +37,6 @@ export function createAskHandler(deps: AskDependencies) {
 }
 
 export async function generateAskWithGroq(input: Input) {
-  const result = await generateText({ abortSignal: input.signal, model: groq(READING_MODEL), providerOptions: { groq: { reasoningEffort: "none" } }, messages: [{ role: "system", content: input.system }, ...input.messages] });
+  const result = await generateText({ abortSignal: input.signal, model: groq(READING_MODEL), maxRetries: 0, providerOptions: { groq: { reasoningEffort: "none" } }, system: input.system, messages: input.messages });
   return result.text;
 }

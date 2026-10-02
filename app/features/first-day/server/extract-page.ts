@@ -46,12 +46,10 @@ export async function runGroqExtraction({
 }: FirstDayPageExtractionInput): Promise<unknown> {
   const { text } = await generateText({
     model: groq(READING_MODEL),
+    maxRetries: 0,
     providerOptions: { groq: { reasoningEffort: "none" } },
     abortSignal: signal,
-    messages: [
-      {
-        role: "system",
-        content: [
+    system: [
           "You extract source-backed facts from one school enrollment document page.",
           `Write labels in ${language}. Preserve names, dates, locations, and contact details exactly as printed.`,
           "Return verbatim document text and proposed facts only.",
@@ -64,7 +62,7 @@ export async function runGroqExtraction({
           "Return one JSON object with exactly this shape and no markdown:",
           RESPONSE_SHAPE,
         ].join("\n"),
-      },
+    messages: [
       {
         role: "user",
         content: [
