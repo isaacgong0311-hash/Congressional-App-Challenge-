@@ -4,6 +4,7 @@ import type {
   FirstDayCase,
   PlannerResult,
 } from "../domain/types";
+import { factHasActiveSource } from "../domain/evidence";
 
 export type TaskFilter = "all" | "attention" | "ready" | "done";
 export type PresentationMode = "standard" | "guided_demo";
@@ -66,6 +67,7 @@ export function caseSnapshot(
       (document) => document.status === "ready",
     ).length,
     pendingFactCount: caseData.facts.filter((fact) => {
+      if (!factHasActiveSource(caseData, fact)) return false;
       if (fact.confirmationState !== "proposed") return false;
       return !caseData.events.some(
         (event) =>

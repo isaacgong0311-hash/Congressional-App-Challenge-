@@ -5,6 +5,7 @@ import {
   createCalendarFile,
 } from "../../app/features/first-day/export/calendar";
 import type { FirstDayCase } from "../../app/features/first-day/domain/types";
+import { fictionalCase } from "../../app/features/first-day/content/fictional-case";
 
 function caseWithDate(
   confirmationState: "confirmed" | "proposed" = "confirmed",
@@ -87,6 +88,17 @@ describe("confirmed date calendar export", () => {
 
     expect(ics).toContain("DTSTART;VALUE=DATE:20260812");
     expect(ics).not.toContain("T00:00");
+  });
+
+  it("includes confirmed appointments with their stated local time", () => {
+    const events = calendarEvents(fictionalCase);
+    expect(events.map((event) => event.title)).toEqual([
+      "Enrollment meeting",
+      "Nurse review",
+    ]);
+    const ics = createCalendarFile(events);
+    expect(ics).toContain("DTSTART:20270812T090000");
+    expect(ics).toContain("DTSTART:20270813T133000");
   });
 
   it("excludes a confirmed date after its source is removed", () => {

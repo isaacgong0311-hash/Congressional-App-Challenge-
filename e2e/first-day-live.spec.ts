@@ -163,7 +163,7 @@ test("live intake preserves partial success, retry, removal, and late-response r
 
   await page.goto("/first-day");
   await page
-    .getByRole("button", { name: "Add Round Rock ISD documents" })
+    .getByRole("button", { name: "Try the public-source example" })
     .click();
   await page.getByLabel("School page images").setInputFiles([
     { name: "success.png", mimeType: "image/png", buffer: Buffer.from("synthetic-one") },
@@ -224,7 +224,7 @@ test("live entry explains an unavailable provider and recovers after capability 
 
   await page.goto("/first-day");
   const liveButton = page.getByRole("button", {
-    name: "Add Round Rock ISD documents",
+    name: "Try the public-source example",
   });
   await expect(liveButton).toBeDisabled();
   await expect(

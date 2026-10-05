@@ -351,7 +351,7 @@ export function FirstDayWorkspace({
         <FirstDayToast
           completionEventId={toast.completionEventId}
           language={language}
-          message={toast.message}
+          message={language === "Español" ? toast.message.es : toast.message.en}
           onDismiss={() => setToast(null)}
           onUndo={undoTask}
           taskId={toast.taskId}

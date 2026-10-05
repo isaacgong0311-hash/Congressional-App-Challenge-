@@ -15,6 +15,7 @@ import {
 import { LetterHelpScreen } from "./letter-help-screen";
 import { LetterIntake } from "./letter-intake";
 import { LetterResults } from "./letter-results";
+import { buildLetterReminderCalendar } from "./letter-calendar";
 import type { Category } from "../../resources";
 
 const LANGUAGES: { label: string; bcp47: string; tts: string }[] = [
@@ -33,38 +34,12 @@ const LANGUAGES: { label: string; bcp47: string; tts: string }[] = [
 const RTL_LANGS = new Set(["ar"]);
 
 const LOADING_STEPS = [
-  { label: "Reading your letter" },
-  { label: "Finding important dates" },
-  { label: "Checking for scam signals" },
-  { label: "Matching verified programs" },
-  { label: "Writing your reply" },
+  { label: "Reading your letter", es: "Leyendo su carta" },
+  { label: "Finding important dates", es: "Buscando fechas importantes" },
+  { label: "Checking for scam signals", es: "Buscando señales de estafa" },
+  { label: "Matching verified programs", es: "Buscando programas verificados" },
+  { label: "Writing your reply", es: "Preparando su respuesta" },
 ];
-
-function buildIcs(dateISO: string, summary: string): string {
-  const d = dateISO.replaceAll("-", "");
-  const dt = new Date(dateISO);
-  dt.setDate(dt.getDate() + 1);
-  const end = dt.toISOString().slice(0, 10).replaceAll("-", "");
-  const stamp = new Date().toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
-  return [
-    "BEGIN:VCALENDAR",
-    "VERSION:2.0",
-    "PRODID:-//Lantern//EN",
-    "BEGIN:VEVENT",
-    `UID:${stamp}-translateform@local`,
-    `DTSTAMP:${stamp}`,
-    `DTSTART;VALUE=DATE:${d}`,
-    `DTEND;VALUE=DATE:${end}`,
-    `SUMMARY:${summary.replace(/\n/g, " ")}`,
-    "BEGIN:VALARM",
-    "TRIGGER:-P1D",
-    "ACTION:DISPLAY",
-    "DESCRIPTION:Reminder",
-    "END:VALARM",
-    "END:VEVENT",
-    "END:VCALENDAR",
-  ].join("\r\n");
-}
 
 export default function LetterWorkspace() {
   const [language, setLanguage] = useState("English");
@@ -212,23 +187,38 @@ export default function LetterWorkspace() {
       body.append("image", file);
       body.append("language", language);
       body.append("readingLevel", simplify ? "simple" : "standard");
-      const res = await fetch("/api/explain", { method: "POST", body });
-      const data: unknown = await res.json();
-      if (!res.ok) {
-        setError(
-          publicApiError(data, "Something went wrong. Please try again.")
-            .message,
-        );
-      } else if (!isLetterResult(data)) {
-        setError(
-          "We couldn't safely read that response. Please try the photo again.",
-        );
-      } else {
-        setResult(data);
-        setActiveTab(0);
+      for (let attempt = 0; attempt < 2; attempt += 1) {
+        try {
+          const res = await fetch("/api/explain", { method: "POST", body });
+          const data: unknown = await res.json();
+          if (!res.ok) {
+            const responseError = publicApiError(
+              data,
+              language === "Spanish"
+                ? "Ocurrió un problema. Inténtelo de nuevo."
+                : "Something went wrong. Please try again.",
+            );
+            if (attempt === 0 && responseError.retryable) continue;
+            setError(responseError.message);
+            return;
+          }
+          if (!isLetterResult(data)) {
+            if (attempt === 0) continue;
+            setError(language === "Spanish"
+              ? "No pudimos leer la respuesta con seguridad. Intente de nuevo con la foto."
+              : "We couldn't safely read that response. Please try the photo again.");
+            return;
+          }
+          setResult(data);
+          setActiveTab(0);
+          return;
+        } catch {
+          if (attempt === 0) continue;
+          setError(language === "Spanish"
+            ? "No pudimos conectar con el servicio. Revise su conexión e inténtelo de nuevo."
+            : "We couldn't reach the server. Please check your connection and try again.");
+        }
       }
-    } catch {
-      setError("We couldn't reach the server. Please check your connection and try again.");
     } finally {
       setLoading(false);
     }
@@ -250,7 +240,9 @@ export default function LetterWorkspace() {
       setError(null);
       setPreview(url);
     } catch {
-      setError("Could not load the sample. Please upload your own photo.");
+      setError(language === "Spanish"
+        ? "No se pudo cargar el ejemplo. Suba su propia foto."
+        : "Could not load the sample. Please upload your own photo.");
     } finally {
       setSampleLoading(false);
     }
@@ -322,16 +314,20 @@ export default function LetterWorkspace() {
     setSpeaking(true);
   }
 
-  function downloadCalendar() {
-    if (!result?.deadlineISO) return;
-    const ics = buildIcs(result.deadlineISO, `Deadline: ${result.documentType}`);
+  function downloadCalendar(): boolean {
+    if (!result?.deadlineISO) return false;
+    const ics = buildLetterReminderCalendar(result.deadlineISO, `Deadline: ${result.documentType}`);
+    if (!ics) return false;
     const blob = new Blob([ics], { type: "text/calendar" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
     a.download = "deadline.ics";
+    document.body.appendChild(a);
     a.click();
-    URL.revokeObjectURL(url);
+    a.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 10_000);
+    return true;
   }
 
   function toggleChecked(i: number) {
@@ -363,8 +359,10 @@ export default function LetterWorkspace() {
     const a = document.createElement("a");
     a.href = url;
     a.download = "my-reply-letter.txt";
+    document.body.appendChild(a);
     a.click();
-    URL.revokeObjectURL(url);
+    a.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 10_000);
   }
 
   function printLetter() {
@@ -446,17 +444,21 @@ export default function LetterWorkspace() {
           href="/"
           className="mb-5 flex min-h-11 items-center gap-1.5 rounded-lg text-sm font-semibold text-slate-700 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
         >
-          ← Lantern home
+          {language === "Spanish" ? "← Inicio de Lantern" : "← Lantern home"}
         </Link>
 
         {!loading && !result && !error ? (
           <div className="mb-7">
-            <p className="lantern-eyebrow">Explain a letter</p>
+            <p className="lantern-eyebrow">{language === "Spanish" ? "Explicar una carta" : "Explain a letter"}</p>
             <h1 className="mt-3 text-balance font-serif text-4xl leading-tight tracking-[-0.04em] text-ink sm:text-5xl">
-              Understand the letter. See what to do next.
+              {language === "Spanish"
+                ? "Entienda la carta. Sepa qué hacer después."
+                : "Understand the letter. See what to do next."}
             </h1>
             <p className="mt-4 max-w-xl text-base leading-7 text-muted">
-              Take a clear photo or choose an image. Lantern will surface urgency, dates, amounts, scam signals, and practical next steps.
+              {language === "Spanish"
+                ? "Tome una foto clara o elija una imagen. Lantern le mostrará lo urgente, las fechas, los montos, las señales de estafa y los próximos pasos."
+                : "Take a clear photo or choose an image. Lantern will surface urgency, dates, amounts, scam signals, and practical next steps."}
             </p>
           </div>
         ) : null}
@@ -468,7 +470,7 @@ export default function LetterWorkspace() {
             languages={LANGUAGES}
             loading={loading}
             sampleLoading={sampleLoading}
-            loadingLabel={LOADING_STEPS[loadingMsg].label}
+            loadingLabel={language === "Spanish" ? LOADING_STEPS[loadingMsg].es : LOADING_STEPS[loadingMsg].label}
             onChooseLanguage={chooseLanguage}
             onExplain={() => void explain()}
             onFindHelp={() => {
@@ -511,7 +513,7 @@ export default function LetterWorkspace() {
                     <span className={`flex h-7 w-7 flex-none items-center justify-center rounded-full text-xs font-extrabold ${done ? "bg-confirmed text-white" : active ? "bg-cobalt text-white" : "bg-canvas text-muted"}`}>
                       {done ? <CheckIcon className="h-4 w-4" /> : i + 1}
                     </span>
-                    <span>{s.label}</span>
+                    <span>{language === "Spanish" ? s.es : s.label}</span>
                   </li>
                 );
               })}
@@ -520,7 +522,9 @@ export default function LetterWorkspace() {
         )}
 
         <div aria-live="polite" className="sr-only">
-          {loading ? LOADING_STEPS[loadingMsg].label : result ? "Analysis complete" : ""}
+          {loading
+            ? language === "Spanish" ? LOADING_STEPS[loadingMsg].es : LOADING_STEPS[loadingMsg].label
+            : result ? language === "Spanish" ? "Análisis completo" : "Analysis complete" : ""}
         </div>
 
         {error && (
@@ -530,7 +534,7 @@ export default function LetterWorkspace() {
           >
             <span aria-hidden="true">⚠️</span>
             <div>
-              <p className="font-semibold">We hit a snag</p>
+              <p className="font-semibold">{language === "Spanish" ? "Hubo un problema" : "We hit a snag"}</p>
               <p className="mt-0.5 text-sm">{error}</p>
               {file ? (
                 <div className="mt-3 flex flex-wrap gap-2">
@@ -539,14 +543,14 @@ export default function LetterWorkspace() {
                     onClick={explain}
                     type="button"
                   >
-                    Try again
+                    {language === "Spanish" ? "Intentar de nuevo" : "Try again"}
                   </button>
                   <button
                     className="min-h-11 rounded-xl border border-red-300 bg-white px-4 text-sm font-bold text-red-800 hover:bg-red-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-700"
                     onClick={reset}
                     type="button"
                   >
-                    Choose another photo
+                    {language === "Spanish" ? "Elegir otra foto" : "Choose another photo"}
                   </button>
                 </div>
               ) : null}

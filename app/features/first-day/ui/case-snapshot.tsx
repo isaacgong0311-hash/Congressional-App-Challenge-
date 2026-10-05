@@ -26,9 +26,13 @@ export function CaseSnapshot({
           <p className="text-[11px] font-extrabold uppercase tracking-[0.16em] text-cobalt">
             {caseData.mode === "fictional"
               ? translated(language, "Fictional demonstration", "Demostración ficticia")
-              : translated(language, "Round Rock ISD pilot", "Piloto de Round Rock ISD")}
+              : translated(language, "Public-source example", "Ejemplo con fuentes públicas")}
           </p>
-          <p className="mt-1 text-sm font-bold text-ink">{caseData.district}</p>
+          <p className="mt-1 text-sm font-bold text-ink">
+            {caseData.mode === "fictional"
+              ? caseData.district
+              : translated(language, "Sample district workflow", "Ejemplo de proceso distrital")}
+          </p>
         </div>
         {snapshot.openConflictCount ? (
           <WarningIcon className="h-5 w-5 text-[#9a6b12]" />
@@ -49,10 +53,10 @@ export function CaseSnapshot({
           language,
           caseData.mode === "fictional"
             ? "No account or cloud case history. Mesa View is not a real district."
-            : "Round Rock ISD is the source-checked local pilot. Lantern is independent and is not affiliated with or endorsed by the district.",
+            : "This sample references public Round Rock ISD pages. Lantern is independent and has no district partnership or endorsement.",
           caseData.mode === "fictional"
             ? "Sin cuenta ni historial en la nube. Mesa View no es un distrito real."
-            : "Round Rock ISD es el piloto local con fuentes revisadas. Lantern es independiente y no está afiliado ni respaldado por el distrito.",
+            : "Este ejemplo usa páginas públicas de Round Rock ISD. Lantern es independiente y no tiene una colaboración ni el respaldo del distrito.",
         )}
       </p>
     </section>

@@ -44,8 +44,8 @@ export function DemoRibbon({
             <span className="fd-demo-kicker">
               {translated(
                 language,
-                `Fictional demo · Beat ${index + 1} of ${DEMO_BEATS.length}`,
-                `Demo ficticia · Momento ${index + 1} de ${DEMO_BEATS.length}`,
+                `Fictional demo · Story beat ${index + 1} of ${DEMO_BEATS.length}`,
+                `Demo ficticia · Momento narrativo ${index + 1} de ${DEMO_BEATS.length}`,
               )}
             </span>
             <span className="fd-demo-title">

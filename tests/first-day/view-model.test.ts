@@ -37,6 +37,17 @@ describe("First Day presentation view", () => {
     expect(caseSnapshot(changed, planCase(changed)).pendingFactCount).toBe(1);
   });
 
+  it("does not ask for review of facts whose only source was removed", () => {
+    const changed = structuredClone(fictionalCase);
+    changed.events.push({
+      id: "event-remove-follow-up",
+      type: "source_removed",
+      documentId: "doc-follow-up-message",
+      timestamp: "2026-09-20T12:00:00.000Z",
+    });
+    expect(caseSnapshot(changed, planCase(changed)).pendingFactCount).toBe(1);
+  });
+
   it("prioritizes clarification before ready, review, waiting, and done", () => {
     const tasks = prioritizedPlanTasks(planCase(fictionalCase).tasks);
     expect(tasks.map((task) => task.state)).toEqual([

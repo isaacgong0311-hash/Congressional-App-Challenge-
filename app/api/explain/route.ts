@@ -225,11 +225,13 @@ export async function POST(req: Request) {
   const bytes = new Uint8Array(await file.arrayBuffer());
 
   try {
+    const abortSignal = AbortSignal.timeout(52_000);
     // Parse and validate the proposed JSON locally before returning it to the UI.
-    const { text } = await generateText({
-      abortSignal: AbortSignal.timeout(45_000),
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+    const { text, finishReason, usage } = await generateText({
+      abortSignal,
       model: groq(READING_MODEL),
-      maxRetries: 0,
+      maxRetries: 1,
       providerOptions: { groq: { reasoningEffort: "none" } },
       maxOutputTokens: 6000,
       system: [
@@ -276,7 +278,8 @@ export async function POST(req: Request) {
     if (!parsed.success) {
       console.error(
         "explain route schema error",
-        providerErrorSummary({
+        {
+          ...providerErrorSummary({
           requestId,
           route: "/api/explain",
           kind: "schema",
@@ -284,12 +287,20 @@ export async function POST(req: Request) {
           issueCount: parsed.error.issues.length,
           issuePaths: parsed.error.issues.map((issue) => issue.path.join(".")),
           issueCodes: parsed.error.issues.map((issue) => issue.code),
-        }),
+          }),
+          outputChars: text.length,
+          finishReason,
+          outputTokens: usage.outputTokens,
+          attempt: attempt + 1,
+        },
       );
-      return fail("INVALID_PROVIDER_RESPONSE", "Could not read this document. Try a clearer, well-lit photo.", 502, true);
+      if (attempt === 0 && !abortSignal.aborted) continue;
+      return fail("INVALID_PROVIDER_RESPONSE", readingUnavailable(language), 502, true);
     }
 
     return apiJson(parsed.data);
+    }
+    return fail("INVALID_PROVIDER_RESPONSE", readingUnavailable(language), 502, true);
   } catch (error) {
     const providerStatus =
       error && typeof error === "object" && "statusCode" in error &&

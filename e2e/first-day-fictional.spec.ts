@@ -158,7 +158,7 @@ test("guided demo follows the six-beat judge story and can exit and resume", asy
   const guide = page.getByLabel("Guided demonstration");
   await expect(guide).toBeVisible();
   await expectNoSeriousAxeViolations(page);
-  await expect(guide.getByText("Fictional demo · Beat 1 of 6")).toBeVisible();
+  await expect(guide.getByText("Fictional demo · Story beat 1 of 6")).toBeVisible();
   await expect(
     page.getByRole("heading", { name: "One case, every instruction." }),
   ).toBeVisible();
@@ -169,7 +169,7 @@ test("guided demo follows the six-beat judge story and can exit and resume", asy
   ).toBeVisible();
 
   await guide.getByRole("button", { name: "Next beat" }).click();
-  await expect(guide.getByText("Fictional demo · Beat 2 of 6")).toBeVisible();
+  await expect(guide.getByText("Fictional demo · Story beat 2 of 6")).toBeVisible();
   await expect(
     page.getByRole("heading", {
       name: "Check the facts that shape the plan.",
@@ -181,7 +181,7 @@ test("guided demo follows the six-beat judge story and can exit and resume", asy
   await expect(guide.getByText("Review 2 facts before continuing.")).toBeVisible();
 
   await guide.getByRole("button", { name: "Previous beat" }).click();
-  await expect(guide.getByText("Fictional demo · Beat 1 of 6")).toBeVisible();
+  await expect(guide.getByText("Fictional demo · Story beat 1 of 6")).toBeVisible();
   await guide.getByRole("button", { name: "Next beat" }).click();
 
   const immunization = page.getByRole("article").filter({
@@ -204,7 +204,7 @@ test("guided demo follows the six-beat judge story and can exit and resume", asy
   ).toBeVisible();
   await expect(guide.getByRole("button", { name: "Next beat" })).toBeEnabled();
   await guide.getByRole("button", { name: "Next beat" }).click();
-  await expect(guide.getByText("Fictional demo · Beat 3 of 6")).toBeVisible();
+  await expect(guide.getByText("Fictional demo · Story beat 3 of 6")).toBeVisible();
   await expect(
     page.getByRole("heading", {
       name: "Two documents. One unanswered question.",
@@ -217,7 +217,7 @@ test("guided demo follows the six-beat judge story and can exit and resume", asy
     .getByRole("button", { name: "Record what the school told me" })
     .last()
     .click();
-  await expect(guide.getByText("Fictional demo · Beat 4 of 6")).toBeVisible();
+  await expect(guide.getByText("Fictional demo · Story beat 4 of 6")).toBeVisible();
   await expect(page.getByText("One answer · one focused update")).toBeVisible();
   await expect(page.getByText("Only the plan steps that depended on this answer were updated.")).toBeVisible();
   await expect(page.getByText("School answer: Gym entrance")).toBeVisible();
@@ -258,10 +258,10 @@ test("guided demo follows the six-beat judge story and can exit and resume", asy
     page.getByRole("heading", { name: "What to do next, and why." }),
   ).toBeVisible();
   await page.getByRole("button", { name: "Resume guided demo" }).click();
-  await expect(guide.getByText("Fictional demo · Beat 4 of 6")).toBeVisible();
+  await expect(guide.getByText("Fictional demo · Story beat 4 of 6")).toBeVisible();
 
   await guide.getByRole("button", { name: "Next beat" }).click();
-  await expect(guide.getByText("Fictional demo · Beat 5 of 6")).toBeVisible();
+  await expect(guide.getByText("Fictional demo · Story beat 5 of 6")).toBeVisible();
   await expect(
     page.getByRole("heading", { name: "A plan the family can carry." }),
   ).toBeVisible();
@@ -270,7 +270,7 @@ test("guided demo follows the six-beat judge story and can exit and resume", asy
   await expect(confirmedFacts.getByText("Gym entrance", { exact: true })).toBeVisible();
 
   await guide.getByRole("button", { name: "Next beat" }).click();
-  await expect(guide.getByText("Fictional demo · Beat 6 of 6")).toBeVisible();
+  await expect(guide.getByText("Fictional demo · Story beat 6 of 6")).toBeVisible();
   const proof = page.locator("[data-demo-proof='true']");
   await expect(proof).toHaveAttribute("open", "");
   await expect(
@@ -293,7 +293,7 @@ test("guided demo follows the six-beat judge story and can exit and resume", asy
   const spanishGuide = page.getByLabel("Demostración guiada");
   await spanishGuide.getByRole("button", { name: "Reiniciar demo" }).click();
   await expect(
-    spanishGuide.getByText("Demo ficticia · Momento 1 de 6"),
+    spanishGuide.getByText("Demo ficticia · Momento narrativo 1 de 6"),
   ).toBeVisible();
   await expect(
     page.getByRole("heading", { name: "Un caso, todas las instrucciones." }),
@@ -344,7 +344,7 @@ test("confirmed dates download as a real calendar file", async ({ page }) => {
   const contents = await readFile(path!, "utf8");
   expect(contents).toContain("BEGIN:VCALENDAR");
   expect(contents).toContain("UID:lantern-fact-registration-date");
-  expect(contents).toContain("DTSTART;VALUE=DATE:20270812");
+  expect(contents).toContain("DTSTART:20270812T090000");
   await expect(page.getByText("Calendar file downloaded.", { exact: false })).toBeVisible();
 });
 

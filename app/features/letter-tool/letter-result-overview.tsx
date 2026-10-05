@@ -8,24 +8,26 @@ import type { Result } from "./letter-tool-state";
 export function LetterResultOverview({
   result,
   urgencyLabel,
+  spanish = false,
 }: {
   result: Result;
   urgencyLabel: string;
+  spanish?: boolean;
 }) {
   const nextStep = result.nextSteps[0];
   const attention = result.deadline
     ? result.deadline
     : result.isPossibleScam
-      ? "Possible scam signals need review"
-      : result.whatTheyNeed[0] ?? "No urgent requirement found";
+      ? (spanish ? "Revise las posibles señales de estafa" : "Possible scam signals need review")
+      : result.whatTheyNeed[0] ?? (spanish ? "No se encontró ningún requisito urgente" : "No urgent requirement found");
 
   return (
-    <section aria-label="Letter summary" className="grid gap-3 lg:grid-cols-3">
+    <section aria-label={spanish ? "Resumen de la carta" : "Letter summary"} className="grid gap-3 lg:grid-cols-3">
       <article className="letter-summary-card">
         <span className="letter-icon-well text-cobalt"><DocumentIcon className="h-5 w-5" /></span>
         <div>
           <p className="text-xs font-extrabold uppercase tracking-[0.15em] text-cobalt">
-            1 · What it means
+            1 · {spanish ? "Qué significa" : "What it means"}
           </p>
           <h2 className="mt-3 text-lg font-bold tracking-[-0.025em] text-ink">
             {result.documentType}
@@ -40,7 +42,7 @@ export function LetterResultOverview({
         <span className="letter-icon-well bg-white/80 text-[#795a18]"><ShieldAlertIcon className="h-5 w-5" /></span>
         <div>
           <p className="text-xs font-extrabold uppercase tracking-[0.15em] text-[#795a18]">
-            2 · What needs attention
+            2 · {spanish ? "Qué necesita atención" : "What needs attention"}
           </p>
           <p className="mt-3 text-lg font-bold tracking-[-0.025em] text-ink">
             {attention}
@@ -55,13 +57,13 @@ export function LetterResultOverview({
         <span className="letter-icon-well bg-white/80 text-cobalt"><CheckIcon className="h-5 w-5" /></span>
         <div>
           <p className="text-xs font-extrabold uppercase tracking-[0.15em] text-cobalt">
-            3 · What to do next
+            3 · {spanish ? "Qué hacer ahora" : "What to do next"}
           </p>
           <p className="mt-3 text-lg font-bold tracking-[-0.025em] text-ink">
-            {nextStep?.step ?? "Review the original letter"}
+            {nextStep?.step ?? (spanish ? "Revise la carta original" : "Review the original letter")}
           </p>
           <p className="mt-2 line-clamp-2 text-sm leading-6 text-[#53628b]">
-            {nextStep?.detail ?? "Confirm important details with the office named on the document."}
+            {nextStep?.detail ?? (spanish ? "Confirme los datos importantes con la oficina indicada en el documento." : "Confirm important details with the office named on the document.")}
           </p>
         </div>
       </article>
@@ -69,15 +71,15 @@ export function LetterResultOverview({
   );
 }
 
-export function LetterMobilePreview({ preview }: { preview: string }) {
+export function LetterMobilePreview({ preview, spanish = false }: { preview: string; spanish?: boolean }) {
   return (
     <details className="rounded-card border border-ink/10 bg-surface p-4 md:hidden">
       <summary className="min-h-11 cursor-pointer py-2 text-sm font-bold text-ink">
-        View the original letter
+        {spanish ? "Ver la carta original" : "View the original letter"}
       </summary>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        alt="Your letter"
+        alt={spanish ? "Su carta" : "Your letter"}
         className="mt-3 max-h-[70vh] w-full rounded-xl border border-ink/10 object-contain"
         src={preview}
       />

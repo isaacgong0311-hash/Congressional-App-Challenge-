@@ -119,7 +119,7 @@ export function PlanStep({
               {translated(language, "One answer · one focused update", "Una respuesta · una actualización precisa")}
             </p>
             <h2 className="mt-2 text-xl font-bold tracking-[-0.025em]">
-              {localizedTaskCopy(highlightedTask, language).title}
+              {translated(language, "School answer recorded", "Respuesta de la escuela registrada")}
             </h2>
             <p className="mt-2 text-sm leading-6 text-muted">
               {translated(
@@ -177,8 +177,8 @@ export function PlanStep({
             <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-cobalt">
               {translated(language, "Best next step", "Mejor paso siguiente")}
             </p>
-            <p className="mt-2 text-xl font-bold tracking-[-0.025em] text-ink">
-              {localizedTaskCopy(bestNext, language).title}
+            <p className="mt-2 text-sm font-bold text-ink">
+              {translated(language, "See the highlighted task in the plan below.", "Vea el paso destacado en el plan de abajo.")}
             </p>
             <p className="mt-2 text-sm leading-6 text-[#53628b]">
               {localizedTaskCopy(bestNext, language).action}

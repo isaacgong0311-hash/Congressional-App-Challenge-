@@ -82,16 +82,16 @@ export function StartStep({
                 <DocumentIcon className="h-4 w-4" />
                 {translated(
                   language,
-                  "Add Round Rock ISD documents",
-                  "Añadir documentos de Round Rock ISD",
+                  "Try the public-source example",
+                  "Probar el ejemplo con fuentes públicas",
                 )}
               </button>
             </div>
             <p className="mt-4 max-w-xl text-xs leading-5 text-[#65716b]">
               {translated(
                 language,
-                "Mesa View is a fictional demonstration. Round Rock ISD is the source-checked local pilot; Lantern is an independent student project and is not affiliated with or endorsed by the district.",
-                "Mesa View es una demostración ficticia. Round Rock ISD es el piloto local con fuentes revisadas; Lantern es un proyecto estudiantil independiente y no está afiliado ni respaldado por el distrito.",
+                "Mesa View is fictional. The optional sample workflow references public Round Rock ISD enrollment pages. It is an independent student example, not a district pilot or partnership.",
+                "Mesa View es ficticio. El ejemplo opcional usa páginas públicas de inscripción de Round Rock ISD. Es un proyecto estudiantil independiente, no un piloto ni una colaboración con el distrito.",
               )}
             </p>
             {!allowLive || providerCapability !== "available" ? (

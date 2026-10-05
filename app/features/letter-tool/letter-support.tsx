@@ -14,13 +14,14 @@ type LocalResource = {
   desc: string;
 };
 
-export function LocalHelpFinder({ category }: { category: Category }) {
+export function LocalHelpFinder({ category, spanish = false }: { category: Category; spanish?: boolean }) {
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
   const [loading, setLoading] = useState(false);
   const [resources, setResources] = useState<LocalResource[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [unavailable, setUnavailable] = useState(false);
+  const copy = (english: string, translated: string) => spanish ? translated : english;
 
   async function search() {
     if (!state.trim()) return;
@@ -39,7 +40,7 @@ export function LocalHelpFinder({ category }: { category: Category }) {
         return;
       }
       if (!response.ok) {
-        setError(publicApiError(data, "Search failed.").message);
+        setError(publicApiError(data, copy("Search failed.", "La búsqueda falló.")).message);
         return;
       }
       setResources(
@@ -48,7 +49,7 @@ export function LocalHelpFinder({ category }: { category: Category }) {
           : [],
       );
     } catch {
-      setError("Could not reach the server. Please try again.");
+      setError(copy("Could not reach the server. Please try again.", "No se pudo conectar con el servidor. Inténtelo de nuevo."));
     } finally {
       setLoading(false);
     }
@@ -64,9 +65,9 @@ export function LocalHelpFinder({ category }: { category: Category }) {
             <SearchIcon className="h-5 w-5" />
           </span>
           <div>
-            <h3 className="font-bold text-ink">Find local help near you</h3>
+            <h3 className="font-bold text-ink">{copy("Find local help near you", "Encuentre ayuda cerca de usted")}</h3>
             <p className="text-xs text-muted">
-              Live web search for <span className="font-medium">{category}</span> programs beyond the national list.
+              {copy("Live web search for", "Búsqueda en la web de programas de")} <span className="font-medium">{category}</span> {copy("programs beyond the national list.", "además de la lista nacional.")}
             </p>
           </div>
         </div>
@@ -74,14 +75,16 @@ export function LocalHelpFinder({ category }: { category: Category }) {
           <input
             className="min-h-11 min-w-0 flex-1 rounded-xl border border-ink/15 bg-white px-3 text-sm focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-amber"
             onChange={(event) => setCity(event.target.value)}
-            placeholder="City (optional)"
+            placeholder={copy("City (optional)", "Ciudad (opcional)")}
+            aria-label={copy("City (optional)", "Ciudad (opcional)")}
             value={city}
           />
           <input
             className="min-h-11 rounded-xl border border-ink/15 bg-white px-3 text-sm focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-amber sm:w-28"
             onChange={(event) => setState(event.target.value)}
             onKeyDown={(event) => event.key === "Enter" && void search()}
-            placeholder="State *"
+            placeholder={copy("State *", "Estado *")}
+            aria-label={copy("State (required)", "Estado (obligatorio)")}
             value={state}
           />
           <button
@@ -90,7 +93,7 @@ export function LocalHelpFinder({ category }: { category: Category }) {
             onClick={() => void search()}
             type="button"
           >
-            {loading ? <Spinner /> : "Search"}
+            {loading ? <Spinner /> : copy("Search", "Buscar")}
           </button>
         </div>
         {error ? <p className="mt-2 text-sm text-review">{error}</p> : null}
@@ -100,7 +103,7 @@ export function LocalHelpFinder({ category }: { category: Category }) {
         <div className="border-t border-cobalt/15 px-5 pb-5">
           {resources.length === 0 ? (
             <p className="pt-4 text-sm text-muted">
-              No results found for {city || state}. Try a broader location.
+              {spanish ? `No se encontraron resultados para ${city || state}. Pruebe una zona más amplia.` : `No results found for ${city || state}. Try a broader location.`}
             </p>
           ) : (
             <ul className="mt-4 space-y-2">
@@ -119,7 +122,7 @@ export function LocalHelpFinder({ category }: { category: Category }) {
                     </div>
                     {resource.phone ? (
                       <a className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-ink/15 px-3 text-sm font-bold text-cobalt" href={`tel:${resource.phone.replace(/[^+\d]/g, "")}`}>
-                        <PhoneIcon className="h-4 w-4" /> Call {resource.phone}
+                        <PhoneIcon className="h-4 w-4" /> {copy("Call", "Llamar al")} {resource.phone}
                       </a>
                     ) : null}
                   </div>
@@ -128,7 +131,7 @@ export function LocalHelpFinder({ category }: { category: Category }) {
             </ul>
           )}
           <p className="mt-3 text-xs text-muted">
-            AI-generated from live web search — verify details before calling.
+            {copy("AI-generated from live web search — verify details before calling.", "Generado por IA a partir de una búsqueda web. Verifique los datos antes de llamar.")}
           </p>
         </div>
       ) : null}
@@ -182,7 +185,7 @@ export function Detail({ label, value }: { label: string; value: string }) {
   );
 }
 
-export function ResourceRow({ resource }: { resource: Resource }) {
+export function ResourceRow({ resource, spanish = false }: { resource: Resource; spanish?: boolean }) {
   return (
     <li className="rounded-xl border border-ink/10 p-3">
       <div className="flex flex-col items-start justify-between gap-3 sm:flex-row">
@@ -197,7 +200,7 @@ export function ResourceRow({ resource }: { resource: Resource }) {
         </div>
         {resource.phone ? (
           <a className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-ink/15 px-3 text-sm font-bold text-cobalt" href={`tel:${resource.phone.replace(/[^+\d]/g, "")}`}>
-            <PhoneIcon className="h-4 w-4" /> Call {resource.phone}
+            <PhoneIcon className="h-4 w-4" /> {spanish ? "Llamar al" : "Call"} {resource.phone}
           </a>
         ) : null}
       </div>

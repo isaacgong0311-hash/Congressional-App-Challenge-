@@ -57,7 +57,7 @@ Use this checklist for the exact public 1–3 minute Congressional App Challenge
 
 - [ ] Add accurate captions and review every technical term and number.
 - [ ] Create a transcript from the actual final take.
-- [ ] Upload to YouTube or Vimeo with public or unlisted visibility accepted by the submission process.
+- [ ] Upload to YouTube or Vimeo with **public** visibility, as required by the 2026 CAC rules.
 - [ ] Test the link in a signed-out/private browser window.
 - [ ] Confirm playback does not require permission or an account.
 - [ ] Record the final video URL, duration, publication state, transcript path, commit, tag, and deployment in `submission-manifest.md` only after each exists.

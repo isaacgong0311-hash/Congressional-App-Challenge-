@@ -99,7 +99,7 @@ export function buildLiveTasks(
     const anchorFact = requestedItems[0] ?? confirmedFacts[0];
     tasks.push({
       id: "task-live-open-enrollment",
-      title: "Open the Round Rock ISD enrollment form",
+      title: "Review the source enrollment form",
       action:
         "Create the portal account, complete the new-student form, then set up guardian access.",
       detail:

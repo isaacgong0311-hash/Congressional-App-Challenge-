@@ -115,7 +115,7 @@ export function localizedTaskCopy(task: DerivedTask, language: Language) {
   if (task.id === "task-live-open-enrollment") {
     return {
       ...task,
-      title: "Abrir el formulario de inscripción de Round Rock ISD",
+      title: "Revisar el formulario de inscripción de la fuente",
       action:
         "Cree la cuenta del portal, complete el formulario de estudiante nuevo y configure el acceso del tutor.",
       detail:
@@ -159,8 +159,8 @@ export const FACT_ES: Record<string, string> = {
   "fact-registration-location": "Lugar de inscripción",
   "fact-immunization-record": "¿Tiene el registro de vacunas de Maya?",
   "fact-nurse-review": "Revisión con la enfermera",
-  "fact-orientation-cafeteria": "Lugar de orientación",
-  "fact-orientation-gym": "Lugar de orientación",
+  "fact-orientation-cafeteria": "Carta de bienvenida: cafetería",
+  "fact-orientation-gym": "Mensaje de seguimiento: entrada del gimnasio",
   "fact-interpreter-preference": "¿Necesita un intérprete?",
 };
 

@@ -12,6 +12,7 @@ import {
 import { publicApiError } from "../../../lib/api-error";
 import { adaptLiveExtraction } from "../adapters/live-extraction";
 import { appendSourceRemoval } from "../domain/events";
+import { factHasActiveSource } from "../domain/evidence";
 import { mergeExtraction } from "../domain/extraction";
 import { deriveLiveCase } from "../domain/live-tasks";
 import {
@@ -20,34 +21,11 @@ import {
   type UploadQueueItem,
   type UploadRejectionCode,
 } from "../domain/upload-queue";
-import type {
-  Fact,
-  FirstDayCase,
-  FirstDayExtractionResponse,
-} from "../domain/types";
+import type { FirstDayCase, FirstDayExtractionResponse } from "../domain/types";
 import { FirstDayExtractionSchema } from "../server/extraction-schema";
 import { translated, type StepId } from "./first-day-copy";
 
-export function factHasActiveSource(caseData: FirstDayCase, fact: Fact) {
-  const removedDocumentIds = new Set(
-    caseData.events
-      .filter((event) => event.type === "source_removed")
-      .map((event) => event.documentId),
-  );
-
-  return fact.evidenceIds.some((evidenceId) => {
-    const evidence = caseData.evidence.find((item) => item.id === evidenceId);
-    if (!evidence) return false;
-    if (evidence.procedureId) return true;
-    if (!evidence.documentId || removedDocumentIds.has(evidence.documentId)) {
-      return false;
-    }
-    return caseData.documents.some(
-      (document) =>
-        document.id === evidence.documentId && document.status !== "removed",
-    );
-  });
-}
+export { factHasActiveSource };
 
 export function canEnterLiveStep(caseData: FirstDayCase, step: StepId) {
   if (caseData.mode !== "live") return true;

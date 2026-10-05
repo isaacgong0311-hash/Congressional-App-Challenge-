@@ -8,9 +8,13 @@ This repository builds from the public [`TRANSLATEtheform`](https://github.com/i
 
 First Day is the flagship experience at `/`, and the general Lantern letter explanation workspace is available at `/explain`. A complete First Day fictional demo is available at `/first-day?demo=1`, with source-linked facts, deterministic task states, conflict resolution, English/Spanish interface copy, undoable task completion, JSON and calendar downloads, and printable output. A static technical walkthrough is available at `/first-day/how-it-works`, and the browser-data boundary is documented at `/privacy`.
 
-First Day also includes a live Round Rock ISD pilot for up to five JPG/PNG pages. It processes pages sequentially, preserves successful pages when another fails, supports per-page retry and removal, validates exact evidence quotes, and keeps live plans limited to versioned, source-checked enrollment procedures. This pilot is not reviewed, endorsed, or partnered with Round Rock ISD.
+First Day also includes an independent public-source example using Round Rock ISD enrollment pages for up to five JPG/PNG pages. It processes pages sequentially, preserves successful pages when another fails, supports per-page retry and removal, validates exact evidence quotes, and keeps plans limited to versioned, source-checked enrollment procedures. This is not a district pilot or partnership; Round Rock ISD has not reviewed or endorsed Lantern. Use synthetic or sample pages, not a real child's records.
 
 The initial First Day school and district scenario is **fictional**. It exists to test evidence handling and deterministic plan logic; it is not real district policy or proof of a school partnership.
+
+The demonstration is free. Lantern has no paid plan, subscription, district contract, or signup today. Pilot and feedback inquiries can be started through the app's `/contact` page.
+
+Provider-backed letter reading retries one malformed model response on the server and one recoverable request failure in the browser. These are recovery measures, not a measured uptime guarantee; the fictional First Day demo remains available without a provider.
 
 ## Local setup
 
@@ -57,7 +61,7 @@ The application does not intentionally write uploaded images to disk or a databa
 
 Every route receives `nosniff`, frame-denial, strict referrer, and camera/microphone/geolocation permission headers. These headers reduce browser attack surface; they do not replace request validation, exact-quote evidence checks, or careful provider privacy controls.
 
-Review [the approved design](docs/superpowers/specs/2026-09-15-lantern-first-day-design.md), [competition upgrade plan](docs/superpowers/plans/2026-09-16-lantern-competition-upgrade.md), [Decision Trace code tour](docs/submission/decision-trace-code-tour.md), [held-out evaluation](evaluation/first-day/report.md), and [AI disclosure](docs/submission/ai-disclosure.md) for scope, architecture, and measured limitations.
+Review [the CAC final sprint plan](docs/superpowers/plans/2026-10-04-cac-final-sprint.md), [the approved design](docs/superpowers/specs/2026-09-15-lantern-first-day-design.md), [Decision Trace code tour](docs/submission/decision-trace-code-tour.md), [held-out evaluation](evaluation/first-day/report.md), and [AI disclosure](docs/submission/ai-disclosure.md) for scope, architecture, and measured limitations.
 
 The [backend code tour](docs/submission/backend-code-tour.md) explains the validated server boundary, provider adapters, safe failure contract, privacy-safe logs, and the tested handoff from AI proposals to deterministic planning code.
 

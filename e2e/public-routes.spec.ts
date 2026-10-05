@@ -71,15 +71,15 @@ test("unknown routes use the branded recovery page", async ({ page }) => {
   );
 });
 
-test("First Day clearly separates the fictional demo from the local pilot", async ({
+test("First Day clearly separates the fictional demo from the public-source example", async ({
   page,
 }) => {
   await page.goto("/first-day");
   await expect(
-    page.getByText("Mesa View is a fictional demonstration.", { exact: false }),
+    page.getByText("Mesa View is fictional.", { exact: false }),
   ).toBeVisible();
   await expect(
-    page.getByText("not affiliated with or endorsed by the district", {
+    page.getByText("not a district pilot or partnership", {
       exact: false,
     }),
   ).toBeVisible();

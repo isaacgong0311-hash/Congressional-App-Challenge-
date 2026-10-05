@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import type { Dispatch, SetStateAction } from "react";
+import { useState, type Dispatch, type SetStateAction } from "react";
 
 import {
   CalendarIcon,
@@ -18,6 +18,7 @@ import {
 import { SegmentedControl } from "../../components/lantern/primitives";
 import { CRISIS_RESOURCES, RESOURCES, SCAM_RESOURCE } from "../../resources";
 import type { Result } from "./letter-tool-state";
+import { validReminderDate } from "./letter-calendar";
 import { LetterMobilePreview, LetterResultOverview } from "./letter-result-overview";
 import { Collapsible, Detail, LocalHelpFinder, ResourceRow } from "./letter-support";
 
@@ -62,7 +63,8 @@ function fleschKincaidGrade(text: string): number {
 }
 
 function daysUntil(iso: string): number {
-  const date = new Date(iso);
+  const [year, month, day] = iso.split("-").map(Number);
+  const date = new Date(year, month - 1, day);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   return Math.round((date.getTime() - today.getTime()) / 86400000);
@@ -105,7 +107,7 @@ export function LetterResults({
   translatedLetter: string | null;
   translatingLetter: boolean;
   copyLetter: () => void;
-  downloadCalendar: () => void;
+  downloadCalendar: () => boolean;
   downloadLetter: () => void;
   printLetter: () => void;
   readAloud: () => void;
@@ -115,6 +117,11 @@ export function LetterResults({
   toggleChecked: (index: number) => void;
   translateLetter: () => Promise<void>;
 }) {
+  const [calendarNotice, setCalendarNotice] = useState(false);
+  const [printNotice, setPrintNotice] = useState(false);
+  const es = lang.label === "Spanish";
+  const copy = (english: string, spanish: string) => es ? spanish : english;
+  const deadlineIsValid = validReminderDate(result.deadlineISO);
   const kd = result.keyDetails;
   const hasDetails = Boolean(kd && (kd.sender || kd.contactPhone || kd.accountNumber || kd.amountDue));
   const hasActions = result.nextSteps.length > 0 || result.whatTheyNeed.length > 0 || result.documentChecklist.length > 0 || (result.responseLetter.applicable && Boolean(result.responseLetter.body)) || Boolean(result.phoneScript);
@@ -123,13 +130,13 @@ export function LetterResults({
           <section
             className="mt-6 space-y-4"
             lang={lang.bcp47}
-            aria-label="Explanation of your letter"
+            aria-label={copy("Explanation of your letter", "Explicación de su carta")}
             aria-live="polite"
           >
             {/* Human-in-loop banner + FK grade */}
             <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-ink/10 bg-surface px-4 py-2.5 text-xs text-muted">
-              <span><span className="font-semibold">Lantern explains — it doesn&apos;t decide.</span>{" "}Always confirm with the office named on your letter before taking action.</span>
-              {result.originalText && (() => {
+              <span><span className="font-semibold">{copy("Lantern explains — it doesn't decide.", "Lantern explica; usted decide.")}</span>{" "}{copy("Always confirm with the office named on your letter before taking action.", "Confirme siempre con la oficina indicada en su carta antes de actuar.")}</span>
+              {!es && result.originalText && (() => {
                 const before = fleschKincaidGrade(result.originalText);
                 const after = fleschKincaidGrade(result.meaning);
                 const improved = after < before;
@@ -143,10 +150,11 @@ export function LetterResults({
 
             <LetterResultOverview
               result={result}
-              urgencyLabel={URGENCY_LABEL[result.urgency]}
+              urgencyLabel={es ? { high: "Urgente", medium: "Plazo próximo", low: "No urgente" }[result.urgency] : URGENCY_LABEL[result.urgency]}
+              spanish={es}
             />
 
-            {preview ? <LetterMobilePreview preview={preview} /> : null}
+            {preview ? <LetterMobilePreview preview={preview} spanish={es} /> : null}
 
 
             {result.photoQualityNote && (
@@ -161,7 +169,7 @@ export function LetterResults({
                 className="ttf-fade-in rounded-2xl border-2 border-orange-500 bg-orange-50 p-4"
               >
                 <p className="flex items-center gap-2 font-bold text-orange-900">
-                  <ShieldAlertIcon className="h-5 w-5 shrink-0" /> This may be a scam — please be careful
+                  <ShieldAlertIcon className="h-5 w-5 shrink-0" /> {copy("This may be a scam — please be careful", "Esto podría ser una estafa: tenga cuidado")}
                 </p>
                 {result.scamSigns.length > 0 && (
                   <ul className="mt-2 list-disc space-y-1 ps-5 text-orange-900">
@@ -171,9 +179,7 @@ export function LetterResults({
                   </ul>
                 )}
                 <p className="mt-2 text-sm text-orange-800">
-                  Do not send money, gift cards, or personal information until you
-                  confirm this is real by contacting the organization through an
-                  official phone number you look up yourself.
+                  {copy("Do not send money, gift cards, or personal information until you confirm this is real by contacting the organization through an official phone number you look up yourself.", "No envíe dinero, tarjetas de regalo ni información personal hasta confirmar que es real. Busque el número oficial de la organización y llame usted mismo.")}
                 </p>
                 {result.scamAgencyFacts && (
                   <div className="mt-3">
@@ -183,7 +189,7 @@ export function LetterResults({
                       className="flex items-center gap-1.5 text-sm font-semibold text-orange-900 underline-offset-2 hover:underline focus-visible:outline-none"
                       aria-expanded={scamExpanded}
                     >
-                      {scamExpanded ? "▾" : "▸"} Why we flagged this — what the real agency does
+                      {scamExpanded ? "▾" : "▸"} {copy("Why we flagged this — what the real agency does", "Por qué lo señalamos y qué hace la agencia real")}
                     </button>
                     {scamExpanded && (
                       <p className="mt-2 rounded-lg bg-white/70 p-3 text-sm text-orange-900">
@@ -200,7 +206,7 @@ export function LetterResults({
                 role="alert"
                 className="ttf-fade-in rounded-2xl border-2 border-red-400 bg-red-50 p-4"
               >
-                <p className="flex items-center gap-2 font-semibold text-red-800"><ShieldAlertIcon className="h-5 w-5 shrink-0" /> This needs attention soon</p>
+                <p className="flex items-center gap-2 font-semibold text-red-800"><ShieldAlertIcon className="h-5 w-5 shrink-0" /> {copy("This needs attention soon", "Esto necesita atención pronto")}</p>
                 <p className="mt-1 text-red-800">{result.crisisMessage}</p>
               </div>
             )}
@@ -210,10 +216,10 @@ export function LetterResults({
               {preview && (
                 <div className="hidden md:flex md:flex-col md:gap-2 md:pt-0">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={preview} alt="Your letter" className="max-h-[70vh] w-full rounded-card border border-ink/10 bg-white object-contain shadow-[0_18px_45px_rgba(20,36,30,.08)]" />
+                  <img src={preview} alt={copy("Your letter", "Su carta")} className="max-h-[70vh] w-full rounded-card border border-ink/10 bg-white object-contain shadow-[0_18px_45px_rgba(20,36,30,.08)]" />
                   <div className="flex flex-wrap gap-1">
-                    <span className={`rounded-full border px-2 py-0.5 text-xs font-semibold ${URGENCY_STYLES[result.urgency]}`}>{URGENCY_LABEL[result.urgency]}</span>
-                    {result.keyDetails?.amountDue && <span className="rounded-full border border-review/20 bg-[#fbe8e3] px-2 py-0.5 text-xs font-semibold text-review">Amount {result.keyDetails.amountDue}</span>}
+                    <span className={`rounded-full border px-2 py-0.5 text-xs font-semibold ${URGENCY_STYLES[result.urgency]}`}>{es ? { high: "Urgente", medium: "Plazo próximo", low: "No urgente" }[result.urgency] : URGENCY_LABEL[result.urgency]}</span>
+                    {result.keyDetails?.amountDue && <span className="rounded-full border border-review/20 bg-[#fbe8e3] px-2 py-0.5 text-xs font-semibold text-review">{copy("Amount", "Monto")} {result.keyDetails.amountDue}</span>}
                     {result.keyDetails?.contactPhone && <span className="inline-flex items-center gap-1 rounded-full border border-ink/10 bg-white px-2 py-0.5 text-xs text-muted"><PhoneIcon className="h-3 w-3" /> {result.keyDetails.contactPhone}</span>}
                   </div>
                 </div>
@@ -222,12 +228,12 @@ export function LetterResults({
             {/* Tab bar */}
             <div className="letter-result-shell overflow-hidden rounded-feature border border-ink/10 bg-surface shadow-[0_18px_55px_rgba(20,36,30,.07)]">
               <SegmentedControl
-                label="Explanation sections"
+                label={copy("Explanation sections", "Secciones de la explicación")}
                 onChange={(value) => setActiveTab(value)}
                 options={[
-                  { icon: <DocumentIcon />, label: "Understand", value: 0 },
-                  { icon: <CheckIcon />, label: "Take Action", value: 1 },
-                  { icon: <HelpIcon />, label: "Get Help", value: 2 },
+                  { icon: <DocumentIcon />, label: copy("Understand", "Entender"), value: 0 },
+                  { icon: <CheckIcon />, label: copy("Take Action", "Actuar"), value: 1 },
+                  { icon: <HelpIcon />, label: copy("Get Help", "Obtener ayuda"), value: 2 },
                 ] as const}
                 value={activeTab}
               />
@@ -242,83 +248,89 @@ export function LetterResults({
                           {result.documentType}
                         </p>
                         <span className={`rounded-full border px-2 py-0.5 text-xs font-semibold ${URGENCY_STYLES[result.urgency]}`}>
-                          {URGENCY_LABEL[result.urgency]}
+                          {es ? { high: "Urgente", medium: "Plazo próximo", low: "No urgente" }[result.urgency] : URGENCY_LABEL[result.urgency]}
                         </span>
                         {result.detectedLetterLanguage && result.detectedLetterLanguage !== "English" && (
                           <span className="rounded-full border border-cobalt/20 bg-[#eef2ff] px-2 py-0.5 text-xs font-medium text-cobalt">
-                            Letter in {result.detectedLetterLanguage}
+                            {copy("Letter in", "Carta en")} {result.detectedLetterLanguage}
                           </span>
                         )}
                       </div>
                       <div className="mt-3 flex items-center justify-between gap-3">
-                        <h2 className="text-xl font-bold">What this means</h2>
+                        <h2 className="text-xl font-bold">{copy("What this means", "Qué significa")}</h2>
                         <button
                           onClick={readAloud}
-                          aria-label={speaking ? "Stop reading explanation" : "Read explanation aloud"}
+                          aria-label={speaking ? copy("Stop reading explanation", "Detener la lectura") : copy("Read explanation aloud", "Leer la explicación en voz alta")}
                           className="letter-action-button"
                           aria-pressed={speaking}
                         >
                           {speaking ? <StopIcon className="h-4 w-4" /> : <VolumeIcon className="h-4 w-4" />}
-                          {speaking ? "Stop" : "Read aloud"}
+                          {speaking ? copy("Stop", "Detener") : copy("Read aloud", "Leer en voz alta")}
                         </button>
                       </div>
                       <p className="mt-2 text-base leading-relaxed text-ink/80">{result.meaning}</p>
                       <div className="mt-4 rounded-xl border border-ink/10 bg-canvas p-3 text-sm text-muted">
-                        <p><span className="font-semibold">Why I think this:</span> {result.whyThisType}</p>
+                        <p><span className="font-semibold">{copy("Why I think this:", "Por qué lo creemos:")}</span> {result.whyThisType}</p>
                         <div className="mt-2 flex items-center gap-2">
-                          <span className="font-semibold">Confidence:</span>
+                          <span className="font-semibold">{copy("Confidence:", "Confianza:")}</span>
                           <span className="inline-flex h-2 w-24 overflow-hidden rounded-full bg-ink/10">
                             <span className={`h-full ${result.confidence >= 60 ? "bg-confirmed" : "bg-amber"}`} style={{ width: `${result.confidence}%` }} />
                           </span>
                           <span>{result.confidence}%</span>
                         </div>
                         {result.confidence < 60 && (
-                          <p className="mt-1 text-amber-700">Please double-check — the photo may be unclear.</p>
+                          <p className="mt-1 text-amber-700">{copy("Please double-check — the photo may be unclear.", "Revise la carta original: la foto podría no ser clara.")}</p>
                         )}
                       </div>
                     </div>
 
                     {result.deadline && (
                       <div className={`rounded-2xl p-4 ${
-                        result.deadlineISO && daysUntil(result.deadlineISO) <= 7
+                        deadlineIsValid && daysUntil(result.deadlineISO!) <= 7
                           ? "border-2 border-red-400 bg-red-50"
-                          : result.deadlineISO && daysUntil(result.deadlineISO) <= 14
+                        : deadlineIsValid && daysUntil(result.deadlineISO!) <= 14
                           ? "border border-orange-300 bg-orange-50"
                           : "border border-amber-300 bg-amber-50"
                       }`}>
-                        <p className={`flex items-center gap-2 font-semibold ${result.deadlineISO && daysUntil(result.deadlineISO) <= 7 ? "text-red-900" : "text-amber-900"}`}><CalendarIcon className="h-5 w-5" /> Important date</p>
-                        <p className={`mt-1 ${result.deadlineISO && daysUntil(result.deadlineISO) <= 7 ? "text-red-900" : "text-amber-900"}`}>{result.deadline}</p>
-                        {result.deadlineISO && (() => {
-                          const days = daysUntil(result.deadlineISO);
+                        <p className={`flex items-center gap-2 font-semibold ${deadlineIsValid && daysUntil(result.deadlineISO!) <= 7 ? "text-red-900" : "text-amber-900"}`}><CalendarIcon className="h-5 w-5" /> {copy("Important date", "Fecha importante")}</p>
+                        <p className={`mt-1 ${deadlineIsValid && daysUntil(result.deadlineISO!) <= 7 ? "text-red-900" : "text-amber-900"}`}>{result.deadline}</p>
+                        {deadlineIsValid && (() => {
+                          const days = daysUntil(result.deadlineISO!);
                           return (
                             <p className={`mt-1 text-sm font-semibold ${days <= 7 ? "text-red-700" : days <= 14 ? "text-orange-700" : "text-amber-700"}`}>
-                              {days < 0 ? "This date has passed." : days === 0 ? "Due today!" : `${days} day${days === 1 ? "" : "s"} away`}
+                              {days < 0 ? copy("This date has passed.", "Esta fecha ya pasó.") : days === 0 ? copy("Due today!", "¡Vence hoy!") : es ? `Faltan ${days} ${days === 1 ? "día" : "días"}` : `${days} day${days === 1 ? "" : "s"} away`}
                             </p>
                           );
                         })()}
-                        <p className="mt-1 text-sm text-amber-700">Double-check this date on the letter yourself before acting.</p>
-                        {result.deadlineISO && (
-                          <button onClick={downloadCalendar} className="mt-3 rounded-lg border border-amber-400 bg-white px-3 py-1.5 text-sm font-medium text-amber-900 transition hover:bg-amber-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500">
-                            Add reminder to calendar
+                        <p className="mt-1 text-sm text-amber-700">{copy("Double-check this date on the letter yourself before acting.", "Confirme esta fecha en la carta original antes de actuar.")}</p>
+                        {result.deadlineISO && !deadlineIsValid && (
+                          <p className="mt-2 text-sm font-semibold text-amber-900" role="status">
+                            {copy("We couldn't verify a calendar date from this letter. Check the original before adding a reminder.", "No pudimos verificar una fecha para el calendario. Revise la carta original antes de añadir un recordatorio.")}
+                          </p>
+                        )}
+                        {deadlineIsValid && (
+                          <button onClick={() => setCalendarNotice(downloadCalendar())} className="mt-3 rounded-lg border border-amber-400 bg-white px-3 py-1.5 text-sm font-medium text-amber-900 transition hover:bg-amber-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500">
+                            {lang.label === "Spanish" ? "Añadir recordatorio al calendario" : "Add reminder to calendar"}
                           </button>
                         )}
+                        {calendarNotice && <p className="mt-2 text-sm font-medium text-amber-900" role="status">{lang.label === "Spanish" ? "Archivo de calendario descargado. Ábralo para añadir el recordatorio." : "Calendar file downloaded. Open it to add the reminder."}</p>}
                       </div>
                     )}
 
                     {result.whatHappensIfNothing && (
                       <div className="rounded-xl border border-ink/10 bg-canvas p-4">
-                        <p className="flex items-center gap-2 font-semibold text-ink"><LightbulbIcon className="h-5 w-5 text-cobalt" /> What happens if you do nothing?</p>
+                        <p className="flex items-center gap-2 font-semibold text-ink"><LightbulbIcon className="h-5 w-5 text-cobalt" /> {copy("What happens if you do nothing?", "¿Qué pasa si no hace nada?")}</p>
                         <p className="mt-1 text-sm text-muted">{result.whatHappensIfNothing}</p>
                       </div>
                     )}
 
                     {hasDetails && (
-                      <Collapsible title="Key details" subtitle="Read from your letter by AI — double-check against the original">
+                      <Collapsible title={copy("Key details", "Datos importantes")} subtitle={copy("Read from your letter by AI — double-check against the original", "Leídos por IA: compárelos con la carta original")}>
                         <dl className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                          {kd!.sender && <Detail label="From" value={kd!.sender} />}
-                          {kd!.contactPhone && <Detail label="Phone" value={kd!.contactPhone} />}
-                          {kd!.accountNumber && <Detail label="Account / case #" value={kd!.accountNumber} />}
-                          {kd!.amountDue && <Detail label="Amount" value={kd!.amountDue} />}
+                          {kd!.sender && <Detail label={copy("From", "Remitente")} value={kd!.sender} />}
+                          {kd!.contactPhone && <Detail label={copy("Phone", "Teléfono")} value={kd!.contactPhone} />}
+                          {kd!.accountNumber && <Detail label={copy("Account / case #", "Número de cuenta o caso")} value={kd!.accountNumber} />}
+                          {kd!.amountDue && <Detail label={copy("Amount", "Monto")} value={kd!.amountDue} />}
                         </dl>
                       </Collapsible>
                     )}
@@ -330,7 +342,7 @@ export function LetterResults({
                   <div className="space-y-4">
                     {result.nextSteps.length > 0 && (
                       <div>
-                        <h2 className="text-xl font-bold">Your next steps</h2>
+                        <h2 className="text-xl font-bold">{copy("Your next steps", "Sus próximos pasos")}</h2>
                         <ol className="mt-3 space-y-4">
                           {result.nextSteps.map((s, i) => (
                             <li key={i} className="flex gap-3">
@@ -347,7 +359,7 @@ export function LetterResults({
 
                     {result.whatTheyNeed.length > 0 && (
                       <div className="rounded-xl border border-ink/10 bg-canvas p-4">
-                        <h2 className="font-bold text-ink">What they need from you</h2>
+                        <h2 className="font-bold text-ink">{copy("What they need from you", "Lo que necesitan de usted")}</h2>
                         <ul className="mt-2 space-y-1.5">
                           {result.whatTheyNeed.map((item, i) => (
                             <li key={i} className="flex gap-2 text-muted"><span className="text-cobalt">•</span><span>{item}</span></li>
@@ -359,8 +371,8 @@ export function LetterResults({
                     {result.documentChecklist.length > 0 && (
                       <div>
                         <div className="flex flex-wrap items-baseline justify-between gap-2">
-                          <h2 className="font-bold text-ink">Documents to gather</h2>
-                          <span className="text-sm font-medium text-muted">{`${checked.size} of ${result.documentChecklist.length} ready`}</span>
+                          <h2 className="font-bold text-ink">{copy("Documents to gather", "Documentos que debe reunir")}</h2>
+                          <span className="text-sm font-medium text-muted">{es ? `${checked.size} de ${result.documentChecklist.length} listos` : `${checked.size} of ${result.documentChecklist.length} ready`}</span>
                         </div>
                         <ul className="mt-2 space-y-2">
                           {result.documentChecklist.map((c, i) => {
@@ -382,46 +394,46 @@ export function LetterResults({
                     )}
 
                     {result.responseLetter.applicable && result.responseLetter.body && (
-                      <Collapsible accent icon={<span className="letter-icon-well"><DocumentIcon className="h-5 w-5" /></span>} title="Your reply, already written" subtitle={result.responseLetter.kind ? `${result.responseLetter.kind} · tap to read, print, or send` : "Tap to read, print, or send"}>
+                      <Collapsible accent icon={<span className="letter-icon-well"><DocumentIcon className="h-5 w-5" /></span>} title={copy("Your reply, already written", "Su respuesta ya redactada")} subtitle={result.responseLetter.kind ? `${result.responseLetter.kind} · ${copy("tap to read, print, or send", "toque para leer, imprimir o enviar")}` : copy("Tap to read, print, or send", "Toque para leer, imprimir o enviar")}>
                         <div className="flex items-start justify-between gap-3">
-                          <p className="text-sm text-muted">We drafted a reply you can print, sign, and send. It&apos;s written in English because that&apos;s what the office reads. Fill in anything in [brackets] and check it before sending.</p>
+                          <p className="text-sm text-muted">{copy("We drafted a reply you can print, sign, and send. It's written in English because that's what the office reads. Fill in anything in [brackets] and check it before sending.", "Redactamos una respuesta que puede imprimir, firmar y enviar. Está en inglés para que la oficina pueda leerla. Complete lo que aparezca entre [corchetes] y revísela antes de enviarla.")}</p>
                           {lang.label !== "English" && (
                             <button onClick={() => void translateLetter()} disabled={translatingLetter} className="letter-action-button flex-none px-3 text-xs disabled:opacity-50">
-                              {translatingLetter ? "Translating…" : translatedLetter ? "Show English" : `Translate to ${lang.label}`}
+                              {translatingLetter ? copy("Translating…", "Traduciendo…") : translatedLetter ? copy("Show English", "Ver en inglés") : copy(`Translate to ${lang.label}`, "Traducir al español")}
                             </button>
                           )}
                         </div>
-                        {translatedLetter && <p className="mt-2 rounded-lg bg-[#eef2ff] px-3 py-1.5 text-xs text-cobalt">Showing {lang.label} translation — send the English version above to the office.</p>}
+                        {translatedLetter && <p className="mt-2 rounded-lg bg-[#eef2ff] px-3 py-1.5 text-xs text-cobalt">{copy(`Showing ${lang.label} translation — send the English version above to the office.`, "Mostrando la traducción al español. Envíe la versión en inglés a la oficina.")}</p>}
                         <pre className="ttf-scroll mt-3 max-h-80 overflow-auto whitespace-pre-wrap rounded-xl border border-ink/10 bg-canvas p-4 font-serif text-sm leading-relaxed text-ink">{translatedLetter ?? result.responseLetter.body}</pre>
                         <div className="mt-3 flex flex-wrap gap-2">
-                          <button onClick={copyLetter} className="inline-flex min-h-11 items-center gap-1.5 rounded-xl bg-cobalt px-4 text-sm font-bold text-white transition hover:bg-cobalt-dark focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-amber">{copiedLetter ? <><CheckIcon className="h-4 w-4" /> Copied</> : "Copy"}</button>
-                          <button onClick={downloadLetter} className="letter-action-button px-4">Download</button>
-                          <button onClick={printLetter} className="letter-action-button px-4">Print</button>
+                          <button onClick={copyLetter} className="inline-flex min-h-11 items-center gap-1.5 rounded-xl bg-cobalt px-4 text-sm font-bold text-white transition hover:bg-cobalt-dark focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-amber">{copiedLetter ? <><CheckIcon className="h-4 w-4" /> {copy("Copied", "Copiado")}</> : copy("Copy", "Copiar")}</button>
+                          <button onClick={downloadLetter} className="letter-action-button px-4">{copy("Download", "Descargar")}</button>
+                          <button onClick={printLetter} className="letter-action-button px-4">{copy("Print", "Imprimir")}</button>
                         </div>
                       </Collapsible>
                     )}
 
                     {result.phoneScript && (
                       <div className="rounded-2xl border border-cobalt/20 bg-[#eef2ff] p-5">
-                        <h2 className="flex items-center gap-2 text-xl font-bold text-ink"><PhoneIcon className="h-5 w-5 text-cobalt" /> What to say when you call</h2>
+                        <h2 className="flex items-center gap-2 text-xl font-bold text-ink"><PhoneIcon className="h-5 w-5 text-cobalt" /> {copy("What to say when you call", "Qué decir al llamar")}</h2>
                         <p className="mt-2 italic leading-relaxed text-[#34487f]">&ldquo;{result.phoneScript}&rdquo;</p>
                         <div className="mt-4 flex flex-wrap items-start gap-4">
                           {kd?.contactPhone && (
                             <a href={`tel:${kd.contactPhone.replace(/[^+\d]/g, "")}`} className="inline-flex min-h-11 items-center rounded-xl bg-cobalt px-4 text-sm font-bold text-white transition hover:bg-cobalt-dark focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-amber">
-                              Call {kd.contactPhone}
+                              {copy("Call", "Llamar al")} {kd.contactPhone}
                             </a>
                           )}
                           <div className="flex items-center gap-3 rounded-xl border border-cobalt/15 bg-white p-3">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={`https://api.qrserver.com/v1/create-qr-code/?size=88x88&format=png&data=${encodeURIComponent(result.phoneScript + (kd?.contactPhone ? `\n\nCall: ${kd.contactPhone}` : ""))}`} alt="QR code — scan to save the phone script on your phone" width={88} height={88} className="rounded-lg" />
-                            <p className="max-w-[120px] text-xs leading-relaxed text-muted">Scan to get this script on your phone</p>
+                            <img src={`https://api.qrserver.com/v1/create-qr-code/?size=88x88&format=png&data=${encodeURIComponent(result.phoneScript + (kd?.contactPhone ? `\n\nCall: ${kd.contactPhone}` : ""))}`} alt={copy("QR code — scan to save the phone script on your phone", "Código QR para guardar el guion de llamada en su teléfono")} width={88} height={88} className="rounded-lg" />
+                            <p className="max-w-[120px] text-xs leading-relaxed text-muted">{copy("Scan to get this script on your phone", "Escanee para guardar este guion en su teléfono")}</p>
                           </div>
                         </div>
                       </div>
                     )}
 
                     {!hasActions && (
-                      <p className="text-sm text-muted">No specific actions required for this document.</p>
+                      <p className="text-sm text-muted">{copy("No specific actions required for this document.", "Este documento no requiere ninguna acción específica.")}</p>
                     )}
                   </div>
                 )}
@@ -445,18 +457,18 @@ export function LetterResults({
 
                     <div>
                       <div className="flex flex-wrap items-center gap-2">
-                        <h2 className="text-xl font-bold">Real help you can use now</h2>
-                        <span className="inline-flex items-center gap-1 rounded-full bg-[#e3f4e8] px-2.5 py-0.5 text-xs font-semibold text-[#24633a] ring-1 ring-confirmed/20"><CheckIcon className="h-3 w-3" /> Verified</span>
+                        <h2 className="text-xl font-bold">{copy("Real help you can use now", "Ayuda real que puede usar ahora")}</h2>
+                        <span className="inline-flex items-center gap-1 rounded-full bg-[#e3f4e8] px-2.5 py-0.5 text-xs font-semibold text-[#24633a] ring-1 ring-confirmed/20"><CheckIcon className="h-3 w-3" /> {copy("Verified", "Verificado")}</span>
                       </div>
-                      <p className="mt-1 text-sm text-muted">These are real national programs from official sources — not AI-generated. We never invent phone numbers.</p>
+                      <p className="mt-1 text-sm text-muted">{copy("These are real national programs from official sources — not AI-generated. We never invent phone numbers.", "Estos programas nacionales provienen de fuentes oficiales. No son inventados por IA. Nunca inventamos números de teléfono.")}</p>
                       <ul className="mt-3 space-y-2">
-                        {result.isPossibleScam && <ResourceRow resource={SCAM_RESOURCE} />}
-                        {result.isCrisis && CRISIS_RESOURCES.map((r) => <ResourceRow key={r.name} resource={r} />)}
-                        {RESOURCES[result.category].map((r) => <ResourceRow key={r.name} resource={r} />)}
+                        {result.isPossibleScam && <ResourceRow resource={SCAM_RESOURCE} spanish={es} />}
+                        {result.isCrisis && CRISIS_RESOURCES.map((r) => <ResourceRow key={r.name} resource={r} spanish={es} />)}
+                        {RESOURCES[result.category].map((r) => <ResourceRow key={r.name} resource={r} spanish={es} />)}
                       </ul>
                     </div>
 
-                    <LocalHelpFinder category={result.category} />
+                    <LocalHelpFinder category={result.category} spanish={es} />
                   </div>
                 )}
               </div>
@@ -465,25 +477,25 @@ export function LetterResults({
 
             <div className="flex items-start gap-2 rounded-xl border border-amber/35 bg-[#fff8df] p-3 text-xs text-[#795a18]">
               <ShieldAlertIcon className="mt-0.5 h-4 w-4 shrink-0" />
-              <p><span className="font-semibold">AI can make mistakes.</span>{" "}Always verify critical dates, amounts, and requirements directly on
-              your original letter before acting. For legal or immigration
-              matters, consult a qualified professional.</p>
+              <p><span className="font-semibold">{copy("AI can make mistakes.", "La IA puede cometer errores.")}</span>{" "}{copy("Always verify critical dates, amounts, and requirements directly on your original letter before acting. For legal or immigration matters, consult a qualified professional.", "Antes de actuar, compruebe las fechas, los montos y los requisitos en la carta original. Para asuntos legales o migratorios, consulte a un profesional calificado.")}</p>
             </div>
 
             <div className="flex flex-wrap justify-center gap-3 pt-1 print:hidden">
               <button
-                onClick={() => window.print()}
+                onClick={() => { setPrintNotice(true); window.print(); }}
                 className="letter-action-button px-5"
+                type="button"
               >
-                Save as PDF
+                {lang.label === "Spanish" ? "Guardar como PDF" : "Save as PDF"}
               </button>
               <button
                 onClick={reset}
                 className="letter-action-button px-5"
               >
-                Explain another letter
+                {lang.label === "Spanish" ? "Explicar otra carta" : "Explain another letter"}
               </button>
             </div>
+            {printNotice && <p className="text-center text-sm text-muted" role="status">{lang.label === "Spanish" ? "En el diálogo de impresión, elija «Guardar como PDF» como destino." : "In the print dialog, choose “Save as PDF” as the destination."}</p>}
           </section>
   );
 }

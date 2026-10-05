@@ -215,8 +215,8 @@ export function DocumentsStep({
               <p className="mt-2 max-w-2xl text-sm leading-6 text-[#59665f]">
                 {translated(
                   language,
-                  "For this source-checked local pilot, use Round Rock ISD enrollment pages. Lantern is an independent student project and is not affiliated with or endorsed by the district. Choose up to five JPG or PNG pages. Each page can be 10 MB, with a 25 MB case limit.",
-                  "Para este piloto local con fuentes revisadas, use páginas de inscripción de Round Rock ISD. Lantern es un proyecto estudiantil independiente y no está afiliado ni respaldado por el distrito. Elija hasta cinco páginas JPG o PNG. Cada página puede tener 10 MB, con un límite total de 25 MB.",
+                  "This independent sample workflow references public Round Rock ISD enrollment pages; the district has not reviewed or endorsed Lantern. Use sample pages only. Choose up to five JPG or PNG pages, up to 10 MB each and 25 MB total.",
+                  "Este ejemplo independiente usa páginas públicas de inscripción de Round Rock ISD; el distrito no ha revisado ni respaldado Lantern. Use solo páginas de ejemplo. Elija hasta cinco páginas JPG o PNG, de hasta 10 MB cada una y 25 MB en total.",
                 )}
               </p>
             </div>

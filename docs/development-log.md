@@ -92,6 +92,14 @@ Provider pricing and retention terms are external and may change. The project do
 - Added runtime guarding for malformed letter-tool responses, a recoverable retry state, browser speech fallback coverage, RTL direction updates, and deferred loading for the optional practice assistant.
 - Added visual regression baselines for 10 critical states at 390, 768, 1024, and 1440 pixels with a 1% threshold, plus horizontal-overflow checks, Letter/A4 PDF checks, accessibility scans, layout-shift/transfer gates, and privacy-storage coverage.
 
+## 2026-10-04 — CAC final sprint, audit stabilization
+
+- Added a dated CAC plan that prioritizes the provider-free fictional judge journey, honest adult validation, one verified release, and the required public video before the October 26, 12:00 p.m. EDT deadline.
+- Corrected fact-review and narrator consistency; repaired calendar, PDF, and text download actions; improved retry handling, Spanish result controls, public-source labeling, copy spacing, and duplicate headings. Added browser coverage for both Yes and No answers to the interpreter question.
+- Updated browser assertions for the clarified story-beat label and timed calendar events. Reviewed the changed mobile guide, desktop start page, and Decision Trace screenshots before refreshing their visual baselines.
+- Local gate: `npm run lint`, `npm test` (153 passed), `npm run evaluate:first-day` (20 synthetic packets; 32/32 fact precision and recall), `npm run build`, `npm run test:e2e` (79 passed, 7 intentional skips), and `git diff --check` all passed. These results do not establish provider uptime or production deployment.
+- The 2026 rules require the demonstration on a public YouTube or Vimeo video; corrected the video checklist to remove the unlisted option.
+
 ## AI assistance disclosure
 
 OpenAI Codex assisted with:

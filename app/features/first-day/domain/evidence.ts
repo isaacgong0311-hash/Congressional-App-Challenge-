@@ -1,4 +1,25 @@
-import type { FirstDayCase } from "./types";
+import type { Fact, FirstDayCase } from "./types";
+
+export function factHasActiveSource(caseData: FirstDayCase, fact: Fact) {
+  const removedDocumentIds = new Set(
+    caseData.events
+      .filter((event) => event.type === "source_removed")
+      .map((event) => event.documentId),
+  );
+
+  return fact.evidenceIds.some((evidenceId) => {
+    const evidence = caseData.evidence.find((item) => item.id === evidenceId);
+    if (!evidence) return false;
+    if (evidence.procedureId) return true;
+    if (!evidence.documentId || removedDocumentIds.has(evidence.documentId)) {
+      return false;
+    }
+    return caseData.documents.some(
+      (document) =>
+        document.id === evidence.documentId && document.status !== "removed",
+    );
+  });
+}
 
 export type EvidenceIssue = {
   code: "missing_document" | "quote_not_found" | "missing_evidence";

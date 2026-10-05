@@ -58,8 +58,10 @@ function downloadFile(contents: string, type: string, fileName: string) {
   const link = document.createElement("a");
   link.href = url;
   link.download = fileName;
+  document.body.appendChild(link);
   link.click();
-  window.setTimeout(() => URL.revokeObjectURL(url), 0);
+  link.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 10_000);
 }
 
 export function ExportStep({
@@ -277,7 +279,11 @@ export function ExportStep({
             <h2 className="mt-5 font-serif text-4xl tracking-[-0.04em]">
               {planTitle}
             </h2>
-            <p className="mt-2 text-sm text-[#68756e]">{caseData.district}</p>
+            <p className="mt-2 text-sm text-[#68756e]">
+              {caseData.mode === "fictional"
+                ? caseData.district
+                : translated(language, "Sample district workflow", "Ejemplo de proceso distrital")}
+            </p>
           </div>
           <div className="rounded-2xl bg-[#fff5d8] px-4 py-3 text-sm font-semibold text-[#795a18]">
             {unresolved.length}{" "}

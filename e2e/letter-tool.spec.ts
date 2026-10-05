@@ -91,6 +91,85 @@ test("Explain intake keeps one clear primary action and stable processing status
   ).toBeVisible();
 });
 
+test("letter calendar and PDF actions give usable output", async ({ page }) => {
+  await page.route("**/api/explain", (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify(validResult),
+    }),
+  );
+  await page.goto("/explain");
+  await page.getByRole("button", { name: /Try a sample/ }).click();
+  await page.getByRole("button", { name: "Explain this letter" }).click();
+  await expect(page.getByRole("heading", { name: "Utility notice", exact: true })).toBeVisible();
+
+  const downloadPromise = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Add reminder to calendar" }).click();
+  expect((await downloadPromise).suggestedFilename()).toBe("deadline.ics");
+  await expect(page.getByText("Calendar file downloaded. Open it to add the reminder.")).toBeVisible();
+
+  await page.evaluate(() => {
+    window.print = () => { document.documentElement.dataset.printInvoked = "true"; };
+  });
+  await page.getByRole("button", { name: "Save as PDF" }).click();
+  await expect(page.locator("html")).toHaveAttribute("data-print-invoked", "true");
+  await expect(page.getByText("In the print dialog, choose")).toBeVisible();
+});
+
+test("invalid generated calendar dates are explained and cannot be downloaded", async ({ page }) => {
+  await page.route("**/api/explain", (route) => route.fulfill({
+    status: 200,
+    contentType: "application/json",
+    body: JSON.stringify({ ...validResult, deadlineISO: "2026-02-30" }),
+  }));
+  await page.goto("/explain");
+  await page.getByRole("button", { name: /Try a sample/ }).click();
+  await page.getByRole("button", { name: "Explain this letter" }).click();
+  await expect(page.getByText("We couldn't verify a calendar date from this letter.", { exact: false })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Add reminder to calendar" })).toHaveCount(0);
+});
+
+test("Spanish letter results translate the primary actions and warnings", async ({ page }) => {
+  await page.route("**/api/explain", (route) => route.fulfill({
+    status: 200,
+    contentType: "application/json",
+    body: JSON.stringify(validResult),
+  }));
+  await page.goto("/explain");
+  await page.getByRole("tab", { name: "Options" }).click();
+  await page.getByLabel("Explain in this language").selectOption("Spanish");
+  await page.getByRole("tab", { name: "Subir" }).click();
+  await page.getByRole("button", { name: /Pruebe un ejemplo/ }).click();
+  await page.getByRole("button", { name: "Explicar esta carta" }).click();
+  await expect(page.getByRole("tab", { name: "Entender" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Qué significa" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Añadir recordatorio al calendario" })).toBeVisible();
+  await page.getByRole("tab", { name: "Actuar" }).click();
+  await expect(page.getByRole("heading", { name: "Sus próximos pasos" })).toBeVisible();
+});
+
+test("a transient reading failure retries the same photo once", async ({ page }) => {
+  let attempts = 0;
+  await page.route("**/api/explain", (route) => {
+    attempts += 1;
+    return route.fulfill({
+      status: attempts === 1 ? 503 : 200,
+      contentType: "application/json",
+      body: JSON.stringify(
+        attempts === 1
+          ? { error: { code: "PROVIDER_UNAVAILABLE", message: "Temporarily unavailable", retryable: true } }
+          : validResult,
+      ),
+    });
+  });
+  await page.goto("/explain");
+  await page.getByRole("button", { name: /Try a sample/ }).click();
+  await page.getByRole("button", { name: "Explain this letter" }).click();
+  await expect(page.getByRole("heading", { name: "Utility notice", exact: true })).toBeVisible();
+  expect(attempts).toBe(2);
+});
+
 test("no-letter help feels like a complete product path", async ({ page }) => {
   await page.goto("/explain");
   await page.getByRole("button", { name: "Find help without a letter" }).click();
@@ -192,6 +271,32 @@ test("letter language updates direction and persists as a shared preference", as
       ),
     )
     .toMatchObject({ preferredLanguage: "ar" });
+});
+
+test("Spanish letter setup, breadcrumb, and recovery copy follow the selected language", async ({ page }) => {
+  await page.route("**/api/explain", (route) =>
+    route.fulfill({
+      status: 503,
+      contentType: "application/json",
+      body: JSON.stringify({
+        error: {
+          code: "PROVIDER_UNAVAILABLE",
+          message: "El servicio de lectura no está disponible en este momento.",
+          retryable: false,
+        },
+      }),
+    }),
+  );
+  await page.goto("/explain");
+  await page.getByRole("tab", { name: "Options" }).click();
+  await page.getByLabel("Explain in this language").selectOption("Spanish");
+  await expect(page.getByRole("heading", { name: "Entienda la carta. Sepa qué hacer después." })).toBeVisible();
+  await expect(page.getByRole("link", { name: "← Inicio de Lantern" })).toBeVisible();
+  await page.getByRole("tab", { name: "Subir" }).click();
+  await page.getByRole("button", { name: /Pruebe un ejemplo/ }).click();
+  await page.getByRole("button", { name: "Explicar esta carta" }).click();
+  await expect(page.locator('.ttf-fade-in[role="alert"]')).toContainText("Hubo un problema");
+  await expect(page.getByRole("button", { name: "Intentar de nuevo" })).toBeVisible();
 });
 
 test("crisis and scam guidance remain distinct while local help loads", async ({

@@ -83,11 +83,11 @@ export default function AboutPage() {
             <p className="text-xs font-extrabold uppercase tracking-[0.18em] !text-amber">
               What is real
             </p>
-            <h2 className="mt-4 text-4xl !text-white">A source-checked local pilot.</h2>
+            <h2 className="mt-4 text-4xl !text-white">A public-source example.</h2>
             <p className="mt-5 !text-white/70">
-              The live workflow uses public Round Rock ISD enrollment pages as a
-              local procedure pilot. Lantern is independent and is not affiliated
-              with, reviewed by, or endorsed by the district.
+              The optional workflow references public Round Rock ISD enrollment
+              pages. It is an independent student example. The district has not
+              partnered with, reviewed, or endorsed Lantern.
             </p>
           </article>
           <article className="info-card">
@@ -101,6 +101,23 @@ export default function AboutPage() {
               asking anyone to upload a real family document.
             </p>
           </article>
+        </section>
+
+        <section className="info-shell pb-8" aria-label="Access and pricing">
+          <div className="info-card">
+            <p className="text-xs font-extrabold uppercase tracking-[0.18em] !text-cobalt">
+              Access and pricing
+            </p>
+            <h2 className="mt-4 text-3xl">The demo is free. There is no paid plan.</h2>
+            <p className="mt-4 max-w-3xl">
+              Lantern is a student project. There is no subscription, school
+              contract, or public signup today. A future model would need to be
+              tested with families and educators before pricing is set.
+            </p>
+            <Link className="mt-5 inline-flex font-bold text-cobalt underline decoration-cobalt/30 underline-offset-4" href="/contact">
+              Share feedback or ask about a pilot <ArrowUpRightIcon className="ml-2 h-5 w-5" />
+            </Link>
+          </div>
         </section>
 
         <section className="info-shell pb-20">

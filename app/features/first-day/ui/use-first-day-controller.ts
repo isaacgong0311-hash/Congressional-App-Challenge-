@@ -34,7 +34,7 @@ import { useProviderCapability } from "./use-provider-capability";
 export type { PresentationMode } from "./first-day-view";
 
 type ToastState = {
-  message: string;
+  message: { en: string; es: string };
   taskId?: string;
   completionEventId?: string;
 } | null;
@@ -236,7 +236,7 @@ export function useFirstDayController({
     );
     setHighlightedTaskId(taskId);
     setToast({
-      message: language === "Español" ? "Paso marcado como terminado." : "Step marked done.",
+      message: { en: "Step marked done.", es: "Paso marcado como terminado." },
       taskId,
       completionEventId,
     });
@@ -259,7 +259,7 @@ export function useFirstDayController({
       }),
     );
     setToast({
-      message: language === "Español" ? "El paso volvió al plan." : "Step returned to the plan.",
+      message: { en: "Step returned to the plan.", es: "El paso volvió al plan." },
     });
   }
 
@@ -286,10 +286,10 @@ export function useFirstDayController({
     setHighlightedTaskId(relatedTaskId ?? null);
     setTraceTaskId(relatedTaskId ?? null);
     setToast({
-      message:
-        language === "Español"
-          ? "El plan se actualizó solo donde dependía de esta respuesta."
-          : "Only the plan steps that depended on this answer were updated.",
+      message: {
+        en: "Only the plan steps that depended on this answer were updated.",
+        es: "El plan se actualizó solo donde dependía de esta respuesta.",
+      },
     });
     setCurrentStep("plan");
     if (presentationMode === "guided_demo") {
