@@ -59,7 +59,7 @@ export function LetterIntake({
   const es = language === "Spanish";
   const copy = (english: string, spanish: string) => es ? spanish : english;
   return (
-    <div className="overflow-hidden rounded-feature border border-ink/10 bg-surface shadow-[0_18px_55px_rgba(20,36,30,.07)]">
+    <div className="letter-intake-shell overflow-hidden rounded-feature border border-ink/10 bg-surface shadow-[0_18px_55px_rgba(20,36,30,.07)]">
       <SegmentedControl
         label={copy("Letter setup", "Opciones de la carta")}
         onChange={(value) => setFormTab(value)}
@@ -81,7 +81,7 @@ export function LetterIntake({
           <div className="space-y-4">
             {!preview ? (
               <>
-                <label className="flex cursor-pointer flex-col items-center justify-center rounded-feature border-2 border-dashed border-ink/20 bg-canvas/70 px-6 py-12 text-center transition hover:border-cobalt hover:bg-[#eef2ff] focus-within:border-cobalt focus-within:ring-2 focus-within:ring-cobalt/30">
+                <label className="letter-dropzone flex cursor-pointer flex-col items-center justify-center rounded-feature border-2 border-dashed border-ink/20 bg-canvas/70 px-6 py-12 text-center transition hover:border-cobalt hover:bg-[#eef2ff] focus-within:border-cobalt focus-within:ring-2 focus-within:ring-cobalt/30">
                   <span className="letter-upload-action">
                     <CameraIcon className="h-5 w-5" />
                     {copy("Choose a letter photo", "Elegir una foto de la carta")}

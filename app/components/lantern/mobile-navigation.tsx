@@ -51,7 +51,7 @@ export function MobileNavigation({
   }, [open]);
 
   return (
-    <div className="relative lg:hidden">
+    <div className="relative xl:hidden">
       <button
         aria-controls="lantern-mobile-navigation"
         aria-expanded={open}

@@ -429,7 +429,7 @@ export default function LetterWorkspace() {
               onToggleLargeText={toggleLT}
             />
             <span className="hidden items-center gap-1 rounded-full bg-[#e4f4e8] px-2.5 py-1 text-xs font-bold text-confirmed ring-1 ring-[#bbdec5] sm:inline-flex">
-              <LockIcon /> No saved history
+              <LockIcon /> {language === "Spanish" ? "Sin historial guardado" : "No saved history"}
             </span>
           </>
         }

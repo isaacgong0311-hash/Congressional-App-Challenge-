@@ -311,14 +311,16 @@ export function DocumentsStep({
                         `Página ${document.pageIndex}`,
                       )}{" "}
                       ·{` `}
-                      {caseData.mode === "live" && queued
-                        ? `${(queued.size / 1024 / 1024).toFixed(1)} MB`
-                        : document.sourceVersion}
+                      {caseData.mode === "fictional"
+                        ? translated(language, "Fictional sample", "Ejemplo ficticio")
+                        : queued
+                          ? `${(queued.size / 1024 / 1024).toFixed(1)} MB`
+                          : translated(language, "Uploaded page", "Página subida")}
                       {typeof document.confidence === "number"
                         ? translated(
                             language,
-                            ` · ${document.confidence}% confidence`,
-                            ` · ${document.confidence}% de confianza`,
+                            ` · AI reading estimate ${document.confidence}%`,
+                            ` · Estimación de lectura de IA ${document.confidence}%`,
                           )
                         : ""}
                     </p>

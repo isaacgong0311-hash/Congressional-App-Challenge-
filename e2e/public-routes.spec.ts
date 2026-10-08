@@ -60,6 +60,20 @@ test("mobile navigation is keyboard reachable and closes on Escape", async ({
   expect(width.scroll).toBeLessThanOrEqual(width.client + 1);
 });
 
+test("navigation stays readable at compact desktop width", async ({ page }) => {
+  await page.setViewportSize({ width: 1024, height: 900 });
+  await page.goto("/explain");
+  await expect(
+    page.getByRole("navigation", { name: "Main navigation" }),
+  ).toBeHidden();
+  const menu = page.getByRole("button", { name: "Open navigation" });
+  await expect(menu).toBeVisible();
+  await menu.click();
+  await expect(
+    page.getByRole("navigation", { name: "Mobile navigation" }),
+  ).toBeVisible();
+});
+
 test("unknown routes use the branded recovery page", async ({ page }) => {
   const response = await page.goto("/about-us");
   expect(response?.status()).toBe(404);

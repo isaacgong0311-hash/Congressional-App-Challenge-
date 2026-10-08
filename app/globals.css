@@ -2,15 +2,15 @@
 @import "./styles/info-pages.css";
 
 :root {
-  --background: #f4f1ea;
-  --foreground: #14241e;
-  --lantern-canvas: #f4f1ea;
+  --background: #f6f3eb;
+  --foreground: #162a22;
+  --lantern-canvas: #f6f3eb;
   --lantern-surface: #fffefa;
-  --lantern-ink: #14241e;
-  --lantern-muted: #4f5f56;
-  --lantern-cobalt: #3556d4;
-  --lantern-cobalt-dark: #2948be;
-  --lantern-amber: #e7b23e;
+  --lantern-ink: #162a22;
+  --lantern-muted: #455b50;
+  --lantern-cobalt: #304fc4;
+  --lantern-cobalt-dark: #253ea4;
+  --lantern-amber: #dca332;
   --lantern-confirmed: #287a47;
   --lantern-review: #a1493b;
 }
@@ -48,7 +48,8 @@ body {
 }
 
 ::selection {
-  background: #c7d7fe;
+  background: #e9d7a3;
+  color: #162a22;
 }
 
 .lantern-primary-cta,
@@ -62,7 +63,7 @@ body {
   padding: 0.8rem 1.15rem;
   font-size: 0.92rem;
   font-weight: 780;
-  transition: transform 160ms ease, background 160ms ease, box-shadow 160ms ease;
+  transition: transform 180ms ease, background 180ms ease, box-shadow 180ms ease;
 }
 
 .lantern-primary-cta {
@@ -74,6 +75,11 @@ body {
 .lantern-primary-cta:hover {
   background: var(--lantern-cobalt-dark);
   transform: translateY(-1px);
+}
+
+.lantern-primary-cta:active,
+.lantern-secondary-cta:active {
+  transform: translateY(1px);
 }
 
 .lantern-secondary-cta {

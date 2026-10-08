@@ -7,8 +7,8 @@ import type {
 } from "react";
 
 const buttonStyles = {
-  primary: "bg-cobalt text-white shadow-[0_10px_24px_rgba(53,86,212,.2)] hover:bg-cobalt-dark",
-  secondary: "border border-ink/15 bg-white text-ink hover:bg-canvas",
+  primary: "bg-cobalt text-white shadow-[0_12px_26px_rgba(48,79,196,.2)] hover:bg-cobalt-dark",
+  secondary: "border border-ink/20 bg-white text-ink hover:bg-canvas",
   danger: "border border-review/25 bg-[#fbe8e3] text-review hover:bg-[#f7dcd5]",
 } as const;
 
@@ -26,7 +26,7 @@ export function Button({
   return (
     <button
       aria-busy={busy || undefined}
-      className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-4 text-sm font-bold transition focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-amber disabled:cursor-not-allowed disabled:opacity-50 ${buttonStyles[variant]} ${className}`}
+      className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-4 text-sm font-bold transition duration-200 active:translate-y-px focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-amber disabled:cursor-not-allowed disabled:opacity-50 ${buttonStyles[variant]} ${className}`}
       disabled={disabled || busy}
       {...props}
     >
@@ -43,7 +43,7 @@ export function IconButton({
   return (
     <button
       aria-label={ariaLabel}
-      className={`inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl border border-ink/15 bg-white text-ink transition hover:bg-canvas focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-amber disabled:opacity-50 ${className}`}
+      className={`inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl border border-ink/20 bg-white text-ink transition duration-200 hover:bg-canvas active:translate-y-px focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-amber disabled:opacity-50 ${className}`}
       {...props}
     />
   );
