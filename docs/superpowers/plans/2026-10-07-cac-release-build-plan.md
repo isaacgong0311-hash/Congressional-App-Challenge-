@@ -30,7 +30,7 @@
 - [x] Run `npx playwright test e2e/print-export.spec.ts`. The actual JSON download retains the open orientation conflict and source references without extracted page text; the print view shows the unresolved item and evidence IDs.
 - [x] Run `npm run lint`, `npm test`, `npm run evaluate:first-day`, and `npm run test:e2e` after the export regression. Result: lint clean, 153 unit tests passed, 20 synthetic packets evaluated, 81 browser tests passed, and 7 intentional browser skips.
 - [ ] Check the six-beat demo at 390 px and 1440 px with keyboard and reduced motion. Use `e2e/first-day-fictional.spec.ts` and `e2e/public-routes.spec.ts` as the repeatable gate; record any manual finding in `docs/development-log.md`.
-- [ ] Update `docs/submission/submission-manifest.md` with the exact tested commit, commands, date, and browsers. Keep deployment marked unverified until the public URL is checked from a signed-out session.
+- [x] Update `docs/submission/submission-manifest.md` with tested code/test commit `12b7052`, commands, October 7 date, and mobile/desktop Chromium results. Deployment remains unverified until the public URL is checked from a signed-out session.
 
 ## Task 2 — Collect bounded community evidence (October 8–14)
 

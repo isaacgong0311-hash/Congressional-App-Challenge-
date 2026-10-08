@@ -1,7 +1,7 @@
 # Lantern submission manifest
 
 **Manifest status:** Preparation in progress  
-**Last verified:** 2026-10-02
+**Last local verification:** 2026-10-07
 **Submission target:** 2026-10-24, ahead of the official deadline
 
 This file is the alignment record between code, deployment, video, captions, transcript, written answers, evidence, and the final form. A status changes only after its evidence exists.
@@ -25,6 +25,18 @@ This file is the alignment record between code, deployment, video, captions, tra
 | Submission confirmation | Does not exist | Save the confirmation only after successful submission |
 
 ## Currently verified local gate
+
+The October 7 local test target is commit `12b7052` on `codex/frontend-overhaul`. It contains the export regression and the refreshed [release build plan](../superpowers/plans/2026-10-07-cac-release-build-plan.md). Verification ran on the same file tree immediately before the commit:
+
+- `npm run lint`: passed.
+- `npm test`: 153 passed.
+- `npm run evaluate:first-day`: 20 synthetic packets, with the versioned results in `evaluation/first-day/report.md`.
+- `npm run test:e2e`: 81 passed and 7 intentional skips on mobile and desktop Chromium against a production build.
+- `npx playwright test e2e/print-export.spec.ts`: 3 passed and 1 intentional mobile skip. The new test reads the downloaded JSON and checks unresolved conflict, source references, and omitted extracted text; it also checks printed unresolved/source details.
+
+This local gate does not verify a public deployment of commit `12b7052`.
+
+### Earlier backend release evidence
 
 - Lint passes.
 - 146 unit tests pass.
