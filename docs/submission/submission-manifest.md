@@ -27,7 +27,7 @@ This file is the alignment record between code, deployment, video, captions, tra
 
 ## Currently verified local gate
 
-The October 8 renovation on `codex/frontend-overhaul` passed lint, 153 unit tests, evaluation on 20 synthetic packets, a production build, and 81 browser tests with 7 intentional skips. A 1024 px navigation regression passed in both Playwright projects. Local Lighthouse assertions passed: Home performance 95–98, First Day 92, accessibility 100 for both, and CLS 0 in all six runs. macOS visual regression passed locally; the Linux baseline generation run passed on GitHub Actions. Final branch CI is pending after the Linux screenshots are committed.
+The October 8 renovation on `codex/frontend-overhaul` passed lint, 153 unit tests, evaluation on 20 synthetic packets, a production build, and 81 browser tests with 7 intentional skips. A 1024 px navigation regression passed in both Playwright projects. Local Lighthouse assertions passed: Home performance 95–98, First Day 92, accessibility 100 for both, and CLS 0 in all six runs. macOS visual regression passed locally; Linux visual regression and the full CI gate passed on commit `38edbdd` ([run](https://github.com/isaacgong0311-hash/Congressional-App-Challenge-/actions/runs/37731551615)).
 
 The October 7 local test target is commit `12b7052` on `codex/frontend-overhaul`. It contains the export regression and the refreshed [release build plan](../superpowers/plans/2026-10-07-cac-release-build-plan.md). Verification ran on the same file tree immediately before the commit:
 
