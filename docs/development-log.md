@@ -100,6 +100,15 @@ Provider pricing and retention terms are external and may change. The project do
 - Local gate: `npm run lint`, `npm test` (153 passed), `npm run evaluate:first-day` (20 synthetic packets; 32/32 fact precision and recall), `npm run build`, `npm run test:e2e` (79 passed, 7 intentional skips), and `git diff --check` all passed. These results do not establish provider uptime or production deployment.
 - The 2026 rules require the demonstration on a public YouTube or Vimeo video; corrected the video checklist to remove the unlisted option.
 
+## 2026-10-08 — Editorial frontend renovation
+
+- Evolved the warm paper, green, ivory, cobalt, and amber system across Home, First Day, and Explain. Increased contrast and hierarchy, strengthened active and source-card states, and kept transitions progressive so base content remains visible.
+- Moved the full navigation to widths where its labels fit; at 1024 px the compact menu remains available. Added a browser regression for that breakpoint.
+- Replaced a visible internal document-version string with plain-language fictional/uploaded page metadata, and identified provider confidence as an AI reading estimate. Translated the Explain privacy badge in Spanish.
+- Reviewed Home, First Day, and Explain screenshots at 390, 768, 1024, and 1440 px. Refreshed macOS and Linux visual baselines; Linux baseline generation passed on GitHub Actions. Removed the temporary baseline generation workflow after downloading the artifact.
+- Local gate: lint clean, 153 unit tests passed, 20 synthetic evaluation packets, 81 browser tests passed with 7 intentional skips, and a production build. A focused 1024 px navigation test passed in both Playwright projects.
+- Local Lighthouse collect/assert passed: Home performance 95–98, First Day performance 92, accessibility 100 on both, and CLS 0 across all six runs. No deployment or usability-study claim follows from these checks.
+
 ## AI assistance disclosure
 
 OpenAI Codex assisted with:

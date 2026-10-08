@@ -1,7 +1,7 @@
 # Lantern submission manifest
 
 **Manifest status:** Preparation in progress  
-**Last local verification:** 2026-10-07
+**Last local verification:** 2026-10-08
 **Submission target:** 2026-10-24, ahead of the official deadline
 
 This file is the alignment record between code, deployment, video, captions, transcript, written answers, evidence, and the final form. A status changes only after its evidence exists.
@@ -9,6 +9,7 @@ This file is the alignment record between code, deployment, video, captions, tra
 | Artifact | Current status | Evidence or next gate |
 | --- | --- | --- |
 | Decision Trace code | Implemented and locally verified | Commits `05218e2`, `0ba9527`, and `5f4f0bf` |
+| Editorial frontend renovation | Implemented and locally verified | Approved design and implementation plan; code commit `90b3ae9`; Home, First Day, and Explain visual baselines refreshed |
 | Backend trust boundary | Implemented and locally verified | Release-candidate code commit `7c55e22`; shared contracts, capability reporting, bounded provider routes, safe diagnostics, zero-API judge-path test, and live synthetic Groq smoke evidence |
 | Usability protocol | Ready; zero sessions recorded | `evaluation/usability/report.md` says Not started |
 | Written answers | Drafted; awaiting adaptation to official form limits | `docs/submission/written-answers.md` |
@@ -25,6 +26,8 @@ This file is the alignment record between code, deployment, video, captions, tra
 | Submission confirmation | Does not exist | Save the confirmation only after successful submission |
 
 ## Currently verified local gate
+
+The October 8 renovation on `codex/frontend-overhaul` passed lint, 153 unit tests, evaluation on 20 synthetic packets, a production build, and 81 browser tests with 7 intentional skips. A 1024 px navigation regression passed in both Playwright projects. Local Lighthouse assertions passed: Home performance 95–98, First Day 92, accessibility 100 for both, and CLS 0 in all six runs. macOS visual regression passed locally; the Linux baseline generation run passed on GitHub Actions. Final branch CI is pending after the Linux screenshots are committed.
 
 The October 7 local test target is commit `12b7052` on `codex/frontend-overhaul`. It contains the export regression and the refreshed [release build plan](../superpowers/plans/2026-10-07-cac-release-build-plan.md). Verification ran on the same file tree immediately before the commit:
 

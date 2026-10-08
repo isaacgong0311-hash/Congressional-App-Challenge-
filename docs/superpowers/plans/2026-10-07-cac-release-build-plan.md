@@ -29,10 +29,12 @@
 
 - [x] Run `npx playwright test e2e/print-export.spec.ts`. The actual JSON download retains the open orientation conflict and source references without extracted page text; the print view shows the unresolved item and evidence IDs.
 - [x] Run `npm run lint`, `npm test`, `npm run evaluate:first-day`, and `npm run test:e2e` after the export regression. Result: lint clean, 153 unit tests passed, 20 synthetic packets evaluated, 81 browser tests passed, and 7 intentional browser skips.
-- [ ] Check the six-beat demo at 390 px and 1440 px with keyboard and reduced motion. Use `e2e/first-day-fictional.spec.ts` and `e2e/public-routes.spec.ts` as the repeatable gate; record any manual finding in `docs/development-log.md`.
+- [x] Check the six-beat demo and critical screens at 390 px and 1440 px, with keyboard and reduced motion covered by the browser suite. The October 8 editorial pass fixed a 1024 px navigation wrap and replaced an internal document label; both are recorded in `docs/development-log.md`. Linux visual baselines remain a separate CI gate.
 - [x] Update `docs/submission/submission-manifest.md` with tested code/test commit `12b7052`, commands, October 7 date, and mobile/desktop Chromium results. Deployment remains unverified until the public URL is checked from a signed-out session.
 
 ## Task 2 — Collect bounded community evidence (October 8–14)
+
+The [editorial renovation](2026-10-08-lantern-editorial-renovation.md) was added at Isaac's request on October 8. Its local functional and Lighthouse gates passed; Linux visual CI is being finished before selecting a release commit. The study below remains unrun and must be performed with consenting adults.
 
 - [ ] Use `evaluation/usability/protocol.md` with approximately five consenting adults and only the fictional case. Record anonymous task outcomes in `evaluation/usability/sessions.json`; keep identifying information out of the repository.
 - [ ] Run `npm run evaluate:usability` and review `evaluation/usability/report.md` for correct participant/task denominators, failures, and limits. If sessions do not happen, retain “Not started” and remove any suggestion of observed family validation from the final pitch.

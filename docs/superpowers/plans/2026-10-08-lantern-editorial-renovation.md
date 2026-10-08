@@ -20,32 +20,32 @@
 
 ## Task 1 — Shared editorial system
 
-- [ ] Read `node_modules/next/dist/docs/01-app/01-getting-started/11-css.md` and relevant component code before editing.
-- [ ] In `app/globals.css`, refine existing canvas/surface/ink/accent tokens, text selection, focus treatment, and shared CTA motion. Keep base text and controls visible without animations.
-- [ ] In `app/components/lantern/primitives.tsx` and the product header, align border, radius, hover, focus, and disabled states. Preserve button semantics and 44 px touch targets.
-- [ ] Run `npm run lint` and `npx playwright test e2e/public-routes.spec.ts` after the shared pass. Expect no failures and no serious/critical axe findings.
+- [x] Read `node_modules/next/dist/docs/01-app/01-getting-started/11-css.md` and relevant component code before editing.
+- [x] In `app/globals.css`, refine existing canvas/surface/ink/accent tokens, text selection, focus treatment, and shared CTA motion. Keep base text and controls visible without animations.
+- [x] In `app/components/lantern/primitives.tsx` and the product header, align border, radius, hover, focus, and disabled states. Preserve button semantics and 44 px touch targets.
+- [x] Run `npm run lint` and `npx playwright test e2e/public-routes.spec.ts` after the shared pass. Both passed, with no serious/critical axe findings.
 
 ## Task 2 — Home
 
-- [ ] Refine `app/page.tsx` only where semantic grouping improves the reading order; retain the fictional preview and existing links.
-- [ ] In `app/styles/home.css`, strengthen hero contrast and specimen hierarchy, reduce low-contrast metadata, and add restrained editorial depth to the hero, conflict, and closing sections. Keep the demo action prominent at 390 px.
-- [ ] Inspect Home at 390, 768, 1024, and 1440 px. Run `npx playwright test e2e/visual-regression.spec.ts --grep 'public routes'` and review changed screenshots before accepting new baselines.
+- [x] Retain `app/page.tsx`'s existing semantic reading order, fictional preview, and links; no markup change was needed.
+- [x] In `app/styles/home.css`, strengthen hero contrast and specimen hierarchy, reduce low-contrast metadata, and add restrained editorial depth to the hero, conflict, and closing sections. The demo action remains prominent at 390 px.
+- [x] Inspect Home at 390, 768, 1024, and 1440 px. The full visual regression suite passed locally after reviewing and refreshing macOS screenshots.
 
 ## Task 3 — First Day
 
-- [ ] In `app/styles/first-day.css` and focused `app/features/first-day/ui/` components, clarify active step, primary action, source/evidence cards, conflict comparison, Decision Trace stages, and export actions. Preserve state labels, fictional notices, and all domain callbacks.
-- [ ] Check both source statements remain peers before school confirmation, and the focused update and trace remain legible afterward.
-- [ ] Run `npx playwright test e2e/first-day-fictional.spec.ts e2e/print-export.spec.ts e2e/production-fixes.spec.ts`. Expect provider-free demo, Spanish output, keyboard, reset, JSON, calendar, and print checks to pass.
+- [x] Refine First Day surfaces in `app/styles/first-day.css`; replace an internal document version label with plain-language page metadata in `documents-step.tsx`. State labels, notices, callbacks, and exports remain intact.
+- [x] Check both source statements remain peers before school confirmation, and the focused update and trace remain legible afterward in the refreshed screenshots and browser journey.
+- [x] Run the focused First Day and export Playwright tests. Provider-free demo, Spanish output, keyboard, reset, JSON, calendar, and print checks passed.
 
 ## Task 4 — Explain
 
-- [ ] In `app/styles/letter-tool.css` and focused `app/features/letter-tool/` components, make intake, meaning, urgency, and next action easier to scan. Keep the original document adjacent on desktop and reachable on mobile.
-- [ ] Preserve distinct crisis/scam and provider-error states, language switching, and speech fallback.
-- [ ] Run `npx playwright test e2e/letter-tool.spec.ts`. Expect all existing routes and recoveries to pass.
+- [x] In `app/styles/letter-tool.css` and the intake component, sharpen the three-stage result hierarchy and warm the upload surface. The original document remains adjacent on desktop and reachable on mobile.
+- [x] Preserve distinct crisis/scam and provider-error states, language switching, and speech fallback. Translate the existing header privacy badge for Spanish.
+- [x] Run the focused Explain Playwright tests. Existing routes and recoveries passed.
 
 ## Task 5 — Visual and release verification
 
-- [ ] Run `npm run lint`, `npm test`, `npm run evaluate:first-day`, `npm run build`, and `npm run test:e2e` on the completed tree.
-- [ ] Review all changed 390/768/1024/1440 screenshots, then update baselines with `npx playwright test e2e/visual-regression.spec.ts --update-snapshots` and rerun the suite. Accept only intended pixel changes; preserve no-overflow assertions.
-- [ ] Run `npm run test:lighthouse` and verify the recorded Home/First Day budgets. Inspect print and reduced-motion output.
-- [ ] Record changed files, checks, and any remaining risk in `docs/development-log.md` and update the CAC release plan. Commit the verified renovation without a deployment claim.
+- [x] Run `npm run lint`, `npm test`, `npm run evaluate:first-day`, a production build, and `npm run test:e2e`. Result: lint clean, 153 unit tests passed, 20 synthetic packets evaluated, 81 browser tests passed, 7 intentional skips. The added 1024 px navigation test passed separately on both browser projects.
+- [x] Review changed 390/768/1024/1440 screenshots and refresh macOS and Linux baselines. The Linux baseline generation run passed; representative desktop and mobile screenshots were inspected.
+- [x] Run local Lighthouse collect/assert without publishing reports. Home performance was 95–98, First Day was 92 in all three runs, accessibility was 100 for both, and CLS was 0. Print and reduced-motion browser checks passed.
+- [x] Record changed files, checks, and remaining release work in `docs/development-log.md`, the submission manifest, and the CAC release plan. The renovation is committed without a deployment claim.
