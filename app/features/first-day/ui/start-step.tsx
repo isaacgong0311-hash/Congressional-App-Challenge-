@@ -15,6 +15,7 @@ export type StartStepProps = {
   language: Language;
   providerCapability: ProviderCapability;
   onOpenSample: () => void;
+  onRetryAvailability: () => void;
   onStartLive: () => void;
 };
 
@@ -23,6 +24,7 @@ export function StartStep({
   language,
   providerCapability,
   onOpenSample,
+  onRetryAvailability,
   onStartLive,
 }: StartStepProps) {
   return (
@@ -114,6 +116,19 @@ export function StartStep({
                       "La lectura de documentos no está disponible ahora. El ejemplo completo sigue funcionando.",
                     )}
               </p>
+            ) : null}
+            {allowLive && providerCapability === "unavailable" ? (
+              <button
+                className="fd-secondary-button mt-3"
+                onClick={onRetryAvailability}
+                type="button"
+              >
+                {translated(
+                  language,
+                  "Check availability again",
+                  "Comprobar disponibilidad de nuevo",
+                )}
+              </button>
             ) : null}
           </div>
 

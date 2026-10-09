@@ -66,6 +66,18 @@ describe("First Day upload selection", () => {
       "case_too_large",
     ]);
   });
+
+  it("rejects an empty image without using a page slot", () => {
+    const result = validateUploadSelection([], [
+      candidate("empty.jpg", 0),
+      candidate("usable.jpg"),
+    ]);
+
+    expect(result.rejected).toEqual([
+      { fileName: "empty.jpg", code: "empty_file" },
+    ]);
+    expect(result.accepted.map((file) => file.name)).toEqual(["usable.jpg"]);
+  });
 });
 
 describe("First Day upload queue", () => {

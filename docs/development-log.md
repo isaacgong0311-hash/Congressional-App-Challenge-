@@ -109,6 +109,14 @@ Provider pricing and retention terms are external and may change. The project do
 - Local gate: lint clean, 153 unit tests passed, 20 synthetic evaluation packets, 81 browser tests passed with 7 intentional skips, and a production build. A focused 1024 px navigation test passed in both Playwright projects.
 - Local Lighthouse collect/assert passed: Home performance 95–98, First Day performance 92, accessibility 100 on both, and CLS 0 across all six runs. No deployment or usability-study claim follows from these checks.
 
+## 2026-10-09 — CAC app readiness pass
+
+- Planned the frontend/backend pass against the official CAC idea, implementation/UX, and coding criteria. Kept the existing source-backed product and fictional judge journey rather than adding unreviewed district breadth or document storage.
+- Updated the Next.js and ESLint config minimum versions to 16.4.0; the lockfile also resolves patched `sharp` and `source-map-js`. The production dependency audit reports zero vulnerabilities. The full audit still reports a development-only `braces` chain without a compatible published patch.
+- Added server-side JPEG/PNG signature checking and provider-proposal validation for duplicate keys and exact source quotes. These checks happen before provider output is returned to the browser; the browser retains its independent evidence check. Failure logs contain request metadata and issue codes, not document text.
+- Rejected zero-byte images before the live queue creates a page. Added a bilingual in-place retry for provider availability and an explicit bilingual explanation when a successfully read page contains no reviewable facts. The mobile progress summary now reflects the locked next step.
+- Verified with lint, 159 unit tests, 20 synthetic held-out packets, a production build, and 85 passing browser tests with 7 intentional device skips. Local Lighthouse assertions passed on six runs: Home performance 96/96/96, First Day 94/94/94, accessibility 100 in every run, and CLS 0 throughout. These are local checks, not provider uptime or observed family outcomes.
+
 ## AI assistance disclosure
 
 OpenAI Codex assisted with:

@@ -29,6 +29,7 @@ export type UploadCandidate = {
 
 export type UploadRejectionCode =
   | "unsupported_type"
+  | "empty_file"
   | "file_too_large"
   | "case_too_large"
   | "too_many";
@@ -53,6 +54,8 @@ export function validateUploadSelection<T extends UploadCandidate>(
 
     if (!SUPPORTED_IMAGE_TYPES.has(candidate.type)) {
       code = "unsupported_type";
+    } else if (candidate.size === 0) {
+      code = "empty_file";
     } else if (candidate.size > MAX_DOCUMENT_BYTES) {
       code = "file_too_large";
     } else if (count >= MAX_DOCUMENTS) {

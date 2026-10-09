@@ -81,7 +81,15 @@ export function WorkspaceProgress(props: WorkspaceProgressProps) {
                 )}
               </span>
             ) : (
-              <span>{next ? translated(props.language, `Next: ${next.en}`, `Siguiente: ${next.es}`) : translated(props.language, "Final step", "Paso final")}</span>
+              <span>
+                {next && !canEnterLiveStep(props.caseData, next.id)
+                  ? props.currentStep === "documents"
+                    ? translated(props.language, "Add a page with a fact", "Añada una página con un dato")
+                    : translated(props.language, "Finish this step to continue", "Termine este paso para continuar")
+                  : next
+                    ? translated(props.language, `Next: ${next.en}`, `Siguiente: ${next.es}`)
+                    : translated(props.language, "Final step", "Paso final")}
+              </span>
             )}
           </span>
         </summary>

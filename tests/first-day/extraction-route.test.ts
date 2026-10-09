@@ -27,6 +27,11 @@ const providerResponse = {
   ],
 };
 
+const JPEG_BYTES = new Uint8Array([0xff, 0xd8, 0xff, 0xd9]);
+const PNG_BYTES = new Uint8Array([
+  0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a,
+]);
+
 function extractionRequest(
   overrides: {
     documentId?: string;
@@ -35,7 +40,7 @@ function extractionRequest(
     bytes?: Uint8Array;
   } = {},
 ) {
-  const bytes = overrides.bytes ?? new Uint8Array([1, 2, 3]);
+  const bytes = overrides.bytes ?? JPEG_BYTES;
   const imageBuffer = bytes.buffer.slice(
     bytes.byteOffset,
     bytes.byteOffset + bytes.byteLength,
@@ -109,6 +114,30 @@ describe("First Day extraction route", () => {
     });
   });
 
+  it("rejects spoofed or mismatched image bytes before calling the provider", async () => {
+    const extractPage = vi.fn(async () => providerResponse);
+    const handler = createExtractionHandler({
+      providerAvailable: () => true,
+      extractPage,
+      timeoutMs: 100,
+    });
+
+    for (const request of [
+      extractionRequest({ bytes: new Uint8Array([1, 2, 3]) }),
+      extractionRequest({ type: "image/png", bytes: JPEG_BYTES }),
+    ]) {
+      const response = await handler(request);
+      expect(response.status).toBe(400);
+      await expect(response.json()).resolves.toMatchObject({
+        error: { code: "UNSUPPORTED_MEDIA", retryable: false },
+      });
+    }
+    expect(extractPage).not.toHaveBeenCalled();
+
+    expect((await handler(extractionRequest({ type: "image/png", bytes: PNG_BYTES }))).status).toBe(200);
+    expect(extractPage).toHaveBeenCalledTimes(1);
+  });
+
   it("reports an unavailable provider without calling it", async () => {
     const extractPage = vi.fn(async () => providerResponse);
     const handler = createExtractionHandler({
@@ -147,6 +176,26 @@ describe("First Day extraction route", () => {
         retryable: true,
       },
     });
+  });
+
+  it("rejects a well-shaped fact whose quote is absent from the page", async () => {
+    const log = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const handler = createExtractionHandler({
+      providerAvailable: () => true,
+      extractPage: async () => ({
+        ...providerResponse,
+        facts: [{ ...providerResponse.facts[0], quote: "Bring a passport." }],
+      }),
+      timeoutMs: 100,
+    });
+
+    const response = await handler(extractionRequest());
+    expect(response.status).toBe(502);
+    await expect(response.json()).resolves.toMatchObject({
+      error: { code: "INVALID_PROVIDER_RESPONSE", retryable: true },
+    });
+    expect(JSON.stringify(log.mock.calls)).not.toContain("Maya should arrive");
+    expect(JSON.stringify(log.mock.calls)).not.toContain("Bring a passport");
   });
 
   it("aborts and returns 504 when extraction exceeds its budget", async () => {

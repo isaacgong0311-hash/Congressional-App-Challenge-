@@ -207,7 +207,7 @@ test("live intake preserves partial success, retry, removal, and late-response r
   await expectNoSeriousAxeViolations(page);
 });
 
-test("live entry explains an unavailable provider and recovers after capability returns", async ({
+test("live entry explains an unavailable provider and retries without reloading", async ({
   page,
 }) => {
   let available = false;
@@ -234,6 +234,55 @@ test("live entry explains an unavailable provider and recovers after capability 
   ).toBeVisible();
 
   available = true;
-  await page.reload();
+  await page.getByRole("button", { name: "Check availability again" }).click();
   await expect(liveButton).toBeEnabled();
+});
+
+test("a successfully read page with no facts explains the next action", async ({ page }, testInfo) => {
+  await page.route("**/api/health", (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        status: "ok",
+        capabilities: { liveDocumentReading: true },
+      }),
+    }),
+  );
+  await page.route("**/api/first-day/extract", (route) => {
+    const documentId = multipartField(route, "documentId");
+    const requestId = multipartField(route, "requestId");
+    return route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        schemaVersion: "first-day-extraction-v1",
+        documentId,
+        requestId,
+        document: {
+          label: "Unclear sample page",
+          confidence: 40,
+          originalText: "The page has no actionable enrollment information.",
+          photoQualityNote: "The lower edge is blurry.",
+        },
+        facts: [],
+      }),
+    });
+  });
+
+  await page.goto("/first-day");
+  await page.getByRole("button", { name: "Try the public-source example" }).click();
+  await page.getByLabel("School page images").setInputFiles({
+    name: "unclear.png",
+    mimeType: "image/png",
+    buffer: Buffer.from("synthetic-page"),
+  });
+  await expect(page.getByRole("article").filter({ hasText: "Unclear sample page" }).getByText("Text ready")).toBeVisible();
+  await expect(page.getByText("No facts were found in the pages read so far.", { exact: false })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Continue" })).toHaveCount(0);
+  if (testInfo.project.name === "mobile-chromium") {
+    await expect(page.getByText("Add a page with a fact")).toBeVisible();
+  }
+  await page.getByRole("button", { name: "ES", exact: true }).click();
+  await expect(page.getByText("No se encontraron datos en las páginas leídas hasta ahora.", { exact: false })).toBeVisible();
 });

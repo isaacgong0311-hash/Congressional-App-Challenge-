@@ -212,6 +212,10 @@ export function useLiveCase({
   function rejectionMessage(code: UploadRejectionCode) {
     const messages: Record<UploadRejectionCode, [string, string]> = {
       unsupported_type: ["Use a JPG or PNG image.", "Use una imagen JPG o PNG."],
+      empty_file: [
+        "This image is empty. Choose a different page.",
+        "Esta imagen está vacía. Elija otra página.",
+      ],
       file_too_large: [
         "Each page must be 10 MB or smaller.",
         "Cada página debe tener 10 MB o menos.",

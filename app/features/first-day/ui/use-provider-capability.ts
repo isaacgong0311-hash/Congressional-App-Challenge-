@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 export type ProviderCapability =
   | "checking"
@@ -27,33 +27,41 @@ export function providerCapabilityFromHealth(
     : "unavailable";
 }
 
-export function useProviderCapability(enabled = true): ProviderCapability {
+export function useProviderCapability(enabled = true) {
   const [capability, setCapability] =
     useState<ProviderCapability>(enabled ? "checking" : "unavailable");
+  const activeRequest = useRef<AbortController | null>(null);
 
-  useEffect(() => {
-    if (!enabled) {
-      return;
-    }
+  const refresh = useCallback(async () => {
+    if (!enabled) return;
+    activeRequest.current?.abort();
     const controller = new AbortController();
+    activeRequest.current = controller;
+    setCapability("checking");
 
-    async function checkHealth() {
-      try {
-        const response = await fetch("/api/health", {
-          signal: controller.signal,
-        });
-        const payload: unknown = await response.json().catch(() => null);
-        if (!controller.signal.aborted) {
-          setCapability(providerCapabilityFromHealth(response.ok, payload));
-        }
-      } catch {
-        if (!controller.signal.aborted) setCapability("unavailable");
+    try {
+      const response = await fetch("/api/health", {
+        signal: controller.signal,
+        cache: "no-store",
+      });
+      const payload: unknown = await response.json().catch(() => null);
+      if (!controller.signal.aborted) {
+        setCapability(providerCapabilityFromHealth(response.ok, payload));
       }
+    } catch {
+      if (!controller.signal.aborted) setCapability("unavailable");
+    } finally {
+      if (activeRequest.current === controller) activeRequest.current = null;
     }
-
-    void checkHealth();
-    return () => controller.abort();
   }, [enabled]);
 
-  return capability;
+  useEffect(() => {
+    const timer = window.setTimeout(() => void refresh(), 0);
+    return () => {
+      window.clearTimeout(timer);
+      activeRequest.current?.abort();
+    };
+  }, [refresh]);
+
+  return { capability, refresh };
 }

@@ -65,6 +65,9 @@ export function DocumentsStep({
       factHasActiveSource(caseData, fact) &&
       currentFactView(caseData, fact).state === "proposed",
   ).length;
+  const activeFactCount = caseData.facts.filter((fact) =>
+    factHasActiveSource(caseData, fact),
+  ).length;
   const openConflicts = caseData.conflicts.filter(
     (conflict) => conflict.status === "open",
   ).length;
@@ -466,12 +469,21 @@ export function DocumentsStep({
               `${readyPages} páginas listas · ${proposedFacts} datos por revisar · ${failedPages} páginas necesitan atención`,
             )}
           </p>
-          {readyPages > 0 ? (
+          {readyPages > 0 && activeFactCount > 0 ? (
             <p className="mt-1">
               {translated(
                 language,
                 "Continue to compare each proposed fact with its exact source.",
                 "Continúe para comparar cada dato propuesto con su fuente exacta.",
+              )}
+            </p>
+          ) : null}
+          {readyPages > 0 && activeFactCount === 0 ? (
+            <p className="mt-1">
+              {translated(
+                language,
+                "No facts were found in the pages read so far. Try a clearer sample page or add another page; review opens once there is a fact to check.",
+                "No se encontraron datos en las páginas leídas hasta ahora. Pruebe una página de ejemplo más clara o añada otra; la revisión se abrirá cuando haya un dato por comprobar.",
               )}
             </p>
           ) : null}

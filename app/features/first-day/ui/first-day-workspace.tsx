@@ -70,6 +70,7 @@ export function FirstDayWorkspace({
     preferences,
     presentationMode,
     providerCapability,
+    refreshProviderCapability,
     resolveCaseConflict,
     resetDemo,
     resumeDemo,
@@ -233,6 +234,7 @@ export function FirstDayWorkspace({
                 onOpenSample={openSampleCase}
                 onStartLive={startLiveCase}
                 providerCapability={providerCapability}
+                onRetryAvailability={refreshProviderCapability}
               />
             ) : null}
             {currentStep === "documents" ? (

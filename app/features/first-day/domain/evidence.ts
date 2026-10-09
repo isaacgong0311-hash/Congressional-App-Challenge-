@@ -34,6 +34,12 @@ function normalizeSourceText(value: string): string {
     .trim();
 }
 
+export function quoteAppearsInSource(sourceText: string, quote: string): boolean {
+  const normalizedQuote = normalizeSourceText(quote);
+  return normalizedQuote.length > 0 &&
+    normalizeSourceText(sourceText).includes(normalizedQuote);
+}
+
 export function validateEvidence(caseData: FirstDayCase): EvidenceIssue[] {
   const issues: EvidenceIssue[] = [];
   const documents = new Map(
@@ -78,11 +84,7 @@ export function validateEvidence(caseData: FirstDayCase): EvidenceIssue[] {
       continue;
     }
 
-    if (
-      !normalizeSourceText(sourceText).includes(
-        normalizeSourceText(evidence.quote),
-      )
-    ) {
+    if (!quoteAppearsInSource(sourceText, evidence.quote)) {
       issues.push({
         code: "quote_not_found",
         evidenceId: evidence.id,

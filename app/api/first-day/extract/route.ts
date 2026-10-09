@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import { runGroqExtraction } from "../../../features/first-day/server/extract-page";
 import { FirstDayExtractionSchema } from "../../../features/first-day/server/extraction-schema";
+import { validatePageProposals } from "../../../features/first-day/server/validate-page";
 import { providerErrorSummary } from "../../../lib/provider-error";
 import {
   apiError,
@@ -16,6 +17,19 @@ export const maxDuration = 60;
 
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
 const SUPPORTED_MEDIA_TYPES = new Set(["image/jpeg", "image/png"]);
+
+function matchesImageSignature(bytes: Uint8Array, mediaType: string) {
+  if (mediaType === "image/jpeg") {
+    return bytes.length >= 3 &&
+      bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
+  }
+  if (mediaType === "image/png") {
+    const signature = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a];
+    return bytes.length >= signature.length &&
+      signature.every((byte, index) => bytes[index] === byte);
+  }
+  return false;
+}
 
 const MetadataSchema = z
   .object({
@@ -143,6 +157,15 @@ export function createExtractionHandler(dependencies: ExtractionDependencies) {
         false,
       );
     }
+    const bytes = new Uint8Array(await image.arrayBuffer());
+    if (!matchesImageSignature(bytes, image.type)) {
+      return errorResponse(
+        "UNSUPPORTED_MEDIA",
+        "The file content does not match a JPG or PNG image.",
+        400,
+        false,
+      );
+    }
     if (!dependencies.providerAvailable()) {
       return errorResponse(
         "PROVIDER_UNAVAILABLE",
@@ -157,7 +180,7 @@ export function createExtractionHandler(dependencies: ExtractionDependencies) {
 
     try {
       const providerValue = await dependencies.extractPage({
-        bytes: new Uint8Array(await image.arrayBuffer()),
+        bytes,
         mediaType: image.type as "image/jpeg" | "image/png",
         language: language.data,
         documentId: metadata.documentId,
@@ -184,6 +207,27 @@ export function createExtractionHandler(dependencies: ExtractionDependencies) {
             issueCount: parsed.error.issues.length,
             issuePaths: parsed.error.issues.map((issue) => issue.path.join(".")),
             issueCodes: parsed.error.issues.map((issue) => issue.code),
+          }),
+        );
+        return errorResponse(
+          "INVALID_PROVIDER_RESPONSE",
+          "Could not read this page. Try a clearer, well-lit photo.",
+          502,
+          true,
+        );
+      }
+
+      const evidenceIssues = validatePageProposals(parsed.data);
+      if (evidenceIssues.length > 0) {
+        console.error(
+          "first-day extraction evidence error",
+          providerErrorSummary({
+            requestId: logRequestId,
+            route: "/api/first-day/extract",
+            kind: "schema",
+            durationMs: Date.now() - startedAt,
+            issueCount: evidenceIssues.length,
+            issueCodes: evidenceIssues,
           }),
         );
         return errorResponse(
