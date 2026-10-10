@@ -32,7 +32,7 @@ export function StartStep({
       <div className="fd-hero overflow-hidden rounded-[2rem] border border-[#dce2dc] bg-[#fbfcf8] shadow-[0_24px_80px_rgba(24,46,38,.08)]">
         <div className="grid lg:grid-cols-[1.08fr_.92fr]">
           <div className="p-7 sm:p-10 lg:p-14">
-            <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-[#cad6ff] bg-[#edf1ff] px-3 py-1.5 text-xs font-bold text-[#3556d4]">
+            <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-[#ead6a9] bg-[#fbf1d9] px-3 py-1.5 text-xs font-bold text-[#795a18]">
               <SparkIcon className="h-4 w-4" />
               {translated(
                 language,
@@ -203,7 +203,7 @@ export function StartStep({
           [WarningIcon, "1", "conflict to resolve", "conflicto por resolver"],
         ].map(([Icon, value, english, spanish]) => (
           <div className="fd-stat-card" key={String(english)}>
-            <Icon className="h-5 w-5 text-[#3556d4]" />
+            <Icon className="h-5 w-5 text-[#2d674b]" />
             <span className="text-2xl font-bold tracking-[-0.03em]">
               {String(value)}
             </span>

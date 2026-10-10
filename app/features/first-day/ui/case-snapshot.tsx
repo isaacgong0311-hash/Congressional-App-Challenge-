@@ -23,7 +23,7 @@ export function CaseSnapshot({
     <section className="fd-case-snapshot" aria-label={translated(language, "Case summary", "Resumen del caso")}>
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-[11px] font-extrabold uppercase tracking-[0.16em] text-cobalt">
+          <p className="text-[11px] font-extrabold uppercase tracking-[0.16em] text-[#1d4b3a]">
             {caseData.mode === "fictional"
               ? translated(language, "Fictional demonstration", "Demostración ficticia")
               : translated(language, "Public-source example", "Ejemplo con fuentes públicas")}

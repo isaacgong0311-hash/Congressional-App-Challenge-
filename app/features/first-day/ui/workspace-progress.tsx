@@ -55,7 +55,7 @@ export function WorkspaceProgress(props: WorkspaceProgressProps) {
       <details className="fd-mobile-progress print:hidden lg:hidden">
         <summary>
           <span>
-            <span className="block text-[11px] font-extrabold uppercase tracking-[0.16em] text-cobalt">
+            <span className="block text-[11px] font-extrabold uppercase tracking-[0.16em] text-[#1d4b3a]">
               {translated(props.language, `Step ${activeStepIndex + 1} of ${STEPS.length}`, `Paso ${activeStepIndex + 1} de ${STEPS.length}`)}
             </span>
             <span className="mt-1 block font-bold text-ink">
