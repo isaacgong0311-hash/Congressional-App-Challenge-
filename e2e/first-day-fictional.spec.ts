@@ -37,7 +37,7 @@ test("fictional case completes all six screens with sources and Spanish output",
   await page.goto("/first-day");
   await expect(
     page.getByRole("heading", {
-      name: "School instructions, turned into a plan you can trust.",
+      name: "School letters, one clear plan.",
     }),
   ).toBeVisible();
   await expectNoSeriousAxeViolations(page);
@@ -52,7 +52,7 @@ test("fictional case completes all six screens with sources and Spanish output",
   await expect(highContrast).toHaveAttribute("aria-pressed", "true");
 
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.getByRole("button", { name: "Open the sample case" }).click();
+  await page.getByRole("button", { name: "Try the fictional case" }).click();
   await expect(
     page.getByRole("heading", { name: "One case, every instruction." }),
   ).toBeVisible();
@@ -128,7 +128,7 @@ test("fictional entry and evidence review are keyboard reachable", async ({
   page,
 }) => {
   await page.goto("/first-day");
-  await page.getByRole("button", { name: "Open the sample case" }).focus();
+  await page.getByRole("button", { name: "Try the fictional case" }).focus();
   await page.keyboard.press("Enter");
   const source = page.getByRole("button", { name: "Show source" }).first();
   await source.focus();
@@ -327,7 +327,7 @@ test("guided demo keeps its mobile presentation controls in the first viewport",
 
 test("confirmed dates download as a real calendar file", async ({ page }) => {
   await page.goto("/first-day");
-  await page.getByRole("button", { name: "Open the sample case" }).click();
+  await page.getByRole("button", { name: "Try the fictional case" }).click();
   await page.getByRole("button", { name: "Continue" }).click();
   await answerFamilyQuestions(page);
   await page.getByRole("button", { name: "Continue" }).click();
@@ -350,7 +350,7 @@ test("confirmed dates download as a real calendar file", async ({ page }) => {
 
 test("task completion can be undone without deleting history", async ({ page }) => {
   await page.goto("/first-day");
-  await page.getByRole("button", { name: "Open the sample case" }).click();
+  await page.getByRole("button", { name: "Try the fictional case" }).click();
   await page.getByRole("button", { name: "Continue" }).click();
   await answerFamilyQuestions(page);
   await page.getByRole("button", { name: "Continue" }).click();
@@ -370,7 +370,7 @@ test("task completion can be undone without deleting history", async ({ page }) 
 test("only harmless Lantern preferences persist locally", async ({ page }) => {
   await page.goto("/first-day");
   await page.getByRole("button", { name: "Toggle large text" }).first().click();
-  await page.getByRole("button", { name: "Open the sample case" }).click();
+  await page.getByRole("button", { name: "Try the fictional case" }).click();
   const storage = await page.evaluate(() =>
     Object.fromEntries(
       Array.from({ length: localStorage.length }, (_, index) => {

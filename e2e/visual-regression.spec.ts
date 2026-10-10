@@ -109,7 +109,7 @@ test.describe("visual regression and responsive layout", () => {
       await capture(page, `first-day-guided-demo-${viewport.name}`);
 
       await page.goto("/first-day");
-      await page.getByRole("button", { name: "Open the sample case" }).click();
+      await page.getByRole("button", { name: "Try the fictional case" }).click();
       await capture(page, `first-day-documents-${viewport.name}`);
 
       await page.getByRole("button", { name: "Continue" }).click();

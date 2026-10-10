@@ -1,7 +1,7 @@
 # Lantern submission manifest
 
 **Manifest status:** Preparation in progress  
-**Last local verification:** 2026-10-08
+**Last local verification:** 2026-10-10
 **Submission target:** 2026-10-24, ahead of the official deadline
 
 This file is the alignment record between code, deployment, video, captions, transcript, written answers, evidence, and the final form. A status changes only after its evidence exists.
@@ -12,9 +12,10 @@ This file is the alignment record between code, deployment, video, captions, tra
 | Editorial frontend renovation | Implemented and locally verified | Approved design and implementation plan; code commit `90b3ae9`; Home, First Day, and Explain visual baselines refreshed |
 | Backend trust boundary | Implemented and locally verified | Release-candidate code commit `7c55e22`; shared contracts, capability reporting, bounded provider routes, safe diagnostics, zero-API judge-path test, and live synthetic Groq smoke evidence |
 | Usability protocol | Ready; zero sessions recorded | `evaluation/usability/report.md` says Not started |
-| Written answers | Drafted; awaiting adaptation to official form limits | `docs/submission/written-answers.md` |
+| Written answers | Form-ready draft prepared; personal fields still need confirmation | `docs/submission/form-ready-answers.md` and `docs/submission/written-answers.md` |
 | Demo script | Drafted for a 2:45–2:55 take | `docs/submission/demo-script.md` |
-| Decision Trace deployment | Not deployed | Deploy and verify the current branch before recording |
+| Cover image | 600×800 JPEG captured from the public app; not uploaded to the form | `docs/submission/cover-photo.jpg` (56 KB) |
+| Decision Trace deployment | Prior audited code is live; the opening-copy candidate is not deployed | On 2026-10-10, the public `/api/health` reported version `65103bbbd5eb2ce93b097ce8ca0c83bdeef2dc0e`, matching local `HEAD` at the time; `/` and `/first-day?demo=1` returned 200. Recheck after the next release. |
 | Final release commit | Not selected | Select only after deployment verification and any final fixes |
 | Final Git tag | Not created | Create an immutable annotated tag after selecting the release commit |
 | Video | Not recorded | Record from the verified Decision Trace deployment |
@@ -25,7 +26,11 @@ This file is the alignment record between code, deployment, video, captions, tra
 | Congressional App Challenge form | Not submitted | Submit only after every required field and link is verified |
 | Submission confirmation | Does not exist | Save the confirmation only after successful submission |
 
-## Currently verified local gate
+## Current verification: 2026-10-10
+
+Local commit `65103bbbd5eb2ce93b097ce8ca0c83bdeef2dc0e` passed lint, 159 unit tests, the 20-packet synthetic evaluation, the production build, and 85 Playwright browser tests with 7 intentional skips. Lighthouse passed all assertions across six runs: Home performance 94–95, First Day 93–95, accessibility 100 on both routes, and cumulative layout shift 0. The public health endpoint returned 200 with `judgeDemo: true` and `liveDocumentReading: true`. Production smoke requests with the synthetic `public/sample-letter.png` returned a schema-valid First Day extraction in 3,946 ms and a schema-valid general Explain response in 3,424 ms. Optional speech and local-help integrations were unavailable. These checks establish availability and contract shape, not real-document accuracy or human usability.
+
+## Earlier verification history
 
 The October 8 renovation on `codex/frontend-overhaul` passed lint, 153 unit tests, evaluation on 20 synthetic packets, a production build, and 81 browser tests with 7 intentional skips. A 1024 px navigation regression passed in both Playwright projects. Local Lighthouse assertions passed: Home performance 95–98, First Day 92, accessibility 100 for both, and CLS 0 in all six runs. macOS visual regression passed locally; Linux visual regression and the full CI gate passed on commit `38edbdd` ([run](https://github.com/isaacgong0311-hash/Congressional-App-Challenge-/actions/runs/37731551615)).
 
@@ -54,7 +59,7 @@ This local gate does not verify a public deployment of commit `12b7052`.
 
 Optional server speech and local-help search were not exercised because their provider credentials are not configured. The app reports those capabilities as unavailable and retains its documented fallbacks; they are not required for the judge demo or the verified First Day journey.
 
-These checks do not prove that the current branch is deployed, the video exists, or the application has been submitted.
+The earlier checks alone did not prove deployment. The public health version matched the October 10 audited code commit, before the subsequent opening-copy candidate. The video does not yet exist and the application has not been submitted.
 
 ## Final alignment record
 

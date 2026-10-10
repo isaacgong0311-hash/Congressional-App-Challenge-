@@ -80,7 +80,7 @@ test("audited proof copy keeps spacing and First Day chrome translates", async (
 
 test("confirmed dates download a calendar file and unresolved facts stay out of the export", async ({ page }) => {
   await page.goto("/first-day");
-  await page.getByRole("button", { name: "Open the sample case" }).click();
+  await page.getByRole("button", { name: "Try the fictional case" }).click();
   const mobileProgress = page.locator(".fd-mobile-progress summary");
   if (await mobileProgress.isVisible()) await mobileProgress.click();
   await page.getByRole("button", { name: "Take it with me" }).click();

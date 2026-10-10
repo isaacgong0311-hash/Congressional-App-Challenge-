@@ -50,15 +50,15 @@ export function StartStep({
             <h1 className="max-w-2xl text-balance font-serif text-5xl leading-[1.03] tracking-[-0.04em] text-[#12221c] sm:text-6xl">
               {translated(
                 language,
-                "School instructions, turned into a plan you can trust.",
-                "Instrucciones escolares convertidas en un plan confiable.",
+                "School letters, one clear plan.",
+                "Cartas escolares, un plan claro.",
               )}
             </h1>
             <p className="mt-6 max-w-xl text-pretty text-base leading-7 text-[#59665f] sm:text-lg sm:leading-8">
               {translated(
                 language,
-                "Bring related letters together, check every important fact against its source, and see what is ready, waiting, or unclear.",
-                "Reúna cartas relacionadas, revise cada dato importante con su fuente y vea qué está listo, en espera o no está claro.",
+                "Bring school letters together. Check suggested facts against their sources, confirm what you know, and see what needs attention.",
+                "Reúna las cartas escolares. Revise los datos propuestos con sus fuentes, confirme lo que sabe y vea qué necesita atención.",
               )}
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -70,8 +70,8 @@ export function StartStep({
               >
                 {translated(
                   language,
-                  "Open the sample case",
-                  "Abrir el caso de ejemplo",
+                  "Try the fictional case",
+                  "Probar el caso ficticio",
                 )}
                 <ArrowRightIcon className="h-5 w-5" />
               </button>

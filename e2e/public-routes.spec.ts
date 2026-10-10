@@ -88,7 +88,15 @@ test("unknown routes use the branded recovery page", async ({ page }) => {
 test("First Day clearly separates the fictional demo from the public-source example", async ({
   page,
 }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/first-day");
+  const fictionalCase = page.getByRole("button", {
+    name: "Try the fictional case",
+  });
+  await expect(fictionalCase).toBeVisible();
+  const actionBounds = await fictionalCase.boundingBox();
+  expect(actionBounds).not.toBeNull();
+  expect(actionBounds!.y + actionBounds!.height).toBeLessThan(700);
   await expect(
     page.getByText("Mesa View is fictional.", { exact: false }),
   ).toBeVisible();

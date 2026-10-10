@@ -5,7 +5,7 @@ import { expect, test } from "@playwright/test";
 test("family plan prints cleanly to Letter and A4", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== "desktop-chromium");
   await page.goto("/first-day");
-  await page.getByRole("button", { name: "Open the sample case" }).click();
+  await page.getByRole("button", { name: "Try the fictional case" }).click();
   await page.getByRole("button", { name: "Take it with me" }).click();
   await page.emulateMedia({ media: "print" });
 
@@ -22,7 +22,7 @@ test("family plan prints cleanly to Letter and A4", async ({ page }, testInfo) =
 
 test("technical download and print keep unresolved items and source references", async ({ page }) => {
   await page.goto("/first-day");
-  await page.getByRole("button", { name: "Open the sample case" }).click();
+  await page.getByRole("button", { name: "Try the fictional case" }).click();
   const compactProgress = page.locator(".fd-mobile-progress summary");
   if (await compactProgress.isVisible()) await compactProgress.click();
   await page.getByRole("button", { name: "Take it with me" }).click();

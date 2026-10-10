@@ -63,7 +63,7 @@ The cohesive frontend overhaul was promoted from its verified preview on 2026-09
 - [x] Evaluation denominators, failures, latency, and cost are reported honestly.
 - [x] AI use, reused code, libraries, and student contribution are disclosed.
 
-## Manual production verification
+## Historical manual production verification (earlier release)
 
 - [x] `GET /` returns 200.
 - [x] `GET /first-day` returns 200.
@@ -83,7 +83,7 @@ The cohesive frontend overhaul was promoted from its verified preview on 2026-09
 - The interface supports English and Spanish; extracted school content is not guaranteed to be available in every language.
 - Provider latency and cost were not measured in the offline held-out evaluation.
 - School procedures can change. The deterministic freshness gate requires re-review rather than treating an old snapshot as current.
-- Production currently has no `GROQ_API_KEY`, so live document intake is disabled and `/api/health` intentionally returns a degraded response. The complete fictional workflow remains available without a provider.
+- As verified on 2026-10-10, production reports live document reading as available and a synthetic First Day extraction passed. Optional server speech and local-help search remain unavailable. The complete fictional workflow remains available without a provider.
 
 ## 2026 final submission gates
 
@@ -99,7 +99,7 @@ The historical deployment identities above predate the current Decision Trace re
 - [x] Updated 2:50 demonstration script drafted around Decision Trace.
 - [x] Written application answers drafted with bounded evidence claims.
 - [x] Video production checklist and truthful submission manifest created.
-- [ ] Current Decision Trace release deployed and verified at the public URL.
+- [x] Current Decision Trace release verified at the public URL by a matching `/api/health` commit, successful route responses, and a synthetic live extraction (2026-10-10); deployment ID still needs recording.
 - [ ] Final release commit selected and annotated submission tag created.
 - [ ] Final 1–3 minute video recorded from that exact release.
 - [ ] Captions reviewed against the accepted final take.
