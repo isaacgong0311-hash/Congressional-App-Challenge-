@@ -11,7 +11,7 @@ This file is the alignment record between code, deployment, video, captions, tra
 | Decision Trace code | Implemented and locally verified | Commits `05218e2`, `0ba9527`, and `5f4f0bf` |
 | Editorial frontend renovation | Implemented and locally verified | Approved design and implementation plan; code commit `90b3ae9`; Home, First Day, and Explain visual baselines refreshed |
 | Backend trust boundary | Implemented and locally verified | Release-candidate code commit `7c55e22`; shared contracts, capability reporting, bounded provider routes, safe diagnostics, zero-API judge-path test, and live synthetic Groq smoke evidence |
-| Usability protocol | Ready; zero sessions recorded | `evaluation/usability/report.md` says Not started |
+| Usability protocol | Ready; zero sessions recorded | `evaluation/usability/report.md` says Not started; `docs/submission/usability-run-kit.md` provides the invitation and session checklist |
 | Written answers | Form-ready draft prepared; personal fields still need confirmation | `docs/submission/form-ready-answers.md` and `docs/submission/written-answers.md` |
 | Demo script | Drafted for a 2:45–2:55 take | `docs/submission/demo-script.md` |
 | Cover image | 600×800 JPEG captured from the public app; not uploaded to the form | `docs/submission/cover-photo.jpg` (56 KB) |
@@ -28,6 +28,8 @@ This file is the alignment record between code, deployment, video, captions, tra
 | Submission confirmation | Does not exist | Save the confirmation only after successful submission |
 
 ## Current verification: 2026-10-10
+
+The opening-copy and silent-rehearsal candidate is commit `7ac8adbf04c9cb4c52d3b416bbde0a1cc8c4c1eb`. Its [GitHub Actions run](https://github.com/isaacgong0311-hash/Congressional-App-Challenge-/actions/runs/38070837522) passed lint, unit tests, synthetic evaluation, build, Linux browser tests, and Lighthouse. Local checks on this candidate passed 159 unit tests and 85 browser tests with 7 intentional skips; Home Lighthouse performance was 96–97, First Day 95, accessibility 100, and layout shift 0. This candidate is not yet the public production release. The public version in the health response was still the prior `65103bb...` release at the last check.
 
 Local commit `65103bbbd5eb2ce93b097ce8ca0c83bdeef2dc0e` passed lint, 159 unit tests, the 20-packet synthetic evaluation, the production build, and 85 Playwright browser tests with 7 intentional skips. Lighthouse passed all assertions across six runs: Home performance 94–95, First Day 93–95, accessibility 100 on both routes, and cumulative layout shift 0. The public health endpoint returned 200 with `judgeDemo: true` and `liveDocumentReading: true`. Production smoke requests with the synthetic `public/sample-letter.png` returned a schema-valid First Day extraction in 3,946 ms and a schema-valid general Explain response in 3,424 ms. Optional speech and local-help integrations were unavailable. These checks establish availability and contract shape, not real-document accuracy or human usability.
 
