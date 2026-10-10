@@ -2,6 +2,10 @@
 
 Use this checklist for the exact public 1–3 minute Congressional App Challenge demonstration. The target is 2:45–2:55.
 
+## Optional screen rehearsal
+
+The repository can record a **silent draft** of the working six-beat fictional path. With a production build running on port 3100, run `npm run record:demo-draft`. It saves `tmp/judge-demo-draft.webm` and makes no provider request. Set `LANTERN_BASE_URL` to a verified deployment to rehearse that release. The October 10 local draft lasts 2:33; it is useful for checking shot order and readable source text, but it is not the accepted submission video. Record the student's narration, then make captions and transcript from the accepted final take.
+
 ## Before recording
 
 - [ ] Record from the exact release candidate intended for submission.

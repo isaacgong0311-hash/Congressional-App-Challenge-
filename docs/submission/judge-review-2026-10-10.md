@@ -70,4 +70,5 @@ Use actual family and school-staff feedback to choose the next district procedur
 
 - The First Day opening now names a fictional case on its primary action and says that suggested facts require source review and human confirmation. At 390×844, that action ends at pixel 676, leaving the disclosure visible in the first viewport.
 - The global Geist Mono preload was removed because the mono face is used later in the flow. In the same local Lighthouse setup, Home performance was 96–97 and First Day 95; accessibility stayed 100 and layout shift 0. First Day LCP remained about 3.0 seconds, so the 2.5-second target is still open.
-- Lint, build, 159 unit tests, and 85 browser checks passed locally after the opening change. macOS visual baselines were refreshed. Linux baselines still need to be refreshed and verified in CI before this candidate can be called release-ready.
+- Lint, build, 159 unit tests, and 85 browser checks passed locally after the opening change. macOS visual baselines were refreshed. The four Linux opening-screen baselines were regenerated from CI's actual captures and await the next CI run.
+- A repeatable silent screen rehearsal was recorded from the local candidate. It lasts 2:33 and follows the real six-beat app path without a provider request. Narration, captions, transcript, and public upload remain open.

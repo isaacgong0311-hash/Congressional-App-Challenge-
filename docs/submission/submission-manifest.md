@@ -19,6 +19,7 @@ This file is the alignment record between code, deployment, video, captions, tra
 | Final release commit | Not selected | Select only after deployment verification and any final fixes |
 | Final Git tag | Not created | Create an immutable annotated tag after selecting the release commit |
 | Video | Not recorded | Record from the verified Decision Trace deployment |
+| Silent rehearsal | Local 2:33 draft recorded from the opening-copy candidate; not a submission video | `tmp/judge-demo-draft.webm` is intentionally ignored by Git; regenerate with `npm run record:demo-draft` |
 | Public video URL | Does not exist | Upload the accepted final take and test it signed out |
 | Captions | Not created | Create and review against the final take |
 | Transcript | Draft script only; final transcript does not exist | Transcribe the accepted final take |
