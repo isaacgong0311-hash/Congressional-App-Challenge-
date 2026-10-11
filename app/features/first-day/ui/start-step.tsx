@@ -2,6 +2,7 @@ import type { Language } from "./first-day-copy";
 import { translated } from "./first-day-copy";
 import { Eyebrow } from "./first-day-shared";
 import type { ProviderCapability } from "./use-provider-capability";
+import { fictionalPreview } from "../content/fictional-case";
 import {
   ArrowRightIcon,
   DocumentIcon,
@@ -155,7 +156,7 @@ export function StartStep({
                   </div>
                 </div>
                 <p className="mt-4 font-serif text-lg leading-7 text-white/90">
-                  “Mesa View Welcome Center, 145 Oak Street…”
+                  “{fictionalPreview.enrollmentLocationQuote}…”
                 </p>
               </div>
               <div className="mr-7 rounded-3xl bg-white p-5 text-[#1b2d26] shadow-2xl">

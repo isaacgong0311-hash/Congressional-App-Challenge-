@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ProductHeader } from "../../components/lantern/product-header";
 import { SiteFooter } from "../../components/lantern/site-footer";
 import { competitionProof } from "../../features/first-day/content/competition-proof";
+import { fictionalPreview } from "../../features/first-day/content/fictional-case";
 
 export const metadata: Metadata = {
   title: "How First Day works | Lantern",
@@ -18,8 +19,7 @@ const stages = [
     owner: "AI proposes",
     detail:
       "A family adds a page. The provider returns extracted text, but the page remains the record Lantern checks.",
-    example:
-      "Welcome letter · “Family orientation will be held in the school cafeteria…”",
+    example: `${fictionalPreview.welcomeDocument.label} · “${fictionalPreview.enrollmentLocationQuote}”`,
   },
   {
     number: "02",
@@ -27,8 +27,7 @@ const stages = [
     owner: "AI proposes · code validates",
     detail:
       "Every proposed fact must include a verbatim passage that exists in that page’s extracted text.",
-    example:
-      "Evidence · “Family orientation will be held in the school cafeteria on August 14, 2026…”",
+    example: `Evidence · “${fictionalPreview.orientationCafeteriaQuote}”`,
   },
   {
     number: "03",
@@ -36,7 +35,7 @@ const stages = [
     owner: "Family decides",
     detail:
       "The proposal does not affect the plan until a person confirms, corrects, or marks it unclear.",
-    example: "Orientation location · School cafeteria · Confirmed",
+    example: `${fictionalPreview.registrationLocationFact.label} · ${fictionalPreview.registrationLocationFact.originalValue} · Confirmed`,
   },
   {
     number: "04",
@@ -44,7 +43,7 @@ const stages = [
     owner: "Student-authored rule",
     detail:
       "Each task names the facts, earlier tasks, and reviewed procedures it depends on. Missing information stays missing.",
-    example: "Confirm orientation · needs one confirmed location fact",
+    example: `${fictionalPreview.orientationTask.title} · needs one confirmed location fact`,
   },
   {
     number: "05",
@@ -52,7 +51,7 @@ const stages = [
     owner: "Deterministic code",
     detail:
       "The planner derives Ready, Waiting, Needs clarification, Needs review, or Done from those records—never from a model guess.",
-    example: "Confirm orientation · Ready",
+    example: `${fictionalPreview.registrationTask.title} · Ready`,
   },
 ] as const;
 

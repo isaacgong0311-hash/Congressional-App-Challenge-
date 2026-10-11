@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
+import { fictionalPreview } from "../app/features/first-day/content/fictional-case";
 
 for (const route of [
   "/",
@@ -35,6 +36,21 @@ for (const route of [
     ).toEqual([]);
   });
 }
+
+test("public examples show the same fictional source quotes as the demo", async ({ page }) => {
+  await page.goto("/first-day/how-it-works");
+  await expect(
+    page.getByText(`Evidence · “${fictionalPreview.orientationCafeteriaQuote}”`),
+  ).toBeVisible();
+
+  await page.goto("/");
+  await expect(
+    page.getByText(`“${fictionalPreview.orientationCafeteriaQuote}”`),
+  ).toBeVisible();
+  await expect(
+    page.getByText(`“${fictionalPreview.orientationGymQuote}”`),
+  ).toBeVisible();
+});
 
 test("mobile navigation is keyboard reachable and closes on Escape", async ({
   page,

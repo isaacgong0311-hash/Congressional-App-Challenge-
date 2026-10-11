@@ -285,3 +285,34 @@ export const fictionalCase: FirstDayCase = {
   ],
   events: [],
 };
+
+function requiredFixtureItem<T extends { id: string }>(items: T[], id: string): T {
+  const item = items.find((candidate) => candidate.id === id);
+  if (!item) throw new Error(`Missing fictional fixture item: ${id}`);
+  return item;
+}
+
+// Public examples read from the same records that drive the interactive demo.
+export const fictionalPreview = {
+  familyLabel: "MESA VIEW · RIVERA FAMILY",
+  welcomeDocument: requiredFixtureItem(fictionalCase.documents, "doc-welcome-letter"),
+  followUpDocument: requiredFixtureItem(fictionalCase.documents, "doc-follow-up-message"),
+  enrollmentLocationQuote: requiredFixtureItem(
+    fictionalCase.evidence,
+    "evidence-registration-location",
+  ).quote,
+  orientationCafeteriaQuote: requiredFixtureItem(
+    fictionalCase.evidence,
+    "evidence-orientation-cafeteria",
+  ).quote,
+  orientationGymQuote: requiredFixtureItem(
+    fictionalCase.evidence,
+    "evidence-orientation-gym",
+  ).quote,
+  registrationLocationFact: requiredFixtureItem(
+    fictionalCase.facts,
+    "fact-registration-location",
+  ),
+  registrationTask: requiredFixtureItem(fictionalCase.tasks, "task-registration"),
+  orientationTask: requiredFixtureItem(fictionalCase.tasks, "task-orientation"),
+} as const;

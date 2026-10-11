@@ -11,6 +11,7 @@ import {
 import { ProductHeader } from "./components/lantern/product-header";
 import { SiteFooter } from "./components/lantern/site-footer";
 import { competitionProof } from "./features/first-day/content/competition-proof";
+import { fictionalPreview } from "./features/first-day/content/fictional-case";
 import "./styles/home.css";
 
 export const metadata: Metadata = {
@@ -110,7 +111,7 @@ export default function HomePage() {
                 <div className="home-window-body">
                   <div className="home-plan-heading">
                     <div>
-                      <p className="home-label">MESA VIEW · RIVERA FAMILY</p>
+                      <p className="home-label">{fictionalPreview.familyLabel}</p>
                       <h2>Your first day, organized.</h2>
                     </div>
                     <span className="home-plan-date">
@@ -132,7 +133,7 @@ export default function HomePage() {
                       <h3>Gather enrollment documents</h3>
                       <p>Keep the required paperwork together.</p>
                       <span className="home-source-ref">
-                        <DocumentLineIcon /> Welcome letter · Page 1
+                        <DocumentLineIcon /> {fictionalPreview.welcomeDocument.label} · Page {fictionalPreview.welcomeDocument.pageIndex}
                       </span>
                     </div>
                     <span className="home-pill">Ready</span>
@@ -142,10 +143,10 @@ export default function HomePage() {
                       <CheckCircleIcon />
                     </span>
                     <div>
-                      <h3>Go to the enrollment meeting</h3>
-                      <p>Mesa View Welcome Center</p>
+                      <h3>{fictionalPreview.registrationTask.title}</h3>
+                      <p>{fictionalPreview.enrollmentLocationQuote}</p>
                       <span className="home-source-ref">
-                        <DocumentLineIcon /> Office note · Page 3
+                        <DocumentLineIcon /> {fictionalPreview.welcomeDocument.label} · Page {fictionalPreview.welcomeDocument.pageIndex}
                       </span>
                     </div>
                     <span className="home-pill">Ready</span>
@@ -153,8 +154,8 @@ export default function HomePage() {
                   <div className="home-task home-task-unclear">
                     <span className="home-question-mark">?</span>
                     <div>
-                      <h3>Confirm the orientation location</h3>
-                      <p>Two pages list different places. Let’s check.</p>
+                      <h3>{fictionalPreview.orientationTask.title}</h3>
+                      <p>{fictionalPreview.orientationTask.detail}</p>
                     </div>
                     <span className="home-pill home-pill-amber">
                       Ask the school
@@ -257,9 +258,9 @@ export default function HomePage() {
               <div className="home-comparison-sources">
                 <article>
                   <span className="home-label">
-                    <DocumentLineIcon /> WELCOME LETTER · P. 1
+                    <DocumentLineIcon /> {fictionalPreview.welcomeDocument.label} · P. {fictionalPreview.welcomeDocument.pageIndex}
                   </span>
-                  <p>“School cafeteria”</p>
+                  <p>“{fictionalPreview.orientationCafeteriaQuote}”</p>
                 </article>
                 <span
                   className="home-conflict-symbol"
@@ -269,14 +270,14 @@ export default function HomePage() {
                 </span>
                 <article>
                   <span className="home-label">
-                    <DocumentLineIcon /> REMINDER · P. 2
+                    <DocumentLineIcon /> {fictionalPreview.followUpDocument.label} · P. {fictionalPreview.followUpDocument.pageIndex}
                   </span>
-                  <p>“Gym entrance”</p>
+                  <p>“{fictionalPreview.orientationGymQuote}”</p>
                 </article>
               </div>
               <div className="home-question">
-                <span className="home-label">YOUR QUESTION, READY TO ASK</span>
-                <p>“Which entrance should our family use for orientation?”</p>
+                <span className="home-label">WHAT TO ASK THE SCHOOL</span>
+                <p>{fictionalPreview.orientationTask.action}</p>
                 <span className="home-question-footer">
                   <span className="home-status-dot" /> Waiting for the school’s
                   answer
