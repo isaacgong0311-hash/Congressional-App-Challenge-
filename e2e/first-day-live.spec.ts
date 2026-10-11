@@ -238,6 +238,62 @@ test("live entry explains an unavailable provider and retries without reloading"
   await expect(liveButton).toBeEnabled();
 });
 
+test("source-backed facts can be confirmed, corrected, or marked unclear in EN and ES", async ({ page }) => {
+  await page.route("**/api/health", (route) => route.fulfill({
+    status: 200,
+    contentType: "application/json",
+    body: JSON.stringify({ status: "ok", capabilities: { liveDocumentReading: true } }),
+  }));
+  await page.route("**/api/first-day/extract", (route) => {
+    const documentId = multipartField(route, "documentId");
+    const requestId = multipartField(route, "requestId");
+    const text = "SYNTHETIC TEST PAGE\nBring a birth certificate.\nGo to the West Welcome Office.\nBring a parent photo ID.";
+    const facts = [
+      ["birth-certificate", "registration.birth_certificate", "Birth certificate", "Birth certificate", "Bring a birth certificate."],
+      ["welcome-office", "registration.welcome_office", "Welcome office", "West Welcome Office", "Go to the West Welcome Office."],
+      ["parent-id", "registration.parent_id", "Parent photo ID", "Parent photo ID", "Bring a parent photo ID."],
+    ].map(([clientKey, semanticKey, label, originalValue, quote]) => ({
+      clientKey, semanticKey, label, originalValue, quote,
+      kind: "requested_item", normalizedValue: null, location: "Synthetic page", confidence: 99,
+    }));
+    return route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        schemaVersion: "first-day-extraction-v1", documentId, requestId,
+        document: { label: "Synthetic enrollment note", confidence: 99, originalText: text, photoQualityNote: null },
+        facts,
+      }),
+    });
+  });
+
+  for (const spanish of [false, true]) {
+    await page.goto("/first-day");
+    if (spanish) await page.getByRole("button", { name: "ES", exact: true }).click();
+    await page.getByRole("button", { name: spanish ? "Probar el ejemplo con fuentes públicas" : "Try the public-source example" }).click();
+    await page.getByLabel(spanish ? "Imágenes de páginas escolares" : "School page images").setInputFiles({
+      name: "synthetic.png", mimeType: "image/png", buffer: Buffer.from("synthetic-test-page"),
+    });
+    await expect(page.getByText("Synthetic enrollment note")).toBeVisible();
+    await page.getByRole("button", { name: spanish ? "Continuar" : "Continue" }).click();
+
+    const birth = page.getByRole("article").filter({ has: page.getByRole("heading", { name: "Birth certificate" }) });
+    await birth.getByRole("button", { name: spanish ? "Confirmar" : "Confirm this" }).click();
+    await expect(birth.getByText(spanish ? "Confirmado" : "Confirmed", { exact: true })).toBeVisible();
+
+    const office = page.getByRole("article").filter({ has: page.getByRole("heading", { name: "Welcome office" }) });
+    await office.getByRole("button", { name: spanish ? "Corregir" : "Correct" }).click();
+    await office.getByRole("textbox").fill("North Welcome Office");
+    await office.getByRole("button", { name: spanish ? "Guardar corrección" : "Save correction" }).click();
+    await expect(office.getByText("North Welcome Office")).toBeVisible();
+    await expect(office.getByText("Go to the West Welcome Office.", { exact: false })).toBeVisible();
+
+    const parentId = page.getByRole("article").filter({ has: page.getByRole("heading", { name: "Parent photo ID" }) });
+    await parentId.getByRole("button", { name: spanish ? "No está claro" : "Not clear" }).click();
+    await expect(parentId.getByText(spanish ? "No está claro" : "Unclear", { exact: true })).toBeVisible();
+  }
+});
+
 test("a successfully read page with no facts explains the next action", async ({ page }, testInfo) => {
   await page.route("**/api/health", (route) =>
     route.fulfill({
