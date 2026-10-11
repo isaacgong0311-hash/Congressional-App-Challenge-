@@ -195,6 +195,7 @@ test("clean demo carries a sourced plan through English and Spanish", async ({ p
       for (const quote of fictionalCase.evidence.slice(0, 2)) {
         await expect(page.getByText(quote.quote, { exact: false }).first()).toBeVisible();
       }
+      await expect(page.getByText("Por favor, entre por la entrada del gimnasio.", { exact: false }).first()).toBeVisible();
       await page.getByRole("button", { name: es ? "Continuar" : "Continue" }).click();
       await expect(page.locator('.fd-step-nav [aria-current="step"]')).toContainText(es ? "Revisar datos" : "Review facts");
 
@@ -335,7 +336,7 @@ test("presenter mode follows the six-beat story and can exit and resume", async 
   await expect(trace.getByText("Confirmed", { exact: true })).toBeVisible();
   await expect(trace.getByText("Not selected", { exact: true })).toBeVisible();
   await expect(
-    trace.getByText("Please enter through the gym entrance.", {
+    trace.getByText("Por favor, entre por la entrada del gimnasio.", {
       exact: false,
     }),
   ).toBeVisible();

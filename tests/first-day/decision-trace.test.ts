@@ -37,7 +37,7 @@ describe("Decision Trace projection", () => {
         .map((node) => node.detail),
     ).toEqual([
       "Family orientation will be held in the school cafeteria on August 14, 2027 at 5:30 p.m.",
-      "Please enter through the gym entrance.",
+      "Por favor, entre por la entrada del gimnasio.",
     ]);
     expect(
       trace.nodes

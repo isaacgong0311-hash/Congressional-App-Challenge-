@@ -33,7 +33,7 @@ export const fictionalCase: FirstDayCase = {
       status: "ready",
       sourceVersion: "demo-packet-v1",
       extractedText:
-        "Reminder for the Rivera family: orientation is August 14, 2027 at 5:30 p.m. Please enter through the gym entrance. Reply to this message if you need an interpreter for enrollment or orientation.",
+        "Recordatorio para la familia Rivera: la orientación es el 14 de agosto de 2027 a las 5:30 p. m. Por favor, entre por la entrada del gimnasio. Responda a este mensaje si necesita un intérprete para la inscripción o la orientación.",
     },
   ],
   procedures: [
@@ -103,14 +103,14 @@ export const fictionalCase: FirstDayCase = {
     {
       id: "evidence-orientation-gym",
       documentId: "doc-follow-up-message",
-      quote: "Please enter through the gym entrance.",
+      quote: "Por favor, entre por la entrada del gimnasio.",
       location: "Page 3, second sentence",
     },
     {
       id: "evidence-interpreter-offer",
       documentId: "doc-follow-up-message",
       quote:
-        "Reply to this message if you need an interpreter for enrollment or orientation.",
+        "Responda a este mensaje si necesita un intérprete para la inscripción o la orientación.",
       location: "Page 3, final sentence",
     },
     {
