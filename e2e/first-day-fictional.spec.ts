@@ -3,6 +3,8 @@ import { readFile } from "node:fs/promises";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
+import { fictionalCase } from "../app/features/first-day/content/fictional-case";
+
 async function expectNoSeriousAxeViolations(page: Page) {
   const results = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa"])
@@ -170,6 +172,78 @@ test("public demo starts at step one without presenter scaffolding or API calls"
   expect(
     requestUrls.filter((url) => new URL(url).origin !== new URL(page.url()).origin),
   ).toEqual([]);
+});
+
+test("clean demo carries a sourced plan through English and Spanish", async ({ page }) => {
+  const unexpectedRequests: string[] = [];
+  page.on("request", (request) => {
+    const url = new URL(request.url());
+    if (url.origin !== "http://127.0.0.1:3100" || url.pathname.startsWith("/api/")) {
+      unexpectedRequests.push(request.url());
+    }
+  });
+
+  for (const language of ["English", "Español"] as const) {
+    await test.step(language, async () => {
+      await page.goto("/first-day?demo=1");
+      if (language === "Español") {
+        await page.getByRole("button", { name: "ES", exact: true }).click();
+      }
+      const es = language === "Español";
+      await page.getByRole("button", { name: es ? "Probar el caso ficticio" : "Try the fictional case" }).click();
+      await expect(page.locator('.fd-step-nav [aria-current="step"]')).toContainText(es ? "Documentos" : "Documents");
+      for (const quote of fictionalCase.evidence.slice(0, 2)) {
+        await expect(page.getByText(quote.quote, { exact: false }).first()).toBeVisible();
+      }
+      await page.getByRole("button", { name: es ? "Continuar" : "Continue" }).click();
+      await expect(page.locator('.fd-step-nav [aria-current="step"]')).toContainText(es ? "Revisar datos" : "Review facts");
+
+      const immunization = page.getByRole("article").filter({
+        has: page.getByRole("heading", { name: es ? "¿Tiene el registro de vacunas de Maya?" : "Do you have Maya's immunization record?" }),
+      });
+      await immunization.getByRole("button", { name: es ? "Sí" : "Yes", exact: true }).click();
+      const interpreter = page.getByRole("article").filter({
+        has: page.getByRole("heading", { name: es ? "¿Necesita un intérprete?" : "Would an interpreter help your family?" }),
+      });
+      await interpreter.getByRole("button", { name: es ? "Aún no sé" : "Not sure yet" }).click();
+      await expect(interpreter.getByText(es ? "No está claro" : "Unclear", { exact: true })).toBeVisible();
+      await page.getByRole("button", { name: es ? "Continuar" : "Continue" }).click();
+      await expect(page.locator('.fd-step-nav [aria-current="step"]')).toContainText(es ? "Mi plan" : "My plan");
+
+      const orientation = page.getByRole("article").filter({
+        has: page.getByRole("heading", { name: es ? "Confirmar dónde empieza la orientación" : "Confirm where orientation begins" }),
+      });
+      await orientation.getByRole("button", { name: es ? "Resolver" : "Resolve this" }).click();
+      await expect(page.locator('.fd-step-nav [aria-current="step"]')).toContainText(es ? "Resolver" : "Resolve");
+      const conflict = page.locator(".fd-conflict-card");
+      await expect(conflict).toHaveCount(2);
+      await expect(conflict.nth(0)).toContainText(fictionalCase.evidence.find((item) => item.id === "evidence-orientation-cafeteria")!.quote);
+      await expect(conflict.nth(1)).toContainText(fictionalCase.evidence.find((item) => item.id === "evidence-orientation-gym")!.quote);
+      await expect(page.getByText(es ? "Pregunta preparada" : "Prepared question")).toBeVisible();
+      await conflict.last().getByRole("button", { name: es ? "Registrar lo que me dijo la escuela" : "Record what the school told me" }).click();
+
+      const progress = page.locator(".fd-mobile-progress summary");
+      if (await progress.isVisible()) await progress.click();
+      await page.getByRole("button", { name: es ? /Llevar conmigo/ : /Take it with me/ }).click();
+      const printPlan = page.locator(".fd-print-plan");
+      await expect(printPlan).toBeVisible();
+      await expect(printPlan.getByText(es ? "Fuentes:" : "Sources:").first()).toBeVisible();
+
+      const downloadPromise = page.waitForEvent("download");
+      await page.getByRole("button", { name: es ? "Descargar JSON técnico" : "Download technical JSON" }).click();
+      const download = await downloadPromise;
+      const portable = JSON.parse(await readFile((await download.path())!, "utf8"));
+      const readyTasks = portable.tasks.filter((task: { state: string }) => task.state === "ready");
+      expect(readyTasks.length).toBeGreaterThan(0);
+      for (const task of readyTasks as Array<{ id: string; evidenceIds: string[] }>) {
+        expect(task.evidenceIds.length, `${task.id} must retain a source`).toBeGreaterThan(0);
+        const source = fictionalCase.evidence.find((item) => item.id === task.evidenceIds[0]);
+        expect(source, `${task.id} must cite case evidence`).toBeDefined();
+        await expect(printPlan).toContainText(source!.location);
+      }
+    });
+  }
+  expect(unexpectedRequests).toEqual([]);
 });
 
 test("presenter mode follows the six-beat story and can exit and resume", async ({

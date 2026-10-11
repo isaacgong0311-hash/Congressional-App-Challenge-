@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import type { FirstDayCase, PlannerResult } from "../domain/types";
+import type { DerivedTask, FirstDayCase, PlannerResult } from "../domain/types";
 import { competitionProof } from "../content/competition-proof";
 import {
   calendarEvents,
@@ -62,6 +62,31 @@ function downloadFile(contents: string, type: string, fileName: string) {
   link.click();
   link.remove();
   window.setTimeout(() => URL.revokeObjectURL(url), 10_000);
+}
+
+function TaskSources({
+  caseData,
+  language,
+  task,
+}: {
+  caseData: FirstDayCase;
+  language: Language;
+  task: DerivedTask;
+}) {
+  const sources = task.evidenceIds.flatMap((id) => {
+    const evidence = caseData.evidence.find((item) => item.id === id);
+    if (!evidence) return [];
+    const document = caseData.documents.find((item) => item.id === evidence.documentId);
+    const procedure = caseData.procedures.find((item) => item.id === evidence.procedureId);
+    if (document?.status === "removed") return [];
+    return [`${document?.label ?? procedure?.sourceSection ?? translated(language, "Source", "Fuente")} · ${evidence.location}`];
+  });
+  if (sources.length === 0) return null;
+  return (
+    <p className="mt-2 text-xs leading-5 text-[#536159]">
+      <strong>{translated(language, "Sources", "Fuentes")}:</strong> {sources.join("; ")}
+    </p>
+  );
 }
 
 export function ExportStep({
@@ -337,6 +362,7 @@ export function ExportStep({
             </h3>
             <p className="mt-3 text-lg font-bold text-ink">{localizedTaskCopy(bestNext, language).title}</p>
             <p className="mt-1 text-sm leading-6 text-[#53628b]">{localizedTaskCopy(bestNext, language).action}</p>
+            <TaskSources caseData={caseData} language={language} task={bestNext} />
           </section>
         ) : null}
 
@@ -361,6 +387,7 @@ export function ExportStep({
                     <p className="mt-1 text-sm leading-6 text-[#5d6963]">
                       {taskCopy.action}
                     </p>
+                    <TaskSources caseData={caseData} language={language} task={task} />
                   </div>
                 </div>
               );
