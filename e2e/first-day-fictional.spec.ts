@@ -142,18 +142,49 @@ test("fictional entry and evidence review are keyboard reachable", async ({
   await expect(source).toBeFocused();
 });
 
-test("guided demo follows the six-beat judge story and can exit and resume", async ({
+test("public demo starts at step one without presenter scaffolding or API calls", async ({ page }) => {
+  const apiRequests: string[] = [];
+  const requestUrls: string[] = [];
+  page.on("request", (request) => {
+    requestUrls.push(request.url());
+    if (new URL(request.url()).pathname.startsWith("/api/")) apiRequests.push(request.url());
+  });
+
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.goto("/first-day?demo=1");
+  const demo = page.getByLabel("Fictional demo");
+  await expect(demo).toBeVisible();
+  await expect(page.getByRole("heading", { name: "School letters, one clear plan." })).toBeVisible();
+  await expect(page.locator('.fd-step-nav [aria-current="step"]')).toContainText("Start");
+  await expect(page.getByText(/Story beat|0:20–0:45|Community need/)).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Next beat" })).toHaveCount(0);
+
+  await page.getByRole("button", { name: "Try the fictional case" }).click();
+  await expect(page.locator('.fd-step-nav [aria-current="step"]')).toContainText("Documents");
+  await page.getByRole("button", { name: "Continue" }).click();
+  await expect(page.locator('.fd-step-nav [aria-current="step"]')).toContainText("Review facts");
+  await page.getByRole("button", { name: "ES", exact: true }).click();
+  await expect(page.getByLabel("Demo ficticia")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Reiniciar demo" })).toBeVisible();
+  expect(apiRequests).toEqual([]);
+  expect(
+    requestUrls.filter((url) => new URL(url).origin !== new URL(page.url()).origin),
+  ).toEqual([]);
+});
+
+test("presenter mode follows the six-beat story and can exit and resume", async ({
   page,
 }) => {
   const providerRequests: string[] = [];
   page.on("request", (request) => {
-    if (new URL(request.url()).pathname.startsWith("/api/")) {
+    const path = new URL(request.url()).pathname;
+    if (path.startsWith("/api/") && path !== "/api/health") {
       providerRequests.push(request.url());
     }
   });
 
   await page.setViewportSize({ width: 1440, height: 1000 });
-  await page.goto("/first-day?demo=1");
+  await page.goto("/first-day?demo=1&present=1");
   await page.emulateMedia({ reducedMotion: "reduce" });
   const guide = page.getByLabel("Guided demonstration");
   await expect(guide).toBeVisible();
@@ -309,11 +340,11 @@ test("guided demo follows the six-beat judge story and can exit and resume", asy
   ).toBeEnabled();
 });
 
-test("guided demo keeps its mobile presentation controls in the first viewport", async ({
+test("presenter mode keeps its mobile controls in the first viewport", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("/first-day?demo=1");
+  await page.goto("/first-day?demo=1&present=1");
   const nextBeat = page.getByRole("button", { name: "Next beat" });
   await expect(nextBeat).toBeVisible();
   const box = await nextBeat.boundingBox();

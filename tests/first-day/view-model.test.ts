@@ -67,11 +67,12 @@ describe("First Day presentation view", () => {
     expect(filterPlanTasks(plan.tasks, "all")).toHaveLength(5);
   });
 
-  it("enables guided demo mode only for the explicit demo flag", () => {
-    expect(presentationModeFromDemoParam("1")).toBe("guided_demo");
-    expect(presentationModeFromDemoParam("0")).toBe("standard");
-    expect(presentationModeFromDemoParam(["1"])).toBe("standard");
-    expect(presentationModeFromDemoParam(undefined)).toBe("standard");
+  it("reserves presenter scaffolding for both explicit flags", () => {
+    expect(presentationModeFromDemoParam("1", "1")).toBe("guided_demo");
+    expect(presentationModeFromDemoParam("1", undefined)).toBe("standard");
+    expect(presentationModeFromDemoParam("0", "1")).toBe("standard");
+    expect(presentationModeFromDemoParam(["1"], "1")).toBe("standard");
+    expect(presentationModeFromDemoParam(undefined, undefined)).toBe("standard");
   });
 
   it("returns only the latest effective completion event", () => {

@@ -10,9 +10,10 @@ export type TaskFilter = "all" | "attention" | "ready" | "done";
 export type PresentationMode = "standard" | "guided_demo";
 
 export function presentationModeFromDemoParam(
-  value: string | string[] | undefined,
+  demo: string | string[] | undefined,
+  present: string | string[] | undefined,
 ): PresentationMode {
-  return value === "1" ? "guided_demo" : "standard";
+  return demo === "1" && present === "1" ? "guided_demo" : "standard";
 }
 
 export type CaseSnapshotView = {

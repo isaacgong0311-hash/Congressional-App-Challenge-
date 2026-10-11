@@ -41,9 +41,11 @@ type ToastState = {
 
 export function useFirstDayController({
   initialCase,
+  initialDemoMode,
   initialPresentationMode,
 }: {
   initialCase: FirstDayCase;
+  initialDemoMode: boolean;
   initialPresentationMode: PresentationMode;
 }) {
   const [caseData, setCaseData] = useState(initialCase);
@@ -59,8 +61,9 @@ export function useFirstDayController({
   const [presentationMode, setPresentationMode] = useState<PresentationMode>(
     initialPresentationMode,
   );
+  const [demoMode, setDemoMode] = useState(initialDemoMode);
   const [demoBeatId, setDemoBeatId] = useState<DemoBeatId>("before_lantern");
-  const [isDemoSession] = useState(initialPresentationMode === "guided_demo");
+  const [isDemoSession] = useState(initialDemoMode);
   const sourceTriggerRef = useRef<HTMLButtonElement | null>(null);
   const eventSequence = useRef(0);
   const preferenceAppliedRef = useRef(false);
@@ -68,7 +71,7 @@ export function useFirstDayController({
     useLanternPreferences();
   const language: Language = caseData.language;
   const { capability: providerCapability, refresh: refreshProviderCapability } = useProviderCapability(
-    initialPresentationMode !== "guided_demo",
+    !demoMode,
   );
   const liveCase = useLiveCase({ caseData, language, setCaseData });
   const plan = useMemo(() => planCase(caseData), [caseData]);
@@ -148,7 +151,7 @@ export function useFirstDayController({
   }
 
   function startLiveCase() {
-    if (presentationMode === "guided_demo") return;
+    if (demoMode) return;
     liveCase.reset();
     setCaseData({
       id: `case-live-${Date.now()}`,
@@ -391,6 +394,7 @@ export function useFirstDayController({
 
   function dismissDemo() {
     setPresentationMode("standard");
+    setDemoMode(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -399,7 +403,7 @@ export function useFirstDayController({
     sourceTriggerRef.current = null;
     eventSequence.current = 0;
     setCaseData({ ...structuredClone(initialCase), language });
-    setCurrentStep("documents");
+    setCurrentStep(initialPresentationMode === "guided_demo" ? "documents" : "start");
     setSourceId(null);
     setActiveConflictId(null);
     setTaskFilter("all");
@@ -407,13 +411,15 @@ export function useFirstDayController({
     setHighlightedTaskId(null);
     setTraceTaskId(null);
     setDemoBeatId("before_lantern");
-    setPresentationMode("guided_demo");
+    setPresentationMode(initialPresentationMode);
+    setDemoMode(true);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   function resumeDemo() {
     setDemoBeatId(demoBeatForStep(currentStep, snapshot, demoBeatId));
-    setPresentationMode("guided_demo");
+    setPresentationMode(initialPresentationMode);
+    setDemoMode(true);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -423,7 +429,7 @@ export function useFirstDayController({
     canGoForward:
       presentationMode === "guided_demo" ? canAdvanceDemo : canGoForward,
     canAdvanceDemo,
-    canResumeDemo: isDemoSession && presentationMode === "standard",
+    canResumeDemo: isDemoSession && !demoMode,
     caseData,
     closeSource,
     closeDecisionTrace,
@@ -433,6 +439,7 @@ export function useFirstDayController({
     currentStep,
     demoBeat,
     demoBeatId,
+    demoMode,
     dismissDemo,
     goBack,
     goForward,

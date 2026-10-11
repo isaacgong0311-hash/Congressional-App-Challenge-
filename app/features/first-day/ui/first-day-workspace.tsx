@@ -28,13 +28,16 @@ import { WorkspaceProgress } from "./workspace-progress";
 
 export function FirstDayWorkspace({
   initialCase,
+  initialDemoMode = false,
   initialPresentationMode = "standard",
 }: {
   initialCase: FirstDayCase;
+  initialDemoMode?: boolean;
   initialPresentationMode?: PresentationMode;
 }) {
   const controller = useFirstDayController({
     initialCase,
+    initialDemoMode,
     initialPresentationMode,
   });
   const {
@@ -52,6 +55,7 @@ export function FirstDayWorkspace({
     currentStep,
     demoBeat,
     demoBeatId,
+    demoMode,
     dismissDemo,
     goBack,
     goForward,
@@ -191,7 +195,7 @@ export function FirstDayWorkspace({
           </div>
         </header>
 
-        {presentationMode === "guided_demo" ? (
+        {presentationMode === "guided_demo" && demoMode ? (
           <DemoRibbon
             beat={demoBeat}
             canGoForward={canAdvanceDemo}
@@ -202,6 +206,32 @@ export function FirstDayWorkspace({
             onReset={resetDemo}
             snapshot={snapshot}
           />
+        ) : null}
+
+        {demoMode && presentationMode === "standard" ? (
+          <aside
+            aria-label={translated(language, "Fictional demo", "Demo ficticia")}
+            className="fd-demo-notice print:hidden"
+          >
+            <div>
+              <strong>{translated(language, "Fictional demo", "Demo ficticia")}</strong>
+              <span>
+                {translated(
+                  language,
+                  "Explore a sample family’s plan. No upload needed.",
+                  "Explore el plan de una familia ficticia. No necesita subir archivos.",
+                )}
+              </span>
+            </div>
+            <div className="fd-demo-notice-actions">
+              <button onClick={resetDemo} type="button">
+                {translated(language, "Reset demo", "Reiniciar demo")}
+              </button>
+              <button onClick={dismissDemo} type="button">
+                {translated(language, "Exit demo", "Salir de la demo")}
+              </button>
+            </div>
+          </aside>
         ) : null}
 
         <div className="mx-auto grid w-full max-w-[1400px] grid-cols-1 gap-6 px-4 py-5 sm:px-7 lg:grid-cols-[250px_minmax(0,1fr)] lg:gap-9 lg:px-10 lg:py-9">
@@ -229,7 +259,7 @@ export function FirstDayWorkspace({
           >
             {currentStep === "start" ? (
               <StartStep
-                allowLive={presentationMode !== "guided_demo"}
+                allowLive={!demoMode}
                 language={language}
                 onOpenSample={openSampleCase}
                 onStartLive={startLiveCase}

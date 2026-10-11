@@ -15,7 +15,7 @@ test("sample loading acknowledges a slow request immediately", async ({ page }) 
 });
 
 test("conflict headings use source page numbers and fact cards hide internal keys", async ({ page }) => {
-  await page.goto("/first-day?demo=1");
+  await page.goto("/first-day?demo=1&present=1");
   await page.getByRole("button", { name: "Next beat", exact: true }).click();
   await expect(page.getByText("orientation.location", { exact: false })).toHaveCount(0);
   const immunization = page.getByRole("article").filter({
@@ -43,7 +43,7 @@ test("conflict headings use source page numbers and fact cards hide internal key
 });
 
 test("a Yes answer to the interpreter question updates the card and unlocks the demo", async ({ page }) => {
-  await page.goto("/first-day?demo=1");
+  await page.goto("/first-day?demo=1&present=1");
   const guide = page.getByLabel("Guided demonstration");
   await guide.getByRole("button", { name: "Next beat" }).click();
 

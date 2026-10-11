@@ -42,7 +42,7 @@ async function main() {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto(baseUrl, { waitUntil: "networkidle" });
     await pause(7);
-    await page.getByRole("link", { name: /See Lantern in action/ }).click();
+    await page.goto(new URL("/first-day?demo=1&present=1", baseUrl).toString());
     const guide = page.getByLabel("Guided demonstration");
     await guide.waitFor();
 

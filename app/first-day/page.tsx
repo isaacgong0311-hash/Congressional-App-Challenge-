@@ -13,13 +13,17 @@ export const metadata: Metadata = {
 export default async function FirstDayPage({
   searchParams,
 }: {
-  searchParams: Promise<{ demo?: string | string[] }>;
+  searchParams: Promise<{
+    demo?: string | string[];
+    present?: string | string[];
+  }>;
 }) {
   const query = await searchParams;
   return (
     <FirstDayWorkspace
       initialCase={fictionalCase}
-      initialPresentationMode={presentationModeFromDemoParam(query.demo)}
+      initialDemoMode={query.demo === "1"}
+      initialPresentationMode={presentationModeFromDemoParam(query.demo, query.present)}
     />
   );
 }

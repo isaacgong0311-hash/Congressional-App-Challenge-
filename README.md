@@ -30,7 +30,7 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ### Judge demo
 
-Open [http://localhost:3000/first-day?demo=1](http://localhost:3000/first-day?demo=1). The six-beat guide runs entirely from fictional data and requires no provider key. Review the two family facts, advance to the orientation conflict, and record the school answer. Lantern will update the affected task and automatically open its **Decision Trace**, showing the path from both original quotes through the human confirmation and dependency rule to the new plan state. Use **Reset demo** at any point to restore the untouched case without reloading the page.
+Open [http://localhost:3000/first-day?demo=1](http://localhost:3000/first-day?demo=1) for the clean fictional walkthrough. It starts at Step 1, makes no provider request, and needs no account or upload. Review the family facts, inspect both sources of the orientation conflict, record the school answer, and take the source-linked plan with you. **Reset demo** restores the untouched case without reloading. The six-beat recording guide with timestamps and narration cues is available only at [http://localhost:3000/first-day?demo=1&present=1](http://localhost:3000/first-day?demo=1&present=1).
 
 Provider-backed features use environment variables when available:
 
