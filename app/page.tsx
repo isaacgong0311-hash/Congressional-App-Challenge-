@@ -306,7 +306,7 @@ export default function HomePage() {
             <p>
               Try the complete fictional demo without sharing a document. No
               account, no saved cloud case history. For live documents, images
-              are sent to the reading provider only when you submit them.
+              are sent to the AI reading service only when you submit them.
             </p>
             <Link className="home-text-link" href="/privacy">
               How we handle your information <ArrowUpRightIcon />
@@ -341,7 +341,7 @@ export default function HomePage() {
               <p className="home-kicker">Built to be checked</p>
               <h2 id="proof-title">Small details. Real accountability.</h2>
               <p>
-                {`Measured offline across ${competitionProof.packetCount} synthetic held-out packets.`}
+                {`We checked Lantern against ${competitionProof.packetCount} made-up school document sets.`}
               </p>
             </div>
             <dl>
@@ -349,15 +349,13 @@ export default function HomePage() {
                 .filter((metric) => metric.id !== "dates")
                 .map((metric) => (
                   <div key={metric.id}>
-                    <dt>{metric.label}</dt>
+                    <dt>{metric.id === "quotes" ? "source quotes checked" : metric.id === "conflicts" ? "disagreements found" : "plan steps with sources"}</dt>
                     <dd>{metric.value}</dd>
                   </div>
                 ))}
             </dl>
             <p className="home-proof-note">
-              {competitionProof.limitation} These are evaluation results on
-              fictional documents, not a guarantee for every real-world
-              document.
+              These results come from made-up documents, not real family cases. <Link href="/first-day/how-it-works">See the test details</Link>.
             </p>
           </div>
         </section>

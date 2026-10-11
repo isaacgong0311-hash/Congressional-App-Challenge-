@@ -52,6 +52,14 @@ test("public examples show the same fictional source quotes as the demo", async 
   ).toBeVisible();
 });
 
+test("landing page explains the evidence without engineering jargon", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator("header")).toContainText("School letters, made clear");
+  const visibleCopy = await page.locator("body").innerText();
+  expect(visibleCopy).not.toMatch(/synthetic held-out|\bprovider\b|\bdeterministic\b|regression checks|0\/8 date errors/i);
+  await expect(page.getByRole("link", { name: "See the test details" })).toHaveAttribute("href", "/first-day/how-it-works");
+});
+
 test("mobile navigation is keyboard reachable and closes on Escape", async ({
   page,
 }) => {

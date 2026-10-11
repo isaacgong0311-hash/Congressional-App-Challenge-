@@ -39,7 +39,7 @@ export function ProductHeader({ active = "home", controls }: ProductHeaderProps)
           </span>
           <span>
             <span className="block text-sm font-extrabold tracking-[-0.02em] text-ink">Lantern</span>
-            <span className="hidden text-[11px] font-medium text-muted sm:block">Evidence into action</span>
+            <span className="hidden text-[11px] font-medium text-muted sm:block">School letters, made clear</span>
           </span>
         </Link>
 
