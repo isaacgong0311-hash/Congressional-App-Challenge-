@@ -6,7 +6,7 @@ import { ProductHeader } from "../../components/lantern/product-header";
 import { CheckIcon, ShieldAlertIcon } from "../../components/lantern/icons";
 import { AccessibilityControls } from "../../components/lantern/primitives";
 import { useLanternPreferences } from "../../components/lantern/use-lantern-preferences";
-import { publicApiError } from "../../lib/api-error";
+import { publicApiError, readingFailureMessage } from "../../lib/api-error";
 import {
   deriveLetterToolView,
   isLetterResult,
@@ -16,6 +16,7 @@ import { LetterHelpScreen } from "./letter-help-screen";
 import { LetterIntake } from "./letter-intake";
 import { LetterResults } from "./letter-results";
 import { buildLetterReminderCalendar } from "./letter-calendar";
+import { sampleLetterResult } from "./sample-letter-result";
 import type { Category } from "../../resources";
 
 const LANGUAGES: { label: string; bcp47: string; tts: string }[] = [
@@ -48,6 +49,7 @@ export default function LetterWorkspace() {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [sampleLoading, setSampleLoading] = useState(false);
+  const [isSample, setIsSample] = useState(false);
   const [loadingMsg, setLoadingMsg] = useState(0);
   const [result, setResult] = useState<Result | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -165,6 +167,7 @@ export default function LetterWorkspace() {
     const url = URL.createObjectURL(f);
     previewUrl.current = url;
     setFile(f);
+    setIsSample(false);
     setResult(null);
     setError(null);
     setPreview(url);
@@ -183,13 +186,22 @@ export default function LetterWorkspace() {
     setCopiedLetter(false);
     setTranslatedLetter(null);
     try {
+      if (isSample) {
+        setResult(sampleLetterResult(language));
+        setActiveTab(0);
+        return;
+      }
       const body = new FormData();
       body.append("image", file);
       body.append("language", language);
       body.append("readingLevel", simplify ? "simple" : "standard");
       for (let attempt = 0; attempt < 2; attempt += 1) {
         try {
-          const res = await fetch("/api/explain", { method: "POST", body });
+          const res = await fetch("/api/explain", {
+            method: "POST",
+            body,
+            signal: AbortSignal.timeout(58_000),
+          });
           const data: unknown = await res.json();
           if (!res.ok) {
             const responseError = publicApiError(
@@ -198,8 +210,12 @@ export default function LetterWorkspace() {
                 ? "Ocurrió un problema. Inténtelo de nuevo."
                 : "Something went wrong. Please try again.",
             );
+            if (res.status === 429) {
+              setError(readingFailureMessage("RATE_LIMITED", language, responseError.message));
+              return;
+            }
             if (attempt === 0 && responseError.retryable) continue;
-            setError(responseError.message);
+            setError(readingFailureMessage(responseError.code, language, responseError.message));
             return;
           }
           if (!isLetterResult(data)) {
@@ -212,11 +228,13 @@ export default function LetterWorkspace() {
           setResult(data);
           setActiveTab(0);
           return;
-        } catch {
+        } catch (error) {
           if (attempt === 0) continue;
-          setError(language === "Spanish"
-            ? "No pudimos conectar con el servicio. Revise su conexión e inténtelo de nuevo."
-            : "We couldn't reach the server. Please check your connection and try again.");
+          setError(error instanceof DOMException && error.name === "TimeoutError"
+            ? readingFailureMessage("PROVIDER_TIMEOUT", language, "")
+            : language === "Spanish"
+              ? "No pudimos conectar con el servicio. Revise su conexión e inténtelo de nuevo."
+              : "We couldn't reach the server. Please check your connection and try again.");
         }
       }
     } finally {
@@ -236,6 +254,7 @@ export default function LetterWorkspace() {
       const url = URL.createObjectURL(f);
       previewUrl.current = url;
       setFile(f);
+      setIsSample(true);
       setResult(null);
       setError(null);
       setPreview(url);
@@ -253,6 +272,7 @@ export default function LetterWorkspace() {
     if (previewUrl.current) URL.revokeObjectURL(previewUrl.current);
     previewUrl.current = null;
     setFile(null);
+    setIsSample(false);
     setPreview(null);
     setResult(null);
     setError(null);
@@ -536,6 +556,9 @@ export default function LetterWorkspace() {
             <div>
               <p className="font-semibold">{language === "Spanish" ? "Hubo un problema" : "We hit a snag"}</p>
               <p className="mt-0.5 text-sm">{error}</p>
+              <Link className="mt-3 inline-flex min-h-11 items-center text-sm font-bold underline underline-offset-4" href="/first-day?demo=1">
+                {language === "Spanish" ? "Probar la demo ficticia" : "Try the fictional demo"}
+              </Link>
               {file ? (
                 <div className="mt-3 flex flex-wrap gap-2">
                   <button

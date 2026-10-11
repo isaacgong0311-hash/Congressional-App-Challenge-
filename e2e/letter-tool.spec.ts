@@ -1,5 +1,11 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
+
+async function uploadTestLetter(page: Page, spanish = false) {
+  await page.getByLabel(spanish
+    ? "Tome una foto o suba una imagen de su carta"
+    : "Take a photo or upload a picture of your letter").setInputFiles("public/sample-letter.png");
+}
 
 const validResult = {
   documentType: "Utility notice",
@@ -61,6 +67,31 @@ test("Explain intake exposes semantic tabs without decorative glyph labels", asy
   ).toBeFocused();
 });
 
+test("the fictional letter sample opens a bundled result without provider calls", async ({ page }) => {
+  const unexpectedRequests: string[] = [];
+  page.on("request", (request) => {
+    const url = new URL(request.url());
+    if (url.origin !== "http://127.0.0.1:3100" || url.pathname.startsWith("/api/")) {
+      unexpectedRequests.push(request.url());
+    }
+  });
+
+  await page.goto("/explain");
+  await page.getByRole("button", { name: /Try a sample/ }).click();
+  await page.getByRole("button", { name: "Explain this letter" }).click();
+  await expect(page.getByRole("heading", { name: "Fictional Medicaid denial notice" })).toBeVisible();
+  await expect(page.getByText("June 25, 2026", { exact: false }).first()).toBeVisible();
+
+  await page.getByRole("button", { name: "Explain another letter" }).click();
+  await page.getByRole("tab", { name: "Options" }).click();
+  await page.getByLabel("Explain in this language").selectOption("Spanish");
+  await page.getByRole("tab", { name: "Subir" }).click();
+  await page.getByRole("button", { name: /Pruebe un ejemplo/ }).click();
+  await page.getByRole("button", { name: "Explicar esta carta" }).click();
+  await expect(page.getByRole("heading", { name: "Aviso ficticio de denegación de Medicaid" })).toBeVisible();
+  expect(unexpectedRequests).toEqual([]);
+});
+
 test("Explain intake keeps one clear primary action and stable processing status", async ({
   page,
 }) => {
@@ -80,7 +111,7 @@ test("Explain intake keeps one clear primary action and stable processing status
   await expect(
     page.getByText("Choose a letter photo", { exact: true }),
   ).toBeVisible();
-  await page.getByRole("button", { name: /Try a sample/ }).click();
+  await uploadTestLetter(page);
   await page.getByRole("button", { name: "Explain this letter" }).click();
   await expect(
     page.getByRole("status", { name: "Analyzing your letter" }),
@@ -100,7 +131,7 @@ test("letter calendar and PDF actions give usable output", async ({ page }) => {
     }),
   );
   await page.goto("/explain");
-  await page.getByRole("button", { name: /Try a sample/ }).click();
+  await uploadTestLetter(page);
   await page.getByRole("button", { name: "Explain this letter" }).click();
   await expect(page.getByRole("heading", { name: "Utility notice", exact: true })).toBeVisible();
 
@@ -124,7 +155,7 @@ test("invalid generated calendar dates are explained and cannot be downloaded", 
     body: JSON.stringify({ ...validResult, deadlineISO: "2026-02-30" }),
   }));
   await page.goto("/explain");
-  await page.getByRole("button", { name: /Try a sample/ }).click();
+  await uploadTestLetter(page);
   await page.getByRole("button", { name: "Explain this letter" }).click();
   await expect(page.getByText("We couldn't verify a calendar date from this letter.", { exact: false })).toBeVisible();
   await expect(page.getByRole("button", { name: "Add reminder to calendar" })).toHaveCount(0);
@@ -140,7 +171,7 @@ test("Spanish letter results translate the primary actions and warnings", async 
   await page.getByRole("tab", { name: "Options" }).click();
   await page.getByLabel("Explain in this language").selectOption("Spanish");
   await page.getByRole("tab", { name: "Subir" }).click();
-  await page.getByRole("button", { name: /Pruebe un ejemplo/ }).click();
+  await uploadTestLetter(page, true);
   await page.getByRole("button", { name: "Explicar esta carta" }).click();
   await expect(page.getByRole("tab", { name: "Entender" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Qué significa" })).toBeVisible();
@@ -164,7 +195,7 @@ test("a transient reading failure retries the same photo once", async ({ page })
     });
   });
   await page.goto("/explain");
-  await page.getByRole("button", { name: /Try a sample/ }).click();
+  await uploadTestLetter(page);
   await page.getByRole("button", { name: "Explain this letter" }).click();
   await expect(page.getByRole("heading", { name: "Utility notice", exact: true })).toBeVisible();
   expect(attempts).toBe(2);
@@ -211,7 +242,7 @@ test("letter workspace recovers from malformed output and keeps speech fallback"
       name: "Understand the letter. See what to do next.",
     }),
   ).toBeVisible();
-  await page.getByRole("button", { name: /Try a sample/ }).click();
+  await uploadTestLetter(page);
   await page.getByRole("button", { name: "Explain this letter" }).click();
   await expect(page.locator('.ttf-fade-in[role="alert"]')).toContainText(
     "We couldn't safely read that response",
@@ -293,10 +324,48 @@ test("Spanish letter setup, breadcrumb, and recovery copy follow the selected la
   await expect(page.getByRole("heading", { name: "Entienda la carta. Sepa qué hacer después." })).toBeVisible();
   await expect(page.getByRole("link", { name: "← Inicio de Lantern" })).toBeVisible();
   await page.getByRole("tab", { name: "Subir" }).click();
-  await page.getByRole("button", { name: /Pruebe un ejemplo/ }).click();
+  await uploadTestLetter(page, true);
   await page.getByRole("button", { name: "Explicar esta carta" }).click();
   await expect(page.locator('.ttf-fade-in[role="alert"]')).toContainText("Hubo un problema");
   await expect(page.getByRole("button", { name: "Intentar de nuevo" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Probar la demo ficticia" })).toHaveAttribute("href", "/first-day?demo=1");
+});
+
+test("rate limits offer a clear recovery path without immediate retries", async ({ page }) => {
+  let attempts = 0;
+  await page.route("**/api/explain", (route) => {
+    attempts += 1;
+    return route.fulfill({
+      status: 429,
+      contentType: "application/json",
+      body: JSON.stringify({ error: { code: "RATE_LIMITED", message: "Busy", retryable: false } }),
+    });
+  });
+  await page.goto("/explain");
+  await uploadTestLetter(page);
+  await page.getByRole("button", { name: "Explain this letter" }).click();
+  await expect(page.locator('.ttf-fade-in[role="alert"]')).toContainText("Please wait a minute");
+  await expect(page.getByRole("link", { name: "Try the fictional demo" })).toBeVisible();
+  expect(attempts).toBe(1);
+});
+
+test("unconfigured local search is hidden while verified help remains available", async ({ page }) => {
+  await page.route("**/api/explain", (route) => route.fulfill({
+    status: 200,
+    contentType: "application/json",
+    body: JSON.stringify(validResult),
+  }));
+  await page.route("**/api/health", (route) => route.fulfill({
+    status: 200,
+    contentType: "application/json",
+    body: JSON.stringify({ capabilities: { localHelpSearch: false } }),
+  }));
+  await page.goto("/explain");
+  await uploadTestLetter(page);
+  await page.getByRole("button", { name: "Explain this letter" }).click();
+  await page.getByRole("tab", { name: "Get Help" }).click();
+  await expect(page.getByText("Find local help near you")).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: "Real help you can use now" })).toBeVisible();
 });
 
 test("crisis and scam guidance remain distinct while local help loads", async ({
@@ -321,6 +390,11 @@ test("crisis and scam guidance remain distinct while local help loads", async ({
       body: JSON.stringify(safetyResult),
     });
   });
+  await page.route("**/api/health", (route) => route.fulfill({
+    status: 200,
+    contentType: "application/json",
+    body: JSON.stringify({ capabilities: { localHelpSearch: true } }),
+  }));
   await page.route("**/api/local-help", async (route) => {
     expect(await route.request().postDataJSON()).toMatchObject({
       category: "utilities",
@@ -345,7 +419,7 @@ test("crisis and scam guidance remain distinct while local help loads", async ({
   });
 
   await page.goto("/explain");
-  await page.getByRole("button", { name: /Try a sample/ }).click();
+  await uploadTestLetter(page);
   await page.getByRole("button", { name: "Explain this letter" }).click();
   await expect(page.getByRole("status", { name: "Analyzing your letter" })).toBeVisible();
   await expect(

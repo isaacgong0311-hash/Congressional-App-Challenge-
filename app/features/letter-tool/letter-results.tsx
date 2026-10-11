@@ -423,11 +423,6 @@ export function LetterResults({
                               {copy("Call", "Llamar al")} {kd.contactPhone}
                             </a>
                           )}
-                          <div className="flex items-center gap-3 rounded-xl border border-cobalt/15 bg-white p-3">
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={`https://api.qrserver.com/v1/create-qr-code/?size=88x88&format=png&data=${encodeURIComponent(result.phoneScript + (kd?.contactPhone ? `\n\nCall: ${kd.contactPhone}` : ""))}`} alt={copy("QR code — scan to save the phone script on your phone", "Código QR para guardar el guion de llamada en su teléfono")} width={88} height={88} className="rounded-lg" />
-                            <p className="max-w-[120px] text-xs leading-relaxed text-muted">{copy("Scan to get this script on your phone", "Escanee para guardar este guion en su teléfono")}</p>
-                          </div>
                         </div>
                       </div>
                     )}

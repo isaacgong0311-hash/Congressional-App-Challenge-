@@ -18,6 +18,34 @@ afterEach(() => {
 });
 
 describe("letter reading recovery", () => {
+  it("returns a safe missing-key response before contacting the provider", async () => {
+    vi.stubEnv("GROQ_API_KEY", "");
+    const form = new FormData();
+    form.set("image", new File(["sample"], "sample.png", { type: "image/png" }));
+    form.set("language", "Spanish");
+    const response = await POST(
+      new Request("http://localhost/api/explain", { method: "POST", body: form }),
+    );
+    expect(response.status).toBe(503);
+    expect(generateText).not.toHaveBeenCalled();
+    await expect(response.json()).resolves.toMatchObject({
+      error: { code: "PROVIDER_UNAVAILABLE", retryable: true },
+    });
+  });
+
+  it("returns a timeout response without exposing provider details", async () => {
+    vi.stubEnv("GROQ_API_KEY", "test-only");
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    vi.mocked(generateText).mockRejectedValueOnce(new DOMException("timed out", "TimeoutError"));
+    const form = new FormData();
+    form.set("image", new File(["sample"], "sample.png", { type: "image/png" }));
+    const response = await POST(
+      new Request("http://localhost/api/explain", { method: "POST", body: form }),
+    );
+    expect(response.status).toBe(504);
+    expect(JSON.stringify(await response.json())).not.toContain("timed out");
+  });
+
   it("retries a malformed provider response once before reporting a safe error", async () => {
     vi.stubEnv("GROQ_API_KEY", "test-only");
     vi.spyOn(console, "error").mockImplementation(() => undefined);

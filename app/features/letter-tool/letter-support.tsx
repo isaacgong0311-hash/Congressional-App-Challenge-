@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import { PhoneIcon, SearchIcon } from "../../components/lantern/icons";
 import { publicApiError } from "../../lib/api-error";
@@ -21,7 +21,21 @@ export function LocalHelpFinder({ category, spanish = false }: { category: Categ
   const [resources, setResources] = useState<LocalResource[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [unavailable, setUnavailable] = useState(false);
+  const [available, setAvailable] = useState(false);
   const copy = (english: string, translated: string) => spanish ? translated : english;
+
+  useEffect(() => {
+    const controller = new AbortController();
+    void fetch("/api/health", { cache: "no-store", signal: controller.signal })
+      .then((response) => response.ok ? response.json() : null)
+      .then((payload) => {
+        if (!controller.signal.aborted) {
+          setAvailable(payload?.capabilities?.localHelpSearch === true);
+        }
+      })
+      .catch(() => setAvailable(false));
+    return () => controller.abort();
+  }, []);
 
   async function search() {
     if (!state.trim()) return;
@@ -55,7 +69,7 @@ export function LocalHelpFinder({ category, spanish = false }: { category: Categ
     }
   }
 
-  if (unavailable) return null;
+  if (!available || unavailable) return null;
 
   return (
     <div className="ttf-fade-in overflow-hidden rounded-feature border border-cobalt/20 bg-[#eef2ff]">

@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import Link from "next/link";
 
 import { MetricCard } from "../../../components/lantern/primitives";
 
@@ -382,12 +383,12 @@ export function DocumentsStep({
                   )
                 ) : null}
                 {queued?.error ? (
-                  <p
-                    className="mt-4 text-sm font-medium text-[#8a3f31]"
-                    role="alert"
-                  >
-                    {queued.error}
-                  </p>
+                  <div className="mt-4 text-sm font-medium text-[#8a3f31]" role="alert">
+                    <p>{queued.error}</p>
+                    <Link className="mt-2 inline-flex min-h-11 items-center font-bold underline underline-offset-4" href="/first-day?demo=1">
+                      {translated(language, "Try the fictional demo", "Probar la demo ficticia")}
+                    </Link>
+                  </div>
                 ) : null}
                 {document.photoQualityNote ? (
                   <p className="mt-4 rounded-2xl bg-[#fff1cf] p-3 text-sm font-medium text-[#6f5218]">

@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 
 // Simple per-IP rate limiter using in-memory state.
 // Limits protect the Groq / ElevenLabs / Perplexity keys from abuse.
-// State lives per function instance (not globally coordinated) which is fine
-// for a demo; swap to Vercel KV for multi-instance production hardening.
+// State lives per function instance, so this is a local guard rather than a
+// globally coordinated quota across a serverless deployment.
 
 const WINDOW_MS = 60_000; // 1-minute sliding window
 const LIMITS: Record<string, number> = {
@@ -56,11 +56,20 @@ export function proxy(req: NextRequest) {
     "unknown";
 
   if (!allow(ip, path)) {
+    const spanish = /\bes\b|spanish/i.test(req.headers.get("accept-language") ?? "");
     return NextResponse.json(
-      { error: "Too many requests — please wait a moment and try again." },
+      {
+        error: {
+          code: "RATE_LIMITED",
+          message: spanish
+            ? "Hay demasiadas solicitudes en este momento. Espere un minuto e inténtelo de nuevo."
+            : "Too many requests right now. Please wait a minute and try again.",
+          retryable: false,
+        },
+      },
       {
         status: 429,
-        headers: { "Retry-After": "60" },
+        headers: { "Retry-After": "60", "Cache-Control": "no-store" },
       },
     );
   }

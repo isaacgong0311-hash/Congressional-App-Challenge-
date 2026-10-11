@@ -224,8 +224,8 @@ export async function POST(req: Request) {
 
   const bytes = new Uint8Array(await file.arrayBuffer());
 
+  const abortSignal = AbortSignal.timeout(52_000);
   try {
-    const abortSignal = AbortSignal.timeout(52_000);
     // Parse and validate the proposed JSON locally before returning it to the UI.
     for (let attempt = 0; attempt < 2; attempt += 1) {
     const { text, finishReason, usage } = await generateText({
@@ -302,6 +302,8 @@ export async function POST(req: Request) {
     }
     return fail("INVALID_PROVIDER_RESPONSE", readingUnavailable(language), 502, true);
   } catch (error) {
+    const timedOut = abortSignal.aborted ||
+      (error instanceof DOMException && error.name === "TimeoutError");
     const providerStatus =
       error && typeof error === "object" && "statusCode" in error &&
       typeof error.statusCode === "number"
@@ -312,12 +314,14 @@ export async function POST(req: Request) {
       providerErrorSummary({
         requestId,
         route: "/api/explain",
-        kind: "provider",
+        kind: timedOut ? "timeout" : "provider",
         durationMs: Date.now() - startedAt,
         providerStatus,
       }),
     );
-    return providerStatus === 429
+    return timedOut
+      ? fail("PROVIDER_TIMEOUT", "Reading this letter took too long. Please try again.", 504, true)
+      : providerStatus === 429
       ? fail("PROVIDER_UNAVAILABLE", readingUnavailable(language), 503, true)
       : fail("PROVIDER_REJECTED", readingUnavailable(language), 502, true);
   }

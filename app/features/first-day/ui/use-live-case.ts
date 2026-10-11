@@ -9,7 +9,7 @@ import {
   type SetStateAction,
 } from "react";
 
-import { publicApiError } from "../../../lib/api-error";
+import { publicApiError, readingFailureMessage } from "../../../lib/api-error";
 import { adaptLiveExtraction } from "../adapters/live-extraction";
 import { appendSourceRemoval } from "../domain/events";
 import { factHasActiveSource } from "../domain/evidence";
@@ -118,7 +118,7 @@ export function useLiveCase({
         const response = await fetch("/api/first-day/extract", {
           method: "POST",
           body: form,
-          signal: controller.signal,
+          signal: AbortSignal.any([controller.signal, AbortSignal.timeout(58_000)]),
         });
         const payload: unknown = await response.json();
         if (!response.ok) {
@@ -126,7 +126,11 @@ export function useLiveCase({
             payload,
             "Could not read this page.",
           );
-          throw new Error(failure.message);
+          throw new Error(readingFailureMessage(
+            response.status === 429 ? "RATE_LIMITED" : failure.code,
+            language,
+            failure.message,
+          ));
         }
 
         const parsed = FirstDayExtractionSchema.safeParse(payload);
@@ -157,8 +161,11 @@ export function useLiveCase({
         });
       } catch (error) {
         if (controller.signal.aborted) return;
-        const message =
-          error instanceof Error ? error.message : "Could not read this page.";
+        const message = error instanceof DOMException && error.name === "TimeoutError"
+          ? readingFailureMessage("PROVIDER_TIMEOUT", language, "")
+          : error instanceof Error
+            ? error.message
+            : readingFailureMessage("INTERNAL_ERROR", language, "Could not read this page.");
         if (
           requestTokensRef.current.get(documentId) !== requestId
         ) {

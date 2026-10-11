@@ -89,7 +89,7 @@ test.describe("visual regression and responsive layout", () => {
           }),
         }),
       );
-      await page.getByRole("button", { name: /Try a sample/ }).click();
+      await page.getByLabel("Take a photo or upload a picture of your letter").setInputFiles("public/sample-letter.png");
       await page.getByRole("button", { name: "Explain this letter" }).click();
       await expect(
         page.getByRole("heading", { name: "Utility notice", exact: true }),
