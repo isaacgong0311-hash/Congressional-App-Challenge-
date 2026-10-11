@@ -1,24 +1,46 @@
 # Lantern: First Day
 
-Lantern helps people understand confusing official letters. **First Day** extends it into a source-backed school-enrollment planner for newcomer families: collect instructions, verify important facts against their source, resolve uncertainty, and leave with a clear plan.
+School enrollment instructions often arrive across several letters, reminders, and office notes. Lantern: First Day brings them into one case, shows each proposed fact beside its original words, asks the family to confirm what it knows, and turns the confirmed information into a source-linked plan. When pages disagree, Lantern keeps the conflict visible and prepares a question for the school instead of guessing. The interface and portable plan support English and Spanish.
 
-This repository builds from the public [`TRANSLATEtheform`](https://github.com/isaacgong0311-hash/TRANSLATEtheform) application at commit `479ff86a30890c76a4ec0240406e66d9de4aa6ce`. It is now an independent Congressional App Challenge project.
+**[Open the public app](https://lantern-first-day.vercel.app/)** · **[Try the fictional demo](https://lantern-first-day.vercel.app/first-day?demo=1)**
 
-## Current status
+![The fictional First Day demo at Step 1](docs/submission/clean-demo-preview.png)
 
-First Day is the flagship experience at `/`, and the general Lantern letter explanation workspace is available at `/explain`. A complete First Day fictional demo is available at `/first-day?demo=1`, with source-linked facts, deterministic task states, conflict resolution, English/Spanish interface copy, undoable task completion, JSON and calendar downloads, and printable output. A static technical walkthrough is available at `/first-day/how-it-works`, and the browser-data boundary is documented at `/privacy`.
+The demo uses fictional Mesa View Community Schools pages. It starts at Step 1, requires no account or upload, and makes no AI provider request. A separate [presenter view](https://lantern-first-day.vercel.app/first-day?demo=1&present=1) has timed story beats and recording cues.
 
-First Day also includes an independent public-source example using Round Rock ISD enrollment pages for up to five JPG/PNG pages. It processes pages sequentially, preserves successful pages when another fails, supports per-page retry and removal, checks image signatures and exact evidence quotes before accepting provider output, and keeps plans limited to versioned, source-checked enrollment procedures. A user can recheck live-reading availability without reloading; an empty image or a page with no proposed facts receives a clear next step. This is not a district pilot or partnership; Round Rock ISD has not reviewed or endorsed Lantern. Use synthetic or sample pages, not a real child's records.
+## How the plan is made
 
-The initial First Day school and district scenario is **fictional**. It exists to test evidence handling and deterministic plan logic; it is not real district policy or proof of a school partnership.
+```mermaid
+flowchart LR
+  A[Document page] --> B[Exact source passage]
+  B --> C[Family-confirmed fact]
+  C --> D[Explicit task dependency]
+  D --> E[Derived task state]
+  B --> F[Visible source conflict]
+  F --> C
+```
 
-The demonstration is free. Lantern has no paid plan, subscription, district contract, or signup today. Pilot and feedback inquiries can be started through the app's `/contact` page.
+AI may propose text, facts, and exact supporting quotes. Schemas and quote checks validate those proposals against the page. The family confirms, corrects, or marks facts unclear. Student-authored dependency rules and deterministic code decide whether each task is ready, waiting, needs review, needs clarification, or done. [Decision Trace](docs/submission/decision-trace-code-tour.md) shows the chain behind a plan state.
 
-Provider-backed letter reading retries one malformed model response on the server and one recoverable request failure in the browser. These are recovery measures, not a measured uptime guarantee; the fictional First Day demo remains available without a provider.
+## Routes
 
-## Local setup
+| Route | Purpose |
+| --- | --- |
+| `/` | Landing page and product preview |
+| `/first-day` | First Day workspace, including optional live page reading |
+| `/first-day?demo=1` | Clean fictional judge demo |
+| `/first-day?demo=1&present=1` | Presenter and recording cues |
+| `/first-day/how-it-works` | Technical explanation and evaluation limits |
+| `/explain` | General letter explanation tool |
+| `/about` | Project background and independent public-source example |
+| `/contact` | Feedback and pilot inquiries |
+| `/privacy` | Data handling and provider boundaries |
 
-Requirements: Node.js 20 or newer and npm.
+Unknown paths use a branded 404 page. The server also provides validated API routes for page extraction, letter explanation, grounded follow-up, field translation, optional speech, optional local help, and capability health checks.
+
+## Run locally
+
+Use Node.js 20 or newer and npm.
 
 ```bash
 npm install
@@ -26,43 +48,38 @@ cp .env.local.example .env.local
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open <http://localhost:3000>. The fictional demo works with empty provider keys. Live document reading and letter explanation require `GROQ_API_KEY`; optional server speech uses `ELEVENLABS_API_KEY`, and optional local-help search uses `PERPLEXITY_API_KEY`. Never commit `.env.local` or real family documents.
 
-### Judge demo
-
-Open [http://localhost:3000/first-day?demo=1](http://localhost:3000/first-day?demo=1) for the clean fictional walkthrough. It starts at Step 1, makes no provider request, and needs no account or upload. Review the family facts, inspect both sources of the orientation conflict, record the school answer, and take the source-linked plan with you. **Reset demo** restores the untouched case without reloading. The six-beat recording guide with timestamps and narration cues is available only at [http://localhost:3000/first-day?demo=1&present=1](http://localhost:3000/first-day?demo=1&present=1).
-
-Provider-backed features use environment variables when available:
-
-- `GROQ_API_KEY` — document explanation and the grounded assistant
-- `ELEVENLABS_API_KEY` — optional server speech
-- `PERPLEXITY_API_KEY` — optional local-help search
-
-Do not commit `.env.local` or real family documents.
-
-## Checks
+## Checks and evaluation
 
 ```bash
 npm run lint
 npm test
-npm run evaluate:first-day
-npm run evaluate:usability
 npm run build
 npm run test:e2e
+npm run evaluate:first-day
+npm run evaluate:usability
 ```
 
-The deterministic evaluation contains 20 synthetic held-out packets across five scenarios. The current versioned report records 32/32 fact precision and recall, 32/32 exact-quote coverage, 8/8 intended conflicts with zero false positives, 0/8 date-normalization errors, and 34/34 ready tasks with source coverage. Provider latency and cost are not measured because the evaluation replays stored responses without making provider calls.
+The First Day evaluation replays versioned synthetic packets without making provider calls and writes [the report](evaluation/first-day/report.md). Its results measure this test set, not accuracy on real family records. The [usability protocol](evaluation/usability/protocol.md) is prepared for consenting adults using fictional documents; [its report](evaluation/usability/report.md) remains marked **Not started** until sessions occur. GitHub Actions runs lint, unit tests, the deterministic evaluation, build, browser tests, and Lighthouse on each push.
 
-The [formative usability protocol](evaluation/usability/protocol.md) is prepared for approximately five consenting adults using fictional documents only. **No participant sessions have been recorded yet.** The [generated usability report](evaluation/usability/report.md) therefore remains explicitly marked “Not started”; it must not be presented as completed user research.
+## Privacy and scope
 
-## Privacy boundary
+The app does not intentionally store uploaded images or case history in a database. Live images are sent to configured providers only after submission; documents, extracted text, facts, tasks, and event history otherwise stay in page memory. Only language, large-text, and contrast preferences may persist locally. The public-source Round Rock ISD example uses public enrollment pages and is an independent student example, not a district pilot, partnership, or endorsement. See [Privacy](app/privacy/page.tsx) and the [backend code tour](docs/submission/backend-code-tour.md) for the detailed boundary.
 
-The application does not intentionally write uploaded images to disk or a database. When document explanation is used, the image is sent to the configured external AI provider for processing. First Day accepts no more than 10 MB per page, five pages, and 25 MB per in-memory case; only one page is sent at a time. Only language, large-text, and high-contrast preferences may be stored under the versioned `lantern.preferences.v1` local-storage key. Documents, extracted text, facts, tasks, and event history stay in page memory.
+## AI use disclosure
 
-Every route receives `nosniff`, frame-denial, strict referrer, and camera/microphone/geolocation permission headers. These headers reduce browser attack surface; they do not replace request validation, exact-quote evidence checks, or careful provider privacy controls.
+OpenAI Codex assisted with planning, code and test drafting, debugging, source review, browser verification, and documentation. Isaac reviewed and revised work before inclusion and owns the product goal, architecture decisions, evidence rules, evaluation interpretation, visual design, and release decisions. At runtime, Groq can assist with document reading, letter explanation, grounded responses, and field translation when configured; optional ElevenLabs speech and Perplexity local-help integrations are separate. AI does **not** confirm family facts, choose between conflicting sources, resolve tasks, or derive plan states. The fictional demo, planner, exports, and offline evaluation run without an AI request. Isaac should review the complete [submission disclosure](docs/submission/ai-disclosure.md) before submitting the final form.
 
-Review [the CAC final sprint plan](docs/superpowers/plans/2026-10-04-cac-final-sprint.md), [the approved design](docs/superpowers/specs/2026-09-15-lantern-first-day-design.md), [Decision Trace code tour](docs/submission/decision-trace-code-tour.md), [held-out evaluation](evaluation/first-day/report.md), and [AI disclosure](docs/submission/ai-disclosure.md) for scope, architecture, and measured limitations.
+## Team
 
-The [backend code tour](docs/submission/backend-code-tour.md) explains the validated server boundary, provider adapters, safe failure contract, privacy-safe logs, and the tested handoff from AI proposals to deterministic planning code.
+- Isaac Gong — student creator and project lead.
+- `<NAME — role>` — add a line for each additional contributor, if any, before submission.
 
-Provider pricing and free-tier limits can change. Verify the current provider terms before deployment; First Day's deterministic fictional demo does not require provider keys.
+## Project history
+
+Lantern builds on the earlier public [TRANSLATEtheform](https://github.com/isaacgong0311-hash/TRANSLATEtheform) repository at commit `479ff86a30890c76a4ec0240406e66d9de4aa6ce` (imported here as `f4d4855`). This version adds the First Day planner, exact-evidence validation, deterministic task dependencies, conflict resolution, a bilingual portable plan, Decision Trace, and the synthetic evaluation harness. The general letter tool remains available at `/explain`.
+
+## License
+
+MIT. See [LICENSE](LICENSE).
