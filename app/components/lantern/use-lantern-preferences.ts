@@ -16,9 +16,14 @@ export function useLanternPreferences() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const stored = parseLanternPreferences(
-      window.localStorage.getItem(LANTERN_PREFERENCES_KEY),
-    );
+    let stored = DEFAULT_LANTERN_PREFERENCES;
+    try {
+      stored = parseLanternPreferences(
+        window.localStorage.getItem(LANTERN_PREFERENCES_KEY),
+      );
+    } catch {
+      // Private browsing and embedded browsers can deny storage access.
+    }
     const timer = window.setTimeout(() => {
       setPreferences(stored);
       setReady(true);
@@ -28,10 +33,14 @@ export function useLanternPreferences() {
 
   useEffect(() => {
     if (!ready) return;
-    window.localStorage.setItem(
-      LANTERN_PREFERENCES_KEY,
-      JSON.stringify(preferences),
-    );
+    try {
+      window.localStorage.setItem(
+        LANTERN_PREFERENCES_KEY,
+        JSON.stringify(preferences),
+      );
+    } catch {
+      // Keep the controls usable for this visit when storage is unavailable.
+    }
   }, [preferences, ready]);
 
   return { preferences, ready, setPreferences };

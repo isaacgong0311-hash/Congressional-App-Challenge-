@@ -490,3 +490,41 @@ test("only harmless Lantern preferences persist locally", async ({ page }) => {
   expect(JSON.stringify(storage)).not.toContain("Welcome Center");
   expect(JSON.stringify(storage)).not.toContain("fact-");
 });
+
+test("reading controls keep working when browser storage is denied", async ({ page }) => {
+  await page.addInitScript(() => {
+    Storage.prototype.getItem = () => { throw new DOMException("Storage blocked", "SecurityError"); };
+    Storage.prototype.setItem = () => { throw new DOMException("Storage blocked", "SecurityError"); };
+  });
+  await page.goto("/first-day?demo=1");
+  const largeText = page.getByRole("button", { name: "Toggle large text" });
+  const highContrast = page.getByRole("button", { name: "Toggle high contrast" });
+  await largeText.click();
+  await highContrast.click();
+  await expect(largeText).toHaveAttribute("aria-pressed", "true");
+  await expect(highContrast).toHaveAttribute("aria-pressed", "true");
+  await page.getByRole("button", { name: "Try the fictional case" }).click();
+  await expect(page.getByRole("heading", { name: "One case, every instruction." })).toBeVisible();
+});
+
+test("clean demo has no horizontal overflow at 375px and 200 percent zoom", async ({ page }) => {
+  for (const width of [375, 188]) {
+    await page.setViewportSize({ width, height: 812 });
+    await page.goto("/first-day?demo=1");
+    await page.getByRole("button", { name: "Try the fictional case" }).click();
+    for (const step of ["documents", "facts", "plan", "export"] as const) {
+      const progress = page.locator(".fd-mobile-progress summary");
+      if (step !== "documents") {
+        const label = { facts: /Review facts/, plan: /My plan/, export: /Take it with me/ }[step];
+        const target = page.getByRole("button", { name: label });
+        if (!(await target.isVisible()) && await progress.isVisible()) await progress.click();
+        await target.click();
+      }
+      const dimensions = await page.evaluate(() => ({
+        client: document.documentElement.clientWidth,
+        scroll: document.documentElement.scrollWidth,
+      }));
+      expect(dimensions.scroll, `${step} at ${width}px`).toBeLessThanOrEqual(dimensions.client + 1);
+    }
+  }
+});

@@ -1471,3 +1471,65 @@
   background: #000 !important;
   color: #fff !important;
 }
+
+/* At 200% zoom on a narrow phone, the CSS viewport is about 188px. */
+@media (max-width: 240px) {
+  .fd-header .truncate { display: none; }
+  .fd-mobile-progress,
+  .fd-mobile-progress summary { min-width: 0; width: 100%; }
+  .fd-mobile-progress summary {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .fd-mobile-progress summary > span:last-child {
+    justify-content: flex-start;
+    text-align: left;
+  }
+  .fd-mobile-progress .grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .fd-app :where(h1, h2, h3, p, span) { overflow-wrap: anywhere; }
+  .fd-page-title { font-size: 1.8rem; }
+  .fd-document-card { display: block; padding: 0.75rem; }
+  .fd-document-card > div:first-child { margin-bottom: 0.5rem; }
+  .fd-fact-card,
+  .fd-conflict-card { padding: 0.75rem; }
+  .fd-fact-card > .grid { grid-template-columns: minmax(0, 1fr); }
+  .fd-fact-card .items-start.justify-between { flex-wrap: wrap; }
+  .fd-task-card { padding: 0.75rem; }
+  .fd-task-card > .flex { gap: 0; }
+  .fd-task-icon { display: none; }
+  .fd-task-card .fd-fact-state {
+    max-width: 100%;
+    width: auto;
+    text-align: center;
+    white-space: normal;
+  }
+  .fd-task-card :where(button, summary, details) {
+    max-width: 100%;
+    min-width: 0;
+    white-space: normal;
+  }
+  .fd-task-card .fd-task-reason { padding-inline: 0.5rem; }
+  .fd-print-plan { padding: 0.75rem; }
+  .fd-print-plan .break-inside-avoid {
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.5rem;
+  }
+  .fd-print-plan .break-inside-avoid > div { min-width: 0; }
+  .fd-print-plan .fd-print-state { max-width: 100%; width: auto; }
+  .fd-action-dock {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding-inline: 0.5rem;
+  }
+  .fd-action-dock button {
+    justify-content: center;
+    min-width: 0;
+    width: 100%;
+  }
+  .fd-app main { padding-bottom: 10rem; }
+}
