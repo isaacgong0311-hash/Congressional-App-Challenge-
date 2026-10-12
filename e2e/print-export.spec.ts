@@ -62,8 +62,11 @@ test("technical download and print keep unresolved items and source references",
 test("family plan shows each source passage once", async ({ page }) => {
   await page.goto("/first-day?demo=1");
   await page.getByRole("button", { name: "Try the fictional case" }).click();
+  const mobileProgress = page.locator(".fd-mobile-progress summary");
+  if (await mobileProgress.isVisible()) await mobileProgress.click();
   await page.getByRole("button", { name: "Resolve", exact: false }).first().click();
   await page.getByRole("button", { name: "Record what the school told me" }).last().click();
+  if (await mobileProgress.isVisible()) await mobileProgress.click();
   await page.getByRole("button", { name: "Take it with me" }).click();
 
   const bestNext = page.getByRole("heading", { name: "Best next step" }).locator("..");
