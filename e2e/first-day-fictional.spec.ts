@@ -256,8 +256,9 @@ test("clean demo carries a sourced plan through English and Spanish", async ({ p
       await expect(printPlan).toBeVisible();
       await expect(printPlan.getByText(es ? "Fuentes:" : "Sources:").first()).toBeVisible();
 
+      await page.getByText(es ? "Más formas de guardar" : "More ways to save").click();
       const downloadPromise = page.waitForEvent("download");
-      await page.getByRole("button", { name: es ? "Descargar JSON técnico" : "Download technical JSON" }).click();
+      await page.getByRole("button", { name: es ? "Descargar datos del plan (JSON)" : "Download plan data (JSON)" }).click();
       const download = await downloadPromise;
       const portable = JSON.parse(await readFile((await download.path())!, "utf8"));
       const readyTasks = portable.tasks.filter((task: { state: string }) => task.state === "ready");

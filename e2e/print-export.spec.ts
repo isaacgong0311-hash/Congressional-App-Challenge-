@@ -27,8 +27,12 @@ test("technical download and print keep unresolved items and source references",
   if (await compactProgress.isVisible()) await compactProgress.click();
   await page.getByRole("button", { name: "Take it with me" }).click();
 
+  const dataExport = page.getByText("More ways to save");
+  await expect(dataExport).toBeVisible();
+  await expect(page.getByRole("button", { name: "Download plan data (JSON)" })).toBeHidden();
+  await dataExport.click();
   const downloadPromise = page.waitForEvent("download");
-  await page.getByRole("button", { name: "Download technical JSON" }).click();
+  await page.getByRole("button", { name: "Download plan data (JSON)" }).click();
   const download = await downloadPromise;
   expect(download.suggestedFilename()).toBe("lantern-first-day-plan.json");
   const contents = await readFile((await download.path())!, "utf8");

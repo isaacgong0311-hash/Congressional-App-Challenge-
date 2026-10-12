@@ -176,17 +176,13 @@ export function ExportStep({
       </div>
 
       <div className="mt-6 grid gap-3 print:hidden md:grid-cols-[1.25fr_1fr]">
-        <button className="fd-export-action fd-export-primary md:row-span-2" data-demo-target="true" onClick={onPrint} type="button">
+        <button className="fd-export-action fd-export-primary" data-demo-target="true" onClick={onPrint} type="button">
           <PrinterIcon className="h-7 w-7" />
           <span><strong>{translated(language, "Print or save as PDF", "Imprimir o guardar como PDF")}</strong><small>{translated(language, "A family-readable copy", "Una copia fácil de leer")}</small></span>
         </button>
         <button aria-describedby="fd-calendar-note" className="fd-export-action" disabled={dates.length === 0} onClick={downloadCalendar} type="button">
           <ClockIcon className="h-6 w-6 text-cobalt" />
           <span><strong>{translated(language, "Add dates to calendar", "Añadir fechas al calendario")}</strong><small>{translated(language, "Confirmed dates only", "Solo fechas confirmadas")}</small></span>
-        </button>
-        <button className="fd-export-action" onClick={downloadPlan} type="button">
-          <DocumentIcon className="h-6 w-6 text-cobalt" />
-          <span><strong>{translated(language, "Download technical JSON", "Descargar JSON técnico")}</strong><small>{translated(language, "Portable event history", "Historial portátil de eventos")}</small></span>
         </button>
       </div>
       <p
@@ -210,6 +206,25 @@ export function ExportStep({
           ? translated(language, `${dates.length} confirmed date${dates.length === 1 ? "" : "s"} will be included.`, `Se incluirá${dates.length === 1 ? "" : "n"} ${dates.length} fecha${dates.length === 1 ? "" : "s"} confirmada${dates.length === 1 ? "" : "s"}.`)
           : translated(language, "Calendar export is available after you confirm a complete, unambiguous date.", "La exportación al calendario estará disponible después de confirmar una fecha completa y sin ambigüedad.")}
       </p>
+
+      <details className="mt-4 rounded-2xl border border-ink/10 bg-white/75 px-4 print:hidden">
+        <summary className="min-h-11 cursor-pointer py-3 text-sm font-bold text-ink">
+          {translated(language, "More ways to save", "Más formas de guardar")}
+        </summary>
+        <div className="border-t border-ink/10 pb-4 pt-3">
+          <p className="mb-3 text-sm leading-6 text-muted">
+            {translated(
+              language,
+              "Download a portable copy for another tool or to review the plan's source history.",
+              "Descargue una copia portátil para otra herramienta o para revisar el historial de fuentes del plan.",
+            )}
+          </p>
+          <button className="fd-secondary-button" onClick={downloadPlan} type="button">
+            <DocumentIcon className="h-4 w-4" />
+            {translated(language, "Download plan data (JSON)", "Descargar datos del plan (JSON)")}
+          </button>
+        </div>
+      </details>
 
       {showGuidedProof ? (
         <details
