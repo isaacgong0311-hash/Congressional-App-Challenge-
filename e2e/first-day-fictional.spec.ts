@@ -188,6 +188,18 @@ test("clean demo presents one usable first action on a phone", async ({ page }) 
   await expect(page.getByText("Documentos ficticios. No necesita una cuenta ni subir archivos.")).toBeVisible();
 });
 
+test("mobile progress closes after choosing a demo step", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/first-day?demo=1");
+  await page.getByRole("button", { name: "Try the fictional case" }).click();
+  const progress = page.locator(".fd-mobile-progress");
+  await progress.locator("summary").click();
+  await expect(progress).toHaveAttribute("open", "");
+  await progress.getByRole("button", { name: /My plan/ }).click();
+  await expect(progress).not.toHaveAttribute("open", "");
+  await expect(page.getByRole("heading", { name: "What to do next, and why." })).toBeVisible();
+});
+
 test("clean demo carries a sourced plan through English and Spanish", async ({ page }) => {
   const unexpectedRequests: string[] = [];
   page.on("request", (request) => {

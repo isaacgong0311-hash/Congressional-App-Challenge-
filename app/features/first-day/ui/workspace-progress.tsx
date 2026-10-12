@@ -17,8 +17,9 @@ function StepList({
   caseData,
   currentStep,
   language,
+  mobile = false,
   onSelectStep,
-}: WorkspaceProgressProps & { activeStepIndex: number }) {
+}: WorkspaceProgressProps & { activeStepIndex: number; mobile?: boolean }) {
   return (
     <ol className="space-y-1">
       {STEPS.map((step, index) => {
@@ -30,7 +31,16 @@ function StepList({
               aria-current={active ? "step" : undefined}
               className={`fd-step-button ${active ? "is-active" : ""}`}
               disabled={!canEnterLiveStep(caseData, step.id)}
-              onClick={() => onSelectStep(step.id)}
+              onClick={(event) => {
+                if (mobile) {
+                  const progress = event.currentTarget.closest("details");
+                  if (progress) {
+                    progress.open = false;
+                    progress.querySelector("summary")?.focus();
+                  }
+                }
+                onSelectStep(step.id);
+              }}
               type="button"
             >
               <span className={`fd-step-number ${visited ? "is-visited" : ""}`}>
@@ -94,7 +104,7 @@ export function WorkspaceProgress(props: WorkspaceProgressProps) {
           </span>
         </summary>
         <div className="border-t border-ink/10 px-3 pb-3 pt-2">
-          <StepList {...props} activeStepIndex={activeStepIndex} />
+          <StepList {...props} activeStepIndex={activeStepIndex} mobile />
           <div className="mt-3 grid grid-cols-3 gap-2 border-t border-ink/10 pt-3 text-center">
             {[
               [props.snapshot.processedDocumentCount, translated(props.language, "pages", "páginas")],
