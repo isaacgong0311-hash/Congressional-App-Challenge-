@@ -73,14 +73,14 @@ function TaskSources({
   language: Language;
   task: DerivedTask;
 }) {
-  const sources = task.evidenceIds.flatMap((id) => {
+  const sources = [...new Set(task.evidenceIds.flatMap((id) => {
     const evidence = caseData.evidence.find((item) => item.id === id);
     if (!evidence) return [];
     const document = caseData.documents.find((item) => item.id === evidence.documentId);
     const procedure = caseData.procedures.find((item) => item.id === evidence.procedureId);
     if (document?.status === "removed") return [];
     return [`${document?.label ?? procedure?.sourceSection ?? translated(language, "Source", "Fuente")} · ${evidence.location}`];
-  });
+  }))];
   if (sources.length === 0) return null;
   return (
     <p className="mt-2 text-xs leading-5 text-[#536159]">

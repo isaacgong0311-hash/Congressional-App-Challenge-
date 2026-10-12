@@ -58,3 +58,16 @@ test("technical download and print keep unresolved items and source references",
     "Evidence IDs",
   );
 });
+
+test("family plan shows each source passage once", async ({ page }) => {
+  await page.goto("/first-day?demo=1");
+  await page.getByRole("button", { name: "Try the fictional case" }).click();
+  await page.getByRole("button", { name: "Resolve", exact: false }).first().click();
+  await page.getByRole("button", { name: "Record what the school told me" }).last().click();
+  await page.getByRole("button", { name: "Take it with me" }).click();
+
+  const bestNext = page.getByRole("heading", { name: "Best next step" }).locator("..");
+  const citation = "Enrollment welcome letter · Page 1, enrollment paragraph";
+  const text = await bestNext.textContent();
+  expect(text?.split(citation).length).toBe(2);
+});

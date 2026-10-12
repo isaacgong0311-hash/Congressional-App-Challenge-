@@ -122,7 +122,9 @@ test("fictional case completes all six screens with sources and Spanish output",
       name: "Un plan que la familia puede llevar.",
     }),
   ).toBeVisible();
-  await expect(page.getByRole("button", { name: "Descargar JSON técnico" })).toBeVisible();
+  await expect(page.getByText("Más formas de guardar")).toBeVisible();
+  await page.getByText("Más formas de guardar").click();
+  await expect(page.getByRole("button", { name: "Descargar datos del plan (JSON)" })).toBeVisible();
   await expectNoSeriousAxeViolations(page);
 });
 
