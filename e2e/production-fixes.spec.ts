@@ -65,7 +65,7 @@ test("a Yes answer to the interpreter question updates the card and unlocks the 
 test("audited proof copy keeps spacing and First Day chrome translates", async ({ page }) => {
   await page.goto("/");
   await expect(
-    page.getByText("Measured offline across 20 synthetic held-out packets."),
+    page.getByText("We checked Lantern against 20 made-up school document sets."),
   ).toBeVisible();
 
   await page.goto("/first-day/how-it-works");
