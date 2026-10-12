@@ -5,7 +5,7 @@
       "startServerReadyPattern": "Ready in",
       "url": [
         "http://127.0.0.1:3100/",
-        "http://127.0.0.1:3100/first-day"
+        "http://127.0.0.1:3100/first-day?demo=1"
       ],
       "numberOfRuns": 3,
       "settings": {
