@@ -174,6 +174,20 @@ test("public demo starts at step one without presenter scaffolding or API calls"
   ).toEqual([]);
 });
 
+test("clean demo presents one usable first action on a phone", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/first-day?demo=1");
+  const start = page.getByRole("button", { name: "Try the fictional case" });
+  const bounds = await start.boundingBox();
+  expect(bounds).not.toBeNull();
+  expect(bounds!.y + bounds!.height).toBeLessThan(844);
+  await expect(page.getByRole("button", { name: "Try the public-source example" })).toHaveCount(0);
+  await expect(page.getByText("Fictional documents. No account or upload required.")).toBeVisible();
+
+  await page.getByRole("button", { name: "ES", exact: true }).click();
+  await expect(page.getByText("Documentos ficticios. No necesita una cuenta ni subir archivos.")).toBeVisible();
+});
+
 test("clean demo carries a sourced plan through English and Spanish", async ({ page }) => {
   const unexpectedRequests: string[] = [];
   page.on("request", (request) => {

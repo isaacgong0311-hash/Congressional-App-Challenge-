@@ -56,11 +56,17 @@ export function StartStep({
               )}
             </h1>
             <p className="mt-6 max-w-xl text-pretty text-base leading-7 text-[#59665f] sm:text-lg sm:leading-8">
-              {translated(
-                language,
-                "Bring school letters together. Check suggested facts against their sources, confirm what you know, and see what needs attention.",
-                "Reúna las cartas escolares. Revise los datos propuestos con sus fuentes, confirme lo que sabe y vea qué necesita atención.",
-              )}
+              {allowLive
+                ? translated(
+                    language,
+                    "Bring school letters together. Check suggested facts against their sources, confirm what you know, and see what needs attention.",
+                    "Reúna las cartas escolares. Revise los datos propuestos con sus fuentes, confirme lo que sabe y vea qué necesita atención.",
+                  )
+                : translated(
+                    language,
+                    "See how three school messages become a plan. Check each suggested fact against its source, then decide what to do next.",
+                    "Vea cómo tres mensajes escolares se convierten en un plan. Compare cada dato propuesto con su fuente y decida el siguiente paso.",
+                  )}
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <button
@@ -76,36 +82,38 @@ export function StartStep({
                 )}
                 <ArrowRightIcon className="h-5 w-5" />
               </button>
-              <button
-                className="fd-secondary-button"
-                disabled={!allowLive || providerCapability !== "available"}
-                onClick={onStartLive}
-                type="button"
-              >
-                <DocumentIcon className="h-4 w-4" />
-                {translated(
-                  language,
-                  "Try the public-source example",
-                  "Probar el ejemplo con fuentes públicas",
-                )}
-              </button>
+              {allowLive ? (
+                <button
+                  className="fd-secondary-button"
+                  disabled={providerCapability !== "available"}
+                  onClick={onStartLive}
+                  type="button"
+                >
+                  <DocumentIcon className="h-4 w-4" />
+                  {translated(
+                    language,
+                    "Try the public-source example",
+                    "Probar el ejemplo con fuentes públicas",
+                  )}
+                </button>
+              ) : null}
             </div>
             <p className="mt-4 max-w-xl text-xs leading-5 text-[#65716b]">
-              {translated(
-                language,
-                "Mesa View is fictional. The optional sample workflow references public Round Rock ISD enrollment pages. It is an independent student example, not a district pilot or partnership.",
-                "Mesa View es ficticio. El ejemplo opcional usa páginas públicas de inscripción de Round Rock ISD. Es un proyecto estudiantil independiente, no un piloto ni una colaboración con el distrito.",
-              )}
+              {allowLive
+                ? translated(
+                    language,
+                    "Mesa View is fictional. The optional sample workflow references public Round Rock ISD enrollment pages. It is an independent student example, not a district pilot or partnership.",
+                    "Mesa View es ficticio. El ejemplo opcional usa páginas públicas de inscripción de Round Rock ISD. Es un proyecto estudiantil independiente, no un piloto ni una colaboración con el distrito.",
+                  )
+                : translated(
+                    language,
+                    "Fictional documents. No account or upload required.",
+                    "Documentos ficticios. No necesita una cuenta ni subir archivos.",
+                  )}
             </p>
-            {!allowLive || providerCapability !== "available" ? (
+            {allowLive && providerCapability !== "available" ? (
               <p aria-live="polite" className="mt-4 text-sm text-[#65716b]">
-                {!allowLive
-                  ? translated(
-                      language,
-                      "Guided demo mode uses fictional data only. Exit demo mode to add live documents.",
-                      "La demostración guiada usa solo datos ficticios. Salga de la demo para añadir documentos reales.",
-                    )
-                  : providerCapability === "checking"
+                {providerCapability === "checking"
                   ? translated(
                       language,
                       "Checking live document availability…",
