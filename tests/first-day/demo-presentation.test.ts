@@ -100,7 +100,7 @@ describe("guided competition presentation", () => {
     ).toEqual({
       quotes: "32/32",
       conflicts: "8/8",
-      dates: "0/8",
+      dates: "8/8",
       tasks: "34/34",
     });
   });

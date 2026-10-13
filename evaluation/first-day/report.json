@@ -1,0 +1,39 @@
+{
+  "fixtureCount": 20,
+  "metrics": {
+    "factPrecision": {
+      "correct": 32,
+      "total": 32
+    },
+    "factRecall": {
+      "correct": 32,
+      "total": 32
+    },
+    "quoteCoverage": {
+      "correct": 32,
+      "total": 32
+    },
+    "conflicts": {
+      "truePositives": 8,
+      "falsePositives": 0,
+      "falseNegatives": 0
+    },
+    "dateErrors": {
+      "errors": 0,
+      "total": 8
+    },
+    "readyTaskSourceCoverage": {
+      "correct": 34,
+      "total": 34
+    },
+    "latency": {
+      "measured": 0,
+      "total": 20
+    },
+    "cost": {
+      "measured": 0,
+      "total": 20
+    }
+  },
+  "failures": []
+}

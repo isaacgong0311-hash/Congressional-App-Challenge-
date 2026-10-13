@@ -46,7 +46,7 @@ const TASK_ORDER = {
 const PROOF_METRIC_ES = {
   quotes: "citas exactas cubiertas",
   conflicts: "conflictos previstos encontrados",
-  dates: "errores de fecha",
+  dates: "fechas leídas correctamente",
   tasks: "pasos listos con fuente",
 } as const;
 

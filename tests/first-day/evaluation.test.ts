@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { runEvaluation } from "../../evaluation/first-day/run";
+import report from "../../evaluation/first-day/report.json";
 
 describe("First Day held-out evaluation", () => {
   it("keeps source grounding and conflict behavior deterministic", async () => {
@@ -14,5 +15,6 @@ describe("First Day held-out evaluation", () => {
     expect(result.metrics.conflicts.falsePositives).toBe(0);
     expect(result.metrics.dateErrors).toEqual({ errors: 0, total: 8 });
     expect(result.failures).toEqual([]);
+    expect(result).toEqual(report);
   });
 });

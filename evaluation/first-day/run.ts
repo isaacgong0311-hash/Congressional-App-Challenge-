@@ -361,7 +361,7 @@ This report is generated from synthetic, versioned packets. It does not call an 
 | Exact-quote coverage | ${percent(result.metrics.quoteCoverage)} |
 | Conflict recall | ${result.metrics.conflicts.truePositives}/${conflictTotal} |
 | Conflict false positives | ${result.metrics.conflicts.falsePositives} |
-| Date normalization errors | ${result.metrics.dateErrors.errors}/${result.metrics.dateErrors.total} |
+| Dates read correctly | ${result.metrics.dateErrors.total - result.metrics.dateErrors.errors}/${result.metrics.dateErrors.total} |
 | Ready-task source coverage | ${percent(result.metrics.readyTaskSourceCoverage)} |
 
 ## Failures
@@ -373,6 +373,10 @@ ${result.failures.length === 0 ? "None." : result.failures.map((failure) => `- $
 async function main() {
   const result = await runEvaluation();
   await writeFile(path.join(evaluationRoot, "report.md"), renderReport(result));
+  await writeFile(
+    path.join(evaluationRoot, "report.json"),
+    `${JSON.stringify(result, null, 2)}\n`,
+  );
   process.stdout.write(renderReport(result));
   if (result.failures.length > 0) process.exitCode = 1;
 }

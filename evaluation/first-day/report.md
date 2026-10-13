@@ -18,7 +18,7 @@ This report is generated from synthetic, versioned packets. It does not call an 
 | Exact-quote coverage | 32/32 (100.0%) |
 | Conflict recall | 8/8 |
 | Conflict false positives | 0 |
-| Date normalization errors | 0/8 |
+| Dates read correctly | 8/8 |
 | Ready-task source coverage | 34/34 (100.0%) |
 
 ## Failures

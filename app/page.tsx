@@ -345,14 +345,12 @@ export default function HomePage() {
               </p>
             </div>
             <dl>
-              {competitionProof.metrics
-                .filter((metric) => metric.id !== "dates")
-                .map((metric) => (
-                  <div key={metric.id}>
-                    <dt>{metric.id === "quotes" ? "source quotes checked" : metric.id === "conflicts" ? "disagreements found" : "plan steps with sources"}</dt>
-                    <dd>{metric.value}</dd>
-                  </div>
-                ))}
+              {competitionProof.metrics.map((metric) => (
+                <div key={metric.id}>
+                  <dt>{metric.label}</dt>
+                  <dd>{metric.value}</dd>
+                </div>
+              ))}
             </dl>
             <p className="home-proof-note">
               These results come from made-up documents, not real family cases. <Link href="/first-day/how-it-works">See the test details</Link>.
