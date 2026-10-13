@@ -1,6 +1,6 @@
 # Lantern: First Day — 2:50 demonstration script
 
-**Recording path:** `/first-day?demo=1`
+**Recording path:** `/first-day?demo=1&present=1`
 
 **Target delivery:** 2:45–2:55
 
@@ -26,33 +26,34 @@
 
 **On screen:** Advance to Review facts. Show the nurse-review quote, select **Confirm this**, then answer the two family questions.
 
-## 1:10–1:38 — Uncertainty preserved
+## 1:10–1:40 — Uncertainty preserved
 
 > The hardest design problem was preserving disagreement. One source says orientation is in the cafeteria; another says it is in the gym. Lantern keeps both quotes, marks the task as needing clarification, and prepares the question to ask. It never silently chooses the newer-looking message.
 
 **On screen:** Advance to the conflict. Point to both locations and both source cards. Record the fictional school response: **Gym**.
 
-## 1:38–2:08 — Focused update and Decision Trace
+## 1:40–2:00 — Focused update and Decision Trace
 
 > That school answer becomes an immutable human-reported event. Deterministic TypeScript recomputes the dependencies, changes only the orientation task, and opens Decision Trace. The trace connects five stages: source evidence, proposed facts, the human decision, dependency logic, and the final ready state. It is a read-only explanation of the same event and planner used by the normal app—not a second AI-generated story.
 
 **On screen:** Let the automatic Decision Trace open. Move slowly through the two quotes, Not selected and Confirmed fact states, school confirmation, any-requirement rule, and Ready result. Keep the focused-update banner visible briefly.
 
-## 2:08–2:30 — A family-ready result
+## 2:00–2:25 — A family-ready result
 
 > Now I’ll switch to Spanish. The family can print or save the plan, inspect unresolved items and source references, download its event history, and add only complete confirmed dates to a calendar. The fictional judge path requires no provider key or account.
 
 **On screen:** Close the trace, switch to **ES**, advance to **Llevar conmigo**, and show the Spanish plan plus print, calendar, and technical JSON actions.
 
-## 2:30–2:50 — Engineering proof and close
+## 2:25–2:50 — Engineering proof and close
 
-> I built Lantern with Next.js, React, TypeScript, Zod, Vitest, and Playwright. Across 20 synthetic offline regression packets, it retained all 32 exact source quotes, found all 8 intended conflicts with zero false positives, produced zero date-normalization errors, and kept source coverage for all 34 ready tasks. AI assisted development and is fully disclosed; I own and understand the product decisions, deterministic rules, tests, and limitations. Lantern helps a family leave with a plan they can explain.
+> I built Lantern with Next.js, TypeScript, Zod, Vitest, and Playwright. In 28 synthetic packets it kept 46 of 46 exact quotes and found 12 of 12 intended conflicts. One equivalent English-Spanish location also triggered a false conflict; the report shows that limit. AI-assisted development is disclosed, while people confirm facts and code derives the plan. Lantern helps a family leave with a plan they can explain.
 
 **On screen:** Open **See how Lantern earns trust**. Show the tool list, AI/code/family boundary, synthetic result denominators, and limitation statement. End with the Lantern name visible.
 
 ## Recording notes
 
-- Speak “32 out of 32,” not “one hundred percent accurate.”
+- Speak “46 out of 46 in our synthetic set,” not “one hundred percent accurate.” Mention the one recorded false conflict when showing the results.
+- Use ← and → to move between beats. Press H to fold or reopen the recording cues.
 - Keep cursor motion slow and purposeful; never circle decorative elements.
 - Use browser zoom that leaves every quoted source readable in the final upload.
 - If a click, state, or spoken claim is wrong, reset and record a new full take. Do not edit separate states together in a way that implies a transition did not actually occur.

@@ -38,7 +38,7 @@ I used TypeScript, React 19, Next.js 16, CSS/Tailwind, Zod, Vitest, Playwright, 
 
 ## Testing and evidence
 
-The repository includes unit tests, mobile and desktop browser journeys, accessibility checks, print and download checks, performance budgets, and responsive visual baselines. A versioned offline evaluation uses 20 synthetic held-out packets across five scenarios. It records 32/32 fact precision and recall, 32/32 exact-quote coverage, all 8 intended conflicts with zero false positives, 0/8 date-normalization errors, and source coverage for all 34 ready tasks. These are synthetic regression results, not an independent measurement of real-world accuracy.
+The repository includes unit tests, mobile and desktop browser journeys, accessibility checks, print and download checks, performance budgets, and responsive visual baselines. A versioned offline evaluation uses 28 synthetic held-out packets across eight scenarios. It records 46/46 fact precision and recall, 46/46 exact-quote coverage, all 12 intended conflicts with one false positive, 9/9 dates read correctly, and source coverage for all 34 ready tasks. These are synthetic regression results, not an independent measurement of real-world accuracy.
 
 A privacy-safe usability protocol is prepared for approximately five consenting adults using only the fictional case. No participant sessions have been recorded yet, so I do not claim that families or community members have validated the app.
 

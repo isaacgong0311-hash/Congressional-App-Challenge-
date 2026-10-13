@@ -11,20 +11,24 @@ import type { CaseSnapshotView } from "./first-day-view";
 export function DemoRibbon({
   beat,
   canGoForward,
+  cuesHidden,
   language,
   onDismiss,
   onNext,
   onPrevious,
   onReset,
+  onToggleCues,
   snapshot,
 }: {
   beat: DemoBeat;
   canGoForward: boolean;
+  cuesHidden: boolean;
   language: Language;
   onDismiss: () => void;
   onNext: () => void;
   onPrevious: () => void;
   onReset: () => void;
+  onToggleCues: (hidden: boolean) => void;
   snapshot: CaseSnapshotView;
 }) {
   const index = DEMO_BEATS.findIndex((item) => item.id === beat.id);
@@ -35,7 +39,7 @@ export function DemoRibbon({
       aria-label={translated(language, "Guided demonstration", "Demostración guiada")}
       className="fd-demo-rail print:hidden"
     >
-      <details open>
+      <details onToggle={(event) => onToggleCues(!event.currentTarget.open)} open={!cuesHidden}>
         <summary>
           <span aria-hidden="true" className="fd-demo-index">
             {index + 1}
@@ -62,6 +66,13 @@ export function DemoRibbon({
             </p>
             <p className="fd-demo-cue">
               {localizedDemoText(beat.cue, language)}
+            </p>
+            <p className="fd-demo-shortcuts">
+              {translated(
+                language,
+                "Keyboard: ← previous · → next · H hide cues",
+                "Teclado: ← anterior · → siguiente · H ocultar indicaciones",
+              )}
             </p>
             <span className="fd-demo-proof">
               {localizedDemoText(beat.proofLabel, language)}

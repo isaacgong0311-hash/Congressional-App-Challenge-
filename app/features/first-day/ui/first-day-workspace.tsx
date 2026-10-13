@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useLayoutEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import {
   AccessibilityControls,
@@ -11,6 +11,7 @@ import type { FirstDayCase } from "../domain/types";
 import { BlockerStep } from "./blocker-step";
 import { CaseSnapshot } from "./case-snapshot";
 import { DemoRibbon } from "./demo-ribbon";
+import { demoBeatIndex } from "./demo-presentation";
 import { DocumentsStep } from "./documents-step";
 import { ExportStep } from "./export-step";
 import { FactsStep } from "./facts-step";
@@ -96,6 +97,7 @@ export function FirstDayWorkspace({
   const shellInert = openEvidence ? true : undefined;
   const mainRef = useRef<HTMLElement>(null);
   const previousStepRef = useRef(currentStep);
+  const [cuesHidden, setCuesHidden] = useState(false);
 
   useLayoutEffect(() => {
     if (previousStepRef.current === currentStep) return;
@@ -103,6 +105,33 @@ export function FirstDayWorkspace({
     window.scrollTo({ top: 0, behavior: "auto" });
     mainRef.current?.focus({ preventScroll: true });
   }, [currentStep]);
+
+  useEffect(() => {
+    if (presentationMode !== "guided_demo" || !demoMode) return;
+
+    function onPresenterKeyDown(event: KeyboardEvent) {
+      if (event.altKey || event.ctrlKey || event.metaKey || event.repeat || openEvidence) return;
+      const target = event.target;
+      if (
+        target instanceof HTMLElement &&
+        (target.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName))
+      ) return;
+
+      if (event.key === "ArrowRight") {
+        event.preventDefault();
+        if (canAdvanceDemo) goForward();
+      } else if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        if (demoBeatIndex(demoBeatId) > 0) goBack();
+      } else if (event.key.toLowerCase() === "h") {
+        event.preventDefault();
+        setCuesHidden((hidden) => !hidden);
+      }
+    }
+
+    window.addEventListener("keydown", onPresenterKeyDown);
+    return () => window.removeEventListener("keydown", onPresenterKeyDown);
+  }, [canAdvanceDemo, demoBeatId, demoMode, goBack, goForward, openEvidence, presentationMode]);
 
   return (
     <div
@@ -199,11 +228,13 @@ export function FirstDayWorkspace({
           <DemoRibbon
             beat={demoBeat}
             canGoForward={canAdvanceDemo}
+            cuesHidden={cuesHidden}
             language={language}
             onDismiss={dismissDemo}
             onNext={goForward}
             onPrevious={goBack}
             onReset={resetDemo}
+            onToggleCues={setCuesHidden}
             snapshot={snapshot}
           />
         ) : null}

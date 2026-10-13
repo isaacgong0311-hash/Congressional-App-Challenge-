@@ -508,6 +508,25 @@ test("presenter mode keeps its mobile controls in the first viewport", async ({
   expect(width.scroll).toBeLessThanOrEqual(width.client + 1);
 });
 
+test("presenter keyboard shortcuts respect blockers and fold the cue panel", async ({ page }) => {
+  await page.goto("/first-day?demo=1&present=1");
+  const guide = page.getByLabel("Guided demonstration");
+
+  await page.keyboard.press("ArrowRight");
+  await expect(guide.getByText("Fictional demo · Story beat 2 of 6")).toBeVisible();
+  await page.keyboard.press("ArrowRight");
+  await expect(guide.getByText("Fictional demo · Story beat 2 of 6")).toBeVisible();
+
+  await page.keyboard.press("h");
+  await expect(guide.locator("details")).not.toHaveAttribute("open", "");
+  await expect(guide.getByText(/Compare the nurse-review appointment/)).toBeHidden();
+
+  await page.keyboard.press("ArrowLeft");
+  await expect(guide.getByText("Fictional demo · Story beat 1 of 6")).toBeVisible();
+  await page.keyboard.press("H");
+  await expect(guide.getByText(/Show three scattered pages/)).toBeVisible();
+});
+
 test("confirmed dates download as a real calendar file", async ({ page }) => {
   await page.goto("/first-day");
   await page.getByRole("button", { name: "Try the fictional case" }).click();

@@ -1,3 +1,4 @@
+import { competitionProof } from "../content/competition-proof";
 import type { CaseSnapshotView } from "./first-day-view";
 import type { Language, StepId } from "./first-day-copy";
 
@@ -92,6 +93,19 @@ export const DEMO_BEATS: readonly DemoBeat[] = [
   },
 ] as const;
 
+export function demoBeatDurationSeconds(beat: DemoBeat) {
+  const match = beat.time.match(/^(\d+):(\d{2})–(\d+):(\d{2})$/);
+  if (!match) throw new Error(`Invalid demo beat time: ${beat.time}`);
+  const start = Number(match[1]) * 60 + Number(match[2]);
+  const end = Number(match[3]) * 60 + Number(match[4]);
+  if (end <= start) throw new Error(`Demo beat must end after it starts: ${beat.time}`);
+  return end - start;
+}
+
+export function totalDemoBeatSeconds(beats: readonly DemoBeat[] = DEMO_BEATS) {
+  return beats.reduce((total, beat) => total + demoBeatDurationSeconds(beat), 0);
+}
+
 export function localizedDemoText(text: LocalizedText, language: Language) {
   return language === "Español" ? text.es : text.en;
 }
@@ -172,8 +186,8 @@ export function demoOutcome(
       return `${countLabel(snapshot.readyTaskCount, language, ["step ready", "steps ready"], ["paso listo", "pasos listos"])} · ${countLabel(snapshot.completedTaskCount, language, ["completed", "completed"], ["terminado", "terminados"])}`;
     case "engineering_proof":
       return es
-        ? "20 paquetes de prueba · límites de IA y código visibles"
-        : "20 held-out packets · AI and code boundaries made visible";
+        ? `${competitionProof.packetCount} paquetes de prueba · límites de IA y código visibles`
+        : `${competitionProof.packetCount} held-out packets · AI and code boundaries made visible`;
   }
 }
 

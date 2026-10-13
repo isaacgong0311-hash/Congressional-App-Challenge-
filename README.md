@@ -6,7 +6,7 @@ School enrollment instructions often arrive across several letters, reminders, a
 
 ![The fictional First Day demo at Step 1](docs/submission/clean-demo-preview.png)
 
-The demo uses fictional Mesa View Community Schools pages. It starts at Step 1, requires no account or upload, and makes no AI provider request. A separate [presenter view](https://lantern-first-day.vercel.app/first-day?demo=1&present=1) has timed story beats and recording cues.
+The demo uses fictional Mesa View Community Schools pages. It starts at Step 1, requires no account or upload, and makes no AI provider request. A separate [presenter view](https://lantern-first-day.vercel.app/first-day?demo=1&present=1) has timed story beats and recording cues. In presenter view, ← and → move between beats and H folds the cue panel.
 
 ## How the plan is made
 

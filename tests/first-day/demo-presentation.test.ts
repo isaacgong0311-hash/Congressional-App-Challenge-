@@ -6,6 +6,7 @@ import {
   demoBeatForStep,
   demoBlocker,
   demoOutcome,
+  totalDemoBeatSeconds,
 } from "../../app/features/first-day/ui/demo-presentation";
 import type { CaseSnapshotView } from "../../app/features/first-day/ui/first-day-view";
 
@@ -33,6 +34,11 @@ describe("guided competition presentation", () => {
       step: "export",
       time: "2:25–2:50",
     });
+  });
+
+  it("fits the story beats inside the video time budget", () => {
+    expect(totalDemoBeatSeconds()).toBe(150);
+    expect(totalDemoBeatSeconds()).toBeLessThanOrEqual(165);
   });
 
   it("realigns manual workflow navigation to the closest valid beat", () => {
