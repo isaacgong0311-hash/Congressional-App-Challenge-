@@ -78,12 +78,12 @@ export const TASK_ES: Record<
   },
   "task-health-records": {
     title: "Prepararse para el paso de salud",
-    action: "Lleve el registro de vacunas o use la cita confirmada con la enfermera.",
+    action: "Lleve el registro de vacunas o confirme la cita con la enfermera.",
     detail: "Este procedimiento ficticio permite cualquiera de las dos opciones.",
   },
   "task-orientation": {
     title: "Confirmar dónde empieza la orientación",
-    action: "Pregunte si la familia debe entrar por la cafetería o el gimnasio.",
+    action: "Pregunte si la orientación será en la cafetería o en el gimnasio.",
     detail: "Dos documentos indican lugares diferentes para la misma orientación.",
   },
   "task-interpreter": {
@@ -160,7 +160,7 @@ export const FACT_ES: Record<string, string> = {
   "fact-immunization-record": "¿Tiene el registro de vacunas de Maya?",
   "fact-nurse-review": "Revisión con la enfermera",
   "fact-orientation-cafeteria": "Carta de bienvenida: cafetería",
-  "fact-orientation-gym": "Mensaje de seguimiento: entrada del gimnasio",
+  "fact-orientation-gym": "Mensaje de seguimiento: gimnasio",
   "fact-interpreter-preference": "¿Necesita un intérprete?",
 };
 

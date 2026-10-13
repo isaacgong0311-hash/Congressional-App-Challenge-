@@ -16,7 +16,7 @@ School enrollment can require families to connect information from several lette
 
 ## What technical difficulties did you face programming your app?
 
-The hardest problem was making a useful plan without letting an AI summary silently turn uncertain information into a fact. In the fictional case, one page says orientation starts in the cafeteria and another says the gym entrance. I separated reading from decision-making: the server validates model proposals and requires an exact quote from the source text; typed case events record family confirmations and corrections; deterministic TypeScript rules calculate each task's state. Decision Trace reads those same sources, events, and rules to show why a task changed. I tested the boundaries with unit tests, synthetic evaluation packets, and mobile and desktop browser journeys.
+The hardest problem was making a useful plan without letting an AI summary silently turn uncertain information into a fact. In the fictional case, one page says orientation is in the cafeteria and another says it is in the gym. I separated reading from decision-making: the server validates model proposals and requires an exact quote from the source text; typed case events record family confirmations and corrections; deterministic TypeScript rules calculate each task's state. Decision Trace reads those same sources, events, and rules to show why a task changed. I tested the boundaries with unit tests, synthetic evaluation packets, and mobile and desktop browser journeys.
 
 ## What improvements would you make in a 2.0 version?
 

@@ -40,7 +40,7 @@ The repository can record a **silent draft** of the working six-beat fictional p
 - [ ] Exact source quote linked to a fact.
 - [ ] Two unanswered family questions.
 - [ ] Both conflicting orientation sources.
-- [ ] School-reported Gym entrance resolution.
+- [ ] School-reported Gym resolution.
 - [ ] Focused update showing only the dependent task changed.
 - [ ] Decision Trace stages and final Ready state.
 - [ ] Spanish family plan and export actions.

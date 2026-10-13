@@ -29,7 +29,7 @@ describe("Decision Trace projection", () => {
         .map((node) => [node.detail, node.state]),
     ).toEqual([
       ["School cafeteria", "conflicted"],
-      ["Gym entrance", "conflicted"],
+      ["Gym", "conflicted"],
     ]);
     expect(
       trace.nodes
@@ -37,7 +37,7 @@ describe("Decision Trace projection", () => {
         .map((node) => node.detail),
     ).toEqual([
       "Family orientation will be held in the school cafeteria on August 14, 2027 at 5:30 p.m.",
-      "Por favor, entre por la entrada del gimnasio.",
+      "La orientación será en el gimnasio.",
     ]);
     expect(
       trace.nodes
@@ -52,7 +52,7 @@ describe("Decision Trace projection", () => {
       type: "school_confirmation_recorded",
       conflictId: "conflict-orientation-location",
       selectedFactId: "fact-orientation-gym",
-      reportedValue: "Gym entrance",
+      reportedValue: "Gym",
       timestamp: "2026-09-30T16:00:00.000Z",
     });
     const trace = buildDecisionTrace(
@@ -68,7 +68,7 @@ describe("Decision Trace projection", () => {
     ).toEqual(
       expect.objectContaining({
         label: "School confirmation recorded",
-        detail: "Gym entrance",
+        detail: "Gym",
         sourceId: "event-location-confirmed",
       }),
     );
@@ -78,7 +78,7 @@ describe("Decision Trace projection", () => {
         .map((node) => [node.detail, node.state]),
     ).toEqual([
       ["School cafeteria", "superseded"],
-      ["Gym entrance", "confirmed"],
+      ["Gym", "confirmed"],
     ]);
   });
 

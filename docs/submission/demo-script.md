@@ -28,9 +28,9 @@
 
 ## 1:10–1:38 — Uncertainty preserved
 
-> The hardest design problem was preserving disagreement. One source says the cafeteria; another says the gym entrance. Lantern keeps both quotes, marks the task as needing clarification, and prepares the question to ask. It never silently chooses the newer-looking message.
+> The hardest design problem was preserving disagreement. One source says orientation is in the cafeteria; another says it is in the gym. Lantern keeps both quotes, marks the task as needing clarification, and prepares the question to ask. It never silently chooses the newer-looking message.
 
-**On screen:** Advance to the conflict. Point to both locations and both source cards. Record the fictional school response: **Gym entrance**.
+**On screen:** Advance to the conflict. Point to both locations and both source cards. Record the fictional school response: **Gym**.
 
 ## 1:38–2:08 — Focused update and Decision Trace
 

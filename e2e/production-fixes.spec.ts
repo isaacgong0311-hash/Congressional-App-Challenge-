@@ -36,7 +36,7 @@ test("conflict headings use source page numbers and fact cards hide internal key
   await expect(page.getByText("Story beat 2 of 6", { exact: false })).toBeVisible();
   await expect(page.getByText("Step 3 · Review facts")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Welcome letter: cafeteria" })).toHaveCount(1);
-  await expect(page.getByRole("heading", { name: "Follow-up message: gym entrance" })).toHaveCount(1);
+  await expect(page.getByRole("heading", { name: "Follow-up message: gym" })).toHaveCount(1);
   await page.getByRole("button", { name: "Next beat", exact: true }).click();
   await expect(page.getByText("Page 3 · School follow-up message", { exact: false })).toBeVisible();
   await expect(page.getByText("1 conflict stays visible until a person decides")).toBeVisible();

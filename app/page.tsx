@@ -246,7 +246,7 @@ export default function HomePage() {
                 <em>you deserve to know.</em>
               </h2>
               <p>
-                A cafeteria on one page. A gym entrance on another. Lantern
+                The cafeteria on one page. The gym on another. Lantern
                 keeps both sources visible and helps you prepare the right
                 question for the school.
               </p>

@@ -7,12 +7,15 @@ import { DOCUMENT_ES, FACT_ES, TASK_ES } from "../../app/features/first-day/ui/f
 describe("fictional packet languages", () => {
   it("preserves exact Spanish source quotes for the follow-up page and conflict", () => {
     const followUp = fictionalCase.documents.find((item) => item.id === "doc-follow-up-message");
-    expect(followUp?.extractedText).toContain("Por favor, entre por la entrada del gimnasio.");
+    expect(followUp?.extractedText).toContain("La orientación será en el gimnasio.");
     expect(followUp?.extractedText).toContain("Responda a este mensaje si necesita un intérprete");
     expect(validateEvidence(fictionalCase)).toEqual([]);
     const gym = fictionalCase.evidence.find((item) => item.id === "evidence-orientation-gym");
+    const cafeteria = fictionalCase.evidence.find((item) => item.id === "evidence-orientation-cafeteria");
     expect(gym?.documentId).toBe(followUp?.id);
-    expect(gym?.quote).toContain("entrada del gimnasio");
+    expect(gym?.quote).toBe("La orientación será en el gimnasio.");
+    expect(cafeteria?.quote).toContain("held in the school cafeteria");
+    expect(gym?.quote).not.toContain("entrada");
   });
 
   it("provides a Spanish label for every fictional document, fact, and task", () => {

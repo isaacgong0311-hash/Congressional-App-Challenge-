@@ -52,8 +52,8 @@ export const DEMO_BEATS: readonly DemoBeat[] = [
     time: "1:10–1:40",
     title: { en: "Uncertainty preserved", es: "Incertidumbre preservada" },
     cue: {
-      en: "Compare both exact quotes. Lantern refuses to guess which entrance is correct.",
-      es: "Compare ambas citas exactas. Lantern se niega a adivinar qué entrada es correcta.",
+      en: "Compare both exact quotes. Lantern refuses to guess which room is correct.",
+      es: "Compare ambas citas exactas. Lantern se niega a adivinar cuál lugar es correcto.",
     },
     proofLabel: { en: "Responsible AI", es: "IA responsable" },
   },

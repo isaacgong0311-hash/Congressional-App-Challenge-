@@ -96,7 +96,7 @@ Prompt:
 
 > Review the plan. Is there anything the family should clarify before relying on it?
 
-- **Success:** Independently identifies that cafeteria and gym entrance conflict for the same orientation.
+- **Success:** Independently identifies that cafeteria and gym are different locations for the same orientation.
 - **Partial:** Notices a blocker or uncertainty but cannot explain the two competing locations.
 - **Not completed:** Says the plan has no relevant uncertainty or cannot find the conflict within 90 seconds before help.
 
@@ -124,9 +124,9 @@ Prompt:
 
 Prompt:
 
-> Assume the school says “Gym entrance.” Record that answer, inspect why the task changed, and tell me the family's next action.
+> Assume the school says “Gym.” Record that answer, inspect why the task changed, and tell me the family's next action.
 
-- **Success:** Records Gym entrance, uses the Decision Trace or status explanation to connect the school answer to the ready orientation task, and states an appropriate next action.
+- **Success:** Records Gym, uses the Decision Trace or status explanation to connect the school answer to the ready orientation task, and states an appropriate next action.
 - **Partial:** Records the answer and sees the updated task but cannot explain the dependency or provenance.
 - **Not completed:** Records the wrong answer, cannot complete the resolution, or cannot identify a next action.
 

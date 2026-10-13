@@ -223,7 +223,7 @@ test("clean demo carries a sourced plan through English and Spanish", async ({ p
       for (const quote of fictionalCase.evidence.slice(0, 2)) {
         await expect(page.getByText(quote.quote, { exact: false }).first()).toBeVisible();
       }
-      await expect(page.getByText("Por favor, entre por la entrada del gimnasio.", { exact: false }).first()).toBeVisible();
+      await expect(page.getByText(fictionalCase.evidence.find((item) => item.id === "evidence-orientation-gym")!.quote, { exact: false }).first()).toBeVisible();
       await page.getByRole("button", { name: es ? "Continuar" : "Continue" }).click();
       await expect(page.locator('.fd-step-nav [aria-current="step"]')).toContainText(es ? "Revisar datos" : "Review facts");
 
@@ -257,12 +257,14 @@ test("clean demo carries a sourced plan through English and Spanish", async ({ p
       const printPlan = page.locator(".fd-print-plan");
       await expect(printPlan).toBeVisible();
       await expect(printPlan.getByText(es ? "Fuentes:" : "Sources:").first()).toBeVisible();
+      await expect(printPlan.getByText("Gym", { exact: true })).toBeVisible();
 
       await page.getByText(es ? "Más formas de guardar" : "More ways to save").click();
       const downloadPromise = page.waitForEvent("download");
       await page.getByRole("button", { name: es ? "Descargar datos del plan (JSON)" : "Download plan data (JSON)" }).click();
       const download = await downloadPromise;
       const portable = JSON.parse(await readFile((await download.path())!, "utf8"));
+      expect(portable.confirmedFacts.find((item: { id: string }) => item.id === "fact-orientation-gym")?.value).toBe("Gym");
       const readyTasks = portable.tasks.filter((task: { state: string }) => task.state === "ready");
       expect(readyTasks.length).toBeGreaterThan(0);
       for (const task of readyTasks as Array<{ id: string; evidenceIds: string[] }>) {
@@ -355,17 +357,17 @@ test("presenter mode follows the six-beat story and can exit and resume", async 
   await expect(guide.getByText("Fictional demo · Story beat 4 of 6")).toBeVisible();
   await expect(page.getByText("One answer · one focused update")).toBeVisible();
   await expect(page.getByText("Only the plan steps that depended on this answer were updated.")).toBeVisible();
-  await expect(page.getByText("School answer: Gym entrance")).toBeVisible();
+  await expect(page.getByText("School answer: Gym")).toBeVisible();
   const trace = page.getByLabel(
     "Decision trace: Confirm where orientation begins",
   );
   await expect(trace).toBeVisible();
   await expect(trace.getByText("School confirmation recorded")).toBeVisible();
-  await expect(trace.getByText("Gym entrance", { exact: true })).toHaveCount(2);
+  await expect(trace.getByText("Gym", { exact: true })).toHaveCount(2);
   await expect(trace.getByText("Confirmed", { exact: true })).toBeVisible();
   await expect(trace.getByText("Not selected", { exact: true })).toBeVisible();
   await expect(
-    trace.getByText("Por favor, entre por la entrada del gimnasio.", {
+    trace.getByText(fictionalCase.evidence.find((item) => item.id === "evidence-orientation-gym")!.quote, {
       exact: false,
     }),
   ).toBeVisible();
@@ -402,7 +404,7 @@ test("presenter mode follows the six-beat story and can exit and resume", async 
   ).toBeVisible();
   await expect(page.getByText("0 unresolved items")).toBeVisible();
   const confirmedFacts = page.getByRole("heading", { name: "Confirmed facts" }).locator("..");
-  await expect(confirmedFacts.getByText("Gym entrance", { exact: true })).toBeVisible();
+  await expect(confirmedFacts.getByText("Gym", { exact: true })).toBeVisible();
 
   await guide.getByRole("button", { name: "Next beat" }).click();
   await expect(guide.getByText("Fictional demo · Story beat 6 of 6")).toBeVisible();

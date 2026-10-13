@@ -28,7 +28,7 @@ If sources disagree, Lantern creates a conflict instead of choosing an answer. T
 
 ## Most difficult technical challenge
 
-The hardest challenge was preserving uncertainty while still producing a useful plan. A normal summarizer tends to collapse two similar statements into one answer. That is unsafe when one page says “cafeteria” and another says “gym entrance.”
+The hardest challenge was preserving uncertainty while still producing a useful plan. A normal summarizer tends to collapse two similar statements into one answer. That is unsafe when one page says orientation is in the cafeteria and another says it is in the gym.
 
 I solved this with separate server and domain boundaries. Server routes enforce file and text limits, validate untrusted provider output with runtime schemas, return privacy-safe failures, and avoid persisting uploads. Exact-quote validation rejects unsupported model proposals. Typed facts retain their source evidence. An append-only event log records confirmations, corrections, source removal, completion, and school-reported conflict resolutions. The planner recursively evaluates `fact`, `task`, `allOf`, and `anyOf` dependencies and produces deterministic states. Decision Trace is a read-only projection of those same records and the planner result, so it cannot invent a more convenient explanation for the demo. The provider-free judge mode exercises the real event and planning code without making an API request.
 

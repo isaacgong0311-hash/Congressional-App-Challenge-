@@ -148,7 +148,7 @@ describe("First Day deterministic planner", () => {
       type: "school_confirmation_recorded",
       conflictId: "conflict-orientation-location",
       selectedFactId: "fact-orientation-gym",
-      reportedValue: "Gym entrance",
+      reportedValue: "Gym",
       timestamp: "2026-09-15T12:00:00.000Z",
     });
 

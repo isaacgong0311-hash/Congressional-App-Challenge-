@@ -27,7 +27,7 @@ const stages = [
     owner: "AI proposes · code validates",
     detail:
       "Every proposed fact must include a verbatim passage that exists in that page’s extracted text.",
-    example: `Evidence · “${fictionalPreview.orientationCafeteriaQuote}”`,
+    example: `Two sources · “${fictionalPreview.orientationCafeteriaQuote}” ≠ “${fictionalPreview.orientationGymQuote}”`,
   },
   {
     number: "03",

@@ -33,7 +33,7 @@ export const fictionalCase: FirstDayCase = {
       status: "ready",
       sourceVersion: "demo-packet-v1",
       extractedText:
-        "Recordatorio para la familia Rivera: la orientación es el 14 de agosto de 2027 a las 5:30 p. m. Por favor, entre por la entrada del gimnasio. Responda a este mensaje si necesita un intérprete para la inscripción o la orientación.",
+        "Recordatorio para la familia Rivera: la orientación es el 14 de agosto de 2027 a las 5:30 p. m. La orientación será en el gimnasio. Responda a este mensaje si necesita un intérprete para la inscripción o la orientación.",
     },
   ],
   procedures: [
@@ -103,7 +103,7 @@ export const fictionalCase: FirstDayCase = {
     {
       id: "evidence-orientation-gym",
       documentId: "doc-follow-up-message",
-      quote: "Por favor, entre por la entrada del gimnasio.",
+      quote: "La orientación será en el gimnasio.",
       location: "Page 3, second sentence",
     },
     {
@@ -176,8 +176,8 @@ export const fictionalCase: FirstDayCase = {
       id: "fact-orientation-gym",
       kind: "location",
       semanticKey: "orientation.location",
-      label: "Follow-up message: gym entrance",
-      originalValue: "Gym entrance",
+      label: "Follow-up message: gym",
+      originalValue: "Gym",
       evidenceIds: ["evidence-orientation-gym"],
       confirmationState: "conflicted",
     },
@@ -210,7 +210,7 @@ export const fictionalCase: FirstDayCase = {
     {
       id: "task-health-records",
       title: "Prepare for the health-record step",
-      action: "Bring the immunization record, or use the confirmed nurse review.",
+      action: "Bring the immunization record, or confirm the nurse review.",
       detail: "This fictional procedure explicitly allows either documented path.",
       evidenceIds: [
         "evidence-immunization-request",
@@ -230,7 +230,7 @@ export const fictionalCase: FirstDayCase = {
     {
       id: "task-orientation",
       title: "Confirm where orientation begins",
-      action: "Ask whether the family should use the cafeteria or gym entrance.",
+      action: "Ask whether orientation is in the cafeteria or the gym.",
       detail: "Two documents name different places for the same orientation.",
       evidenceIds: [
         "evidence-orientation-cafeteria",

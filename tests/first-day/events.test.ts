@@ -26,7 +26,7 @@ describe("First Day case events", () => {
     expect(
       next.facts.find((fact) => fact.id === "fact-orientation-gym")
         ?.originalValue,
-    ).toBe("Gym entrance");
+    ).toBe("Gym");
   });
 
   it("appends confirmations, task completions, and source removals", () => {
@@ -131,7 +131,7 @@ describe("First Day case events", () => {
       id: "event-school-report",
       conflictId: "conflict-orientation-location",
       selectedFactId: "fact-orientation-gym",
-      reportedValue: "Gym entrance",
+      reportedValue: "Gym",
       timestamp: "2026-09-19T12:00:00.000Z",
     });
 

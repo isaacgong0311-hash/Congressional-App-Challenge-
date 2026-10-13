@@ -40,7 +40,7 @@ for (const route of [
 test("public examples show the same fictional source quotes as the demo", async ({ page }) => {
   await page.goto("/first-day/how-it-works");
   await expect(
-    page.getByText(`Evidence · “${fictionalPreview.orientationCafeteriaQuote}”`),
+    page.getByText(`Two sources · “${fictionalPreview.orientationCafeteriaQuote}” ≠ “${fictionalPreview.orientationGymQuote}”`),
   ).toBeVisible();
 
   await page.goto("/");
