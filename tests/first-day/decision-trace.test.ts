@@ -11,6 +11,27 @@ function copyCase(): FirstDayCase {
 }
 
 describe("Decision Trace projection", () => {
+  it("traces the confirmed nurse review back to its exact source", () => {
+    const changed = copyCase();
+    changed.events.push({
+      id: "event-confirm-nurse-review",
+      type: "fact_confirmed",
+      factId: "fact-nurse-review",
+      timestamp: "2026-10-12T12:00:00.000Z",
+    });
+    const trace = buildDecisionTrace(changed, planCase(changed), "task-health-records");
+    expect(trace.state).toBe("ready");
+    expect(trace.nodes).toContainEqual(expect.objectContaining({
+      kind: "fact",
+      detail: "August 13, 2027 at 1:30 p.m. at the Welcome Center",
+      state: "confirmed",
+    }));
+    expect(trace.nodes).toContainEqual(expect.objectContaining({
+      kind: "evidence",
+      detail: "A nurse review is reserved for August 13, 2027 at 1:30 p.m. at the Welcome Center.",
+    }));
+  });
+
   it("explains an unresolved conflict from both source documents", () => {
     const trace = buildDecisionTrace(
       fictionalCase,

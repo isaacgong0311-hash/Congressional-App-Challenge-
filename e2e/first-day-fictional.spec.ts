@@ -15,7 +15,13 @@ async function expectNoSeriousAxeViolations(page: Page) {
   expect(violations).toEqual([]);
 }
 
-async function answerFamilyQuestions(page: Page) {
+async function reviewProposedFacts(page: Page) {
+  const nurseReview = page.getByRole("article").filter({
+    has: page.getByRole("heading", { name: "Nurse review" }),
+  });
+  await expect(nurseReview).toContainText("A nurse review is reserved for August 13, 2027 at 1:30 p.m. at the Welcome Center.");
+  await nurseReview.getByRole("button", { name: "Confirm this" }).click();
+
   const immunization = page.getByRole("article").filter({
     has: page.getByRole("heading", {
       name: "Do you have Maya's immunization record?",
@@ -80,7 +86,7 @@ test("fictional case completes all six screens with sources and Spanish output",
     page.getByRole("heading", { name: "Check the facts that shape the plan." }),
   ).toBeVisible();
   await expectNoSeriousAxeViolations(page);
-  await answerFamilyQuestions(page);
+  await reviewProposedFacts(page);
 
   await page.getByRole("button", { name: "Continue" }).click();
   await expect(
@@ -278,6 +284,38 @@ test("clean demo carries a sourced plan through English and Spanish", async ({ p
   expect(unexpectedRequests).toEqual([]);
 });
 
+test("confirming the nurse-review quote makes the health step ready", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/first-day?demo=1");
+  await page.getByRole("button", { name: "Try the fictional case" }).click();
+  await page.getByRole("button", { name: "Continue" }).click();
+  const nurseReview = page.getByRole("article").filter({
+    has: page.getByRole("heading", { name: "Nurse review" }),
+  });
+  const sourceQuote = fictionalCase.evidence.find((item) => item.id === "evidence-nurse-review")!.quote;
+  await expect(nurseReview).toContainText(sourceQuote);
+  await expect(nurseReview.getByRole("button", { name: "Confirm this" })).toBeVisible();
+
+  await page.getByRole("button", { name: "Continue" }).click();
+  let healthStep = page.locator(".fd-task-card").filter({
+    has: page.getByRole("heading", { name: "Prepare for the health-record step" }),
+  });
+  await expect(healthStep.locator(".fd-fact-state")).toHaveText("Waiting");
+
+  const progress = page.getByRole("navigation", { name: "First Day progress" });
+  await progress.getByRole("button", { name: "Review facts" }).click();
+  await nurseReview.getByRole("button", { name: "Confirm this" }).click();
+  await progress.getByRole("button", { name: "My plan" }).click();
+  healthStep = page.locator(".fd-task-card").filter({
+    has: page.getByRole("heading", { name: "Prepare for the health-record step" }),
+  });
+  await expect(healthStep.locator(".fd-fact-state")).toHaveText("Ready");
+  await healthStep.getByRole("button", { name: "Trace this decision" }).click();
+  const trace = page.getByLabel("Decision trace: Prepare for the health-record step");
+  await expect(trace).toContainText("Nurse review");
+  await expect(trace).toContainText(sourceQuote);
+});
+
 test("presenter mode follows the six-beat story and can exit and resume", async ({
   page,
 }) => {
@@ -315,7 +353,7 @@ test("presenter mode follows the six-beat story and can exit and resume", async 
   await expect(
     guide.getByRole("button", { name: "Next beat" }),
   ).toBeDisabled();
-  await expect(guide.getByText("Review 2 facts before continuing.")).toBeVisible();
+  await expect(guide.getByText("Review 3 facts before continuing.")).toBeVisible();
 
   await guide.getByRole("button", { name: "Previous beat" }).click();
   await expect(guide.getByText("Fictional demo · Story beat 1 of 6")).toBeVisible();
@@ -327,7 +365,7 @@ test("presenter mode follows the six-beat story and can exit and resume", async 
     }),
   });
   await immunization.getByRole("button", { name: "Yes", exact: true }).click();
-  await expect(guide.getByText("Review 1 fact before continuing.")).toBeVisible();
+  await expect(guide.getByText("Review 2 facts before continuing.")).toBeVisible();
   await expect(guide.getByRole("button", { name: "Next beat" })).toBeDisabled();
 
   const interpreter = page.getByRole("article").filter({
@@ -336,6 +374,11 @@ test("presenter mode follows the six-beat story and can exit and resume", async 
     }),
   });
   await interpreter.getByRole("button", { name: "No", exact: true }).click();
+  await expect(guide.getByText("Review 1 fact before continuing.")).toBeVisible();
+  const nurseReview = page.getByRole("article").filter({
+    has: page.getByRole("heading", { name: "Nurse review" }),
+  });
+  await nurseReview.getByRole("button", { name: "Confirm this" }).click();
   await expect(
     guide.getByText("Every proposed fact has been reviewed by the family"),
   ).toBeVisible();
@@ -466,7 +509,7 @@ test("confirmed dates download as a real calendar file", async ({ page }) => {
   await page.goto("/first-day");
   await page.getByRole("button", { name: "Try the fictional case" }).click();
   await page.getByRole("button", { name: "Continue" }).click();
-  await answerFamilyQuestions(page);
+  await reviewProposedFacts(page);
   await page.getByRole("button", { name: "Continue" }).click();
   const compactProgress = page.locator(".fd-mobile-progress summary");
   if (await compactProgress.isVisible()) await compactProgress.click();
@@ -489,7 +532,7 @@ test("task completion can be undone without deleting history", async ({ page }) 
   await page.goto("/first-day");
   await page.getByRole("button", { name: "Try the fictional case" }).click();
   await page.getByRole("button", { name: "Continue" }).click();
-  await answerFamilyQuestions(page);
+  await reviewProposedFacts(page);
   await page.getByRole("button", { name: "Continue" }).click();
 
   const registrationTask = page.getByRole("article").filter({

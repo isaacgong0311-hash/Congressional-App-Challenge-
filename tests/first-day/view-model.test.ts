@@ -17,10 +17,10 @@ describe("First Day presentation view", () => {
     expect(snapshot).toEqual({
       documentCount: 3,
       processedDocumentCount: 3,
-      pendingFactCount: 2,
+      pendingFactCount: 3,
       openConflictCount: 1,
-      readyTaskCount: 2,
-      waitingTaskCount: 2,
+      readyTaskCount: 1,
+      waitingTaskCount: 3,
       completedTaskCount: 0,
     });
   });
@@ -34,7 +34,7 @@ describe("First Day presentation view", () => {
       timestamp: "2026-09-20T12:00:00.000Z",
     });
 
-    expect(caseSnapshot(changed, planCase(changed)).pendingFactCount).toBe(1);
+    expect(caseSnapshot(changed, planCase(changed)).pendingFactCount).toBe(2);
   });
 
   it("does not ask for review of facts whose only source was removed", () => {
@@ -45,7 +45,7 @@ describe("First Day presentation view", () => {
       documentId: "doc-follow-up-message",
       timestamp: "2026-09-20T12:00:00.000Z",
     });
-    expect(caseSnapshot(changed, planCase(changed)).pendingFactCount).toBe(1);
+    expect(caseSnapshot(changed, planCase(changed)).pendingFactCount).toBe(2);
   });
 
   it("prioritizes clarification before ready, review, waiting, and done", () => {
@@ -53,7 +53,7 @@ describe("First Day presentation view", () => {
     expect(tasks.map((task) => task.state)).toEqual([
       "needs_clarification",
       "ready",
-      "ready",
+      "waiting",
       "waiting",
       "waiting",
     ]);
@@ -62,7 +62,7 @@ describe("First Day presentation view", () => {
   it("filters attention, ready, and done tasks", () => {
     const plan = planCase(fictionalCase);
     expect(filterPlanTasks(plan.tasks, "attention")).toHaveLength(1);
-    expect(filterPlanTasks(plan.tasks, "ready")).toHaveLength(2);
+    expect(filterPlanTasks(plan.tasks, "ready")).toHaveLength(1);
     expect(filterPlanTasks(plan.tasks, "done")).toHaveLength(0);
     expect(filterPlanTasks(plan.tasks, "all")).toHaveLength(5);
   });

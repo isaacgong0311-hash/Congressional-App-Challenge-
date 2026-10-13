@@ -16,7 +16,7 @@ The repository can record a **silent draft** of the working six-beat fictional p
 - [ ] Set the capture canvas to at least 1440×900 and verify text remains readable after upload compression.
 - [ ] Use a visible but unobtrusive cursor and disable cursor effects that cover source text.
 - [ ] Silence system and phone notifications.
-- [ ] Select **Reset demo** and confirm Beat 1, two facts to check, and one blocker.
+- [ ] Select **Reset demo** and confirm Beat 1, three facts to check, and one blocker.
 - [ ] Complete one full English rehearsal including the automatic Decision Trace.
 - [ ] Complete one Spanish-switch rehearsal through **Llevar conmigo**.
 - [ ] Monitor requests during rehearsal and confirm the fictional judge path makes no provider request.

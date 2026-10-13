@@ -30,8 +30,8 @@ export const DEMO_BEATS: readonly DemoBeat[] = [
     time: "0:20–0:45",
     title: { en: "Before Lantern", es: "Antes de Lantern" },
     cue: {
-      en: "Show three scattered pages, two facts to check, and the contradiction the family still has to resolve.",
-      es: "Muestre tres páginas dispersas, dos datos por revisar y la contradicción que la familia aún debe resolver.",
+      en: "Show three scattered pages, three facts to check, and the contradiction the family still has to resolve.",
+      es: "Muestre tres páginas dispersas, tres datos por revisar y la contradicción que la familia aún debe resolver.",
     },
     proofLabel: { en: "Community need", es: "Necesidad comunitaria" },
   },
@@ -41,8 +41,8 @@ export const DEMO_BEATS: readonly DemoBeat[] = [
     time: "0:45–1:10",
     title: { en: "Traceable evidence", es: "Evidencia rastreable" },
     cue: {
-      en: "Open one source passage, then confirm the two proposed facts. The original words never disappear.",
-      es: "Abra un fragmento de la fuente y confirme los dos datos propuestos. Las palabras originales nunca desaparecen.",
+      en: "Compare the nurse-review appointment with its exact quote and confirm it. The health step changes from Waiting to Ready.",
+      es: "Compare la cita con la enfermera con su fuente exacta y confírmela. El paso de salud cambia de En espera a Listo.",
     },
     proofLabel: { en: "Evidence integrity", es: "Integridad de evidencia" },
   },

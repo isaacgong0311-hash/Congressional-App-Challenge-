@@ -91,7 +91,17 @@ describe("confirmed date calendar export", () => {
   });
 
   it("includes confirmed appointments with their stated local time", () => {
-    const events = calendarEvents(fictionalCase);
+    expect(calendarEvents(fictionalCase).map((event) => event.title)).toEqual([
+      "Enrollment meeting",
+    ]);
+    const reviewed = structuredClone(fictionalCase);
+    reviewed.events.push({
+      id: "event-confirm-nurse-review",
+      type: "fact_confirmed",
+      factId: "fact-nurse-review",
+      timestamp: "2026-10-12T12:00:00.000Z",
+    });
+    const events = calendarEvents(reviewed);
     expect(events.map((event) => event.title)).toEqual([
       "Enrollment meeting",
       "Nurse review",

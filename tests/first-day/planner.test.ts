@@ -23,7 +23,7 @@ describe("First Day deterministic planner", () => {
     const result = planCase(fictionalCase);
 
     expect(byId(result, "task-registration").state).toBe("ready");
-    expect(byId(result, "task-health-records").state).toBe("ready");
+    expect(byId(result, "task-health-records").state).toBe("waiting");
     expect(byId(result, "task-orientation").state).toBe(
       "needs_clarification",
     );
@@ -43,6 +43,27 @@ describe("First Day deterministic planner", () => {
     expect(byId(planCase(changed), "task-registration").state).toBe(
       "waiting",
     );
+  });
+
+  it("makes the health-record step ready after the nurse review is confirmed", () => {
+    const changed = copyCase();
+    expect(byId(planCase(changed), "task-health-records").state).toBe("waiting");
+    changed.events.push({
+      id: "event-confirm-nurse-review",
+      type: "fact_confirmed",
+      factId: "fact-nurse-review",
+      timestamp: "2026-10-12T12:00:00.000Z",
+    });
+    expect(byId(planCase(changed), "task-health-records").state).toBe("ready");
+
+    const withRecord = copyCase();
+    withRecord.events.push({
+      id: "event-confirm-immunization-record",
+      type: "fact_confirmed",
+      factId: "fact-immunization-record",
+      timestamp: "2026-10-12T12:01:00.000Z",
+    });
+    expect(byId(planCase(withRecord), "task-health-records").state).toBe("ready");
   });
 
   it("treats an explicit unclear event as needing clarification", () => {
@@ -138,7 +159,7 @@ describe("First Day deterministic planner", () => {
 
     const result = planCase(changed);
     expect(byId(result, "task-registration").state).toBe("needs_review");
-    expect(byId(result, "task-health-records").state).toBe("ready");
+    expect(byId(result, "task-health-records").state).toBe("waiting");
   });
 
   it("uses an explicit school report to resolve the supported conflict path", () => {

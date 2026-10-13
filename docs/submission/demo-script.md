@@ -18,13 +18,13 @@
 
 > This fictional family received three pages. The enrollment appointment is in one letter, the health instructions are in another, and two pages disagree about where orientation begins. The family has to connect every detail while working across languages and avoiding a missed step.
 
-**On screen:** Show all three document identities, “2 facts to check,” and the visible blocker. Do not scroll past the fictional district notice.
+**On screen:** Show all three document identities, “3 facts to check,” and the visible blocker. Do not scroll past the fictional district notice.
 
 ## 0:45–1:10 — Evidence before answers
 
-> Lantern keeps every page separate. Runtime AI may propose a structured fact, but code rejects it unless its exact supporting quotation appears in the page text. The family—not the model—reviews questions the documents cannot answer. Nothing enters the plan as confirmed just because AI suggested it.
+> Lantern keeps every page separate. Runtime AI may propose a structured fact, but code rejects it unless its exact supporting quotation appears in the page text. Here the nurse-review appointment starts unconfirmed. I compare it with the source, confirm it, and the health step moves from Waiting to Ready. The family—not the model—also answers questions the documents cannot answer.
 
-**On screen:** Advance to Review facts. Open **More source context**, point to the exact quote and document name, close it, then answer the two family questions.
+**On screen:** Advance to Review facts. Show the nurse-review quote, select **Confirm this**, then answer the two family questions.
 
 ## 1:10–1:38 — Uncertainty preserved
 

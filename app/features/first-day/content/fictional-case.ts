@@ -160,8 +160,8 @@ export const fictionalCase: FirstDayCase = {
       label: "Nurse review",
       originalValue: "August 13, 2027 at 1:30 p.m. at the Welcome Center",
       normalizedValue: "2027-08-13T13:30:00",
-      evidenceIds: ["evidence-nurse-alternative", "evidence-nurse-review"],
-      confirmationState: "confirmed",
+      evidenceIds: ["evidence-nurse-review", "evidence-nurse-alternative"],
+      confirmationState: "proposed",
     },
     {
       id: "fact-orientation-cafeteria",

@@ -12,10 +12,10 @@ import type { CaseSnapshotView } from "../../app/features/first-day/ui/first-day
 const snapshot: CaseSnapshotView = {
   documentCount: 3,
   processedDocumentCount: 3,
-  pendingFactCount: 2,
+  pendingFactCount: 3,
   openConflictCount: 1,
-  readyTaskCount: 2,
-  waitingTaskCount: 2,
+  readyTaskCount: 1,
+  waitingTaskCount: 3,
   completedTaskCount: 0,
 };
 
@@ -53,7 +53,7 @@ describe("guided competition presentation", () => {
 
   it("explains the human actions required before advancing", () => {
     expect(demoBlocker("traceable_evidence", snapshot, "English")).toBe(
-      "Review 2 facts before continuing.",
+      "Review 3 facts before continuing.",
     );
     expect(demoBlocker("uncertainty_preserved", snapshot, "English")).toBe(
       "Record what the school told the family.",

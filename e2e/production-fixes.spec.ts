@@ -30,6 +30,10 @@ test("conflict headings use source page numbers and fact cards hide internal key
     }),
   });
   await interpreter.getByRole("button", { name: "No", exact: true }).click();
+  const nurseReview = page.getByRole("article").filter({
+    has: page.getByRole("heading", { name: "Nurse review" }),
+  });
+  await nurseReview.getByRole("button", { name: "Confirm this" }).click();
   await expect(interpreter.getByText("Not answered yet")).toHaveCount(0);
   await expect(interpreter.getByText("No", { exact: true })).toBeVisible();
   await expect(page.getByText("Every proposed fact has been reviewed by the family")).toBeVisible();
@@ -55,6 +59,10 @@ test("a Yes answer to the interpreter question updates the card and unlocks the 
     has: page.getByRole("heading", { name: "Would an interpreter help your family?" }),
   });
   await interpreter.getByRole("button", { name: "Yes", exact: true }).click();
+  const nurseReview = page.getByRole("article").filter({
+    has: page.getByRole("heading", { name: "Nurse review" }),
+  });
+  await nurseReview.getByRole("button", { name: "Confirm this" }).click();
 
   await expect(interpreter.getByText("Not answered yet")).toHaveCount(0);
   await expect(interpreter.getByText("Yes", { exact: true })).toBeVisible();
