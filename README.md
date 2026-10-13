@@ -57,6 +57,7 @@ npm run lint
 npm test
 npm run build
 npm run test:e2e
+npm run smoke -- --base-url https://lantern-first-day.vercel.app
 npm run evaluate:first-day
 npm run evaluate:usability
 ```

@@ -14,6 +14,7 @@
     "evaluate:usability": "tsx evaluation/usability/run.ts",
     "sync:readme": "tsx scripts/sync-readme.ts",
     "smoke:providers": "tsx scripts/smoke-providers.ts",
+    "smoke": "tsx scripts/smoke.ts",
     "record:demo-draft": "tsx scripts/record-demo-draft.ts",
     "test:e2e": "playwright test",
     "test:e2e:headed": "playwright test --headed",

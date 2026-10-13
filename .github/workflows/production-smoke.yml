@@ -1,0 +1,25 @@
+name: production smoke
+
+on:
+  deployment_status:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    if: github.event.deployment_status.state == 'success' && github.event.deployment.environment == 'Production'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.deployment.ref }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Check the public production deployment
+        run: npm run smoke -- --base-url https://lantern-first-day.vercel.app

@@ -74,6 +74,12 @@ export default function ContactPage() {
               <a className="lantern-primary-cta mt-7" href={issueUrl} rel="noreferrer" target="_blank">
                 Start a pilot or feedback inquiry <ArrowUpRightIcon className="h-5 w-5" />
               </a>
+              <a
+                className="mt-5 block w-fit font-semibold text-cobalt underline decoration-cobalt/30 underline-offset-4"
+                href="mailto:isaacgong0311@gmail.com?subject=Lantern%20feedback"
+              >
+                Or email Isaac directly
+              </a>
             </div>
             <aside className="bg-ink p-7 text-white sm:p-10 lg:p-12">
               <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-amber">Before sharing</p>
