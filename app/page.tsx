@@ -353,6 +353,9 @@ export default function HomePage() {
               ))}
             </dl>
             <p className="home-proof-note">
+              {competitionProof.conflictFalsePositives > 0
+                ? `The test also found ${competitionProof.conflictFalsePositives} unintended conflict${competitionProof.conflictFalsePositives === 1 ? "" : "s"}. `
+                : ""}
               These results come from made-up documents, not real family cases. <Link href="/first-day/how-it-works">See the test details</Link>.
             </p>
           </div>

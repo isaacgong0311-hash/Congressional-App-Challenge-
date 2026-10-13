@@ -1,0 +1,124 @@
+[
+  {
+    "fixtureId": "false-positive-trap-01",
+    "scenario": "false_positive_traps",
+    "pages": [
+      {
+        "pageIndex": 1,
+        "response": {
+          "schemaVersion": "first-day-extraction-v1",
+          "requestId": "eval-false-positive-trap-01-1",
+          "documentId": "false-positive-trap-01-1",
+          "document": {
+            "label": "English orientation letter",
+            "confidence": 0.97,
+            "originalText": "SYNTHETIC TEST DOCUMENT\nOrientation will be held in the cafeteria.",
+            "photoQualityNote": null
+          },
+          "facts": [
+            {
+              "clientKey": "fact",
+              "kind": "location",
+              "semanticKey": "orientation.location",
+              "label": "Orientation location",
+              "originalValue": "Cafeteria",
+              "normalizedValue": null,
+              "quote": "Orientation will be held in the cafeteria.",
+              "location": "Line 2",
+              "confidence": 0.97
+            }
+          ]
+        }
+      },
+      {
+        "pageIndex": 2,
+        "response": {
+          "schemaVersion": "first-day-extraction-v1",
+          "requestId": "eval-false-positive-trap-01-2",
+          "documentId": "false-positive-trap-01-2",
+          "document": {
+            "label": "Aviso de entrada",
+            "confidence": 0.97,
+            "originalText": "SYNTHETIC TEST DOCUMENT\nEntre por la entrada del gimnasio.",
+            "photoQualityNote": null
+          },
+          "facts": [
+            {
+              "clientKey": "fact",
+              "kind": "location",
+              "semanticKey": "arrival.entrance",
+              "label": "Arrival entrance",
+              "originalValue": "Gym entrance",
+              "normalizedValue": null,
+              "quote": "Entre por la entrada del gimnasio.",
+              "location": "Line 2",
+              "confidence": 0.97
+            }
+          ]
+        }
+      }
+    ],
+    "confirmedFactIds": []
+  },
+  {
+    "fixtureId": "false-positive-trap-02",
+    "scenario": "false_positive_traps",
+    "pages": [
+      {
+        "pageIndex": 1,
+        "response": {
+          "schemaVersion": "first-day-extraction-v1",
+          "requestId": "eval-false-positive-trap-02-1",
+          "documentId": "false-positive-trap-02-1",
+          "document": {
+            "label": "English orientation letter",
+            "confidence": 0.97,
+            "originalText": "SYNTHETIC TEST DOCUMENT\nOrientation will be held in the gymnasium.",
+            "photoQualityNote": null
+          },
+          "facts": [
+            {
+              "clientKey": "fact",
+              "kind": "location",
+              "semanticKey": "orientation.location",
+              "label": "Orientation location",
+              "originalValue": "Gymnasium",
+              "normalizedValue": null,
+              "quote": "Orientation will be held in the gymnasium.",
+              "location": "Line 2",
+              "confidence": 0.97
+            }
+          ]
+        }
+      },
+      {
+        "pageIndex": 2,
+        "response": {
+          "schemaVersion": "first-day-extraction-v1",
+          "requestId": "eval-false-positive-trap-02-2",
+          "documentId": "false-positive-trap-02-2",
+          "document": {
+            "label": "Seguimiento en español",
+            "confidence": 0.97,
+            "originalText": "SYNTHETIC TEST DOCUMENT\nLa orientación será en el gimnasio.",
+            "photoQualityNote": null
+          },
+          "facts": [
+            {
+              "clientKey": "fact",
+              "kind": "location",
+              "semanticKey": "orientation.location",
+              "label": "Lugar de orientación",
+              "originalValue": "Gimnasio",
+              "normalizedValue": null,
+              "quote": "La orientación será en el gimnasio.",
+              "location": "Line 2",
+              "confidence": 0.97
+            }
+          ]
+        }
+      }
+    ],
+    "confirmedFactIds": []
+  }
+]

@@ -1,0 +1,70 @@
+[
+  {
+    "fixtureId": "spanish-only-01",
+    "scenario": "spanish_only",
+    "pages": [
+      {
+        "pageIndex": 1,
+        "response": {
+          "schemaVersion": "first-day-extraction-v1",
+          "requestId": "eval-spanish-only-01-1",
+          "documentId": "spanish-only-01-1",
+          "document": {
+            "label": "Aviso de inscripción",
+            "confidence": 0.97,
+            "originalText": "SYNTHETIC TEST DOCUMENT\nLa inscripción será el 15 de agosto de 2026.",
+            "photoQualityNote": null
+          },
+          "facts": [
+            {
+              "clientKey": "fact",
+              "kind": "date",
+              "semanticKey": "registration.date",
+              "label": "Fecha de inscripción",
+              "originalValue": "15 de agosto de 2026",
+              "normalizedValue": "2026-08-15",
+              "quote": "La inscripción será el 15 de agosto de 2026.",
+              "location": "Line 2",
+              "confidence": 0.97
+            }
+          ]
+        }
+      }
+    ],
+    "confirmedFactIds": []
+  },
+  {
+    "fixtureId": "spanish-only-02",
+    "scenario": "spanish_only",
+    "pages": [
+      {
+        "pageIndex": 1,
+        "response": {
+          "schemaVersion": "first-day-extraction-v1",
+          "requestId": "eval-spanish-only-02-1",
+          "documentId": "spanish-only-02-1",
+          "document": {
+            "label": "Lista de documentos",
+            "confidence": 0.97,
+            "originalText": "SYNTHETIC TEST DOCUMENT\nTraiga una factura de servicios como comprobante de domicilio.",
+            "photoQualityNote": null
+          },
+          "facts": [
+            {
+              "clientKey": "fact",
+              "kind": "requested_item",
+              "semanticKey": "registration.proof_of_residence",
+              "label": "Comprobante de domicilio",
+              "originalValue": "Factura de servicios",
+              "normalizedValue": null,
+              "quote": "Traiga una factura de servicios como comprobante de domicilio.",
+              "location": "Line 2",
+              "confidence": 0.97
+            }
+          ]
+        }
+      }
+    ],
+    "confirmedFactIds": []
+  }
+]

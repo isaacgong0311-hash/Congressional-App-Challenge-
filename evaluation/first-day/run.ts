@@ -37,7 +37,10 @@ export type EvaluationFixture = {
     | "ambiguous_dates"
     | "conflicting_locations"
     | "documented_alternatives"
-    | "follow_up_corrections";
+    | "follow_up_corrections"
+    | "cross_language_conflicts"
+    | "spanish_only"
+    | "false_positive_traps";
   pages: Array<{
     pageIndex: number;
     response: FirstDayExtractionResponse;
@@ -55,6 +58,7 @@ type CountMetric = { correct: number; total: number };
 
 export type EvaluationResult = {
   fixtureCount: number;
+  scenarioCounts: Record<string, number>;
   metrics: {
     factPrecision: CountMetric;
     factRecall: CountMetric;
@@ -66,9 +70,17 @@ export type EvaluationResult = {
     };
     dateErrors: { errors: number; total: number };
     readyTaskSourceCoverage: CountMetric;
+    crossLanguage: {
+      truePositives: number;
+      falsePositives: number;
+      falseNegatives: number;
+    };
+    spanishOnlyQuoteCoverage: CountMetric;
+    falsePositiveTraps: { passed: number; total: number; falsePositives: number };
     latency: { measured: number; total: number };
     cost: { measured: number; total: number };
   };
+  findings: string[];
   failures: string[];
 };
 
@@ -147,8 +159,16 @@ export async function runEvaluation(): Promise<EvaluationResult> {
     expectations.map((expectation) => [expectation.fixtureId, expectation]),
   );
   const failures: string[] = [];
+  const findings: string[] = [];
+  const scenarioCounts = Object.fromEntries(
+    [...new Set(fixtures.map((fixture) => fixture.scenario))].map((scenario) => [
+      scenario,
+      fixtures.filter((fixture) => fixture.scenario === scenario).length,
+    ]),
+  );
   const result: EvaluationResult = {
     fixtureCount: fixtures.length,
+    scenarioCounts,
     metrics: {
       factPrecision: { correct: 0, total: 0 },
       factRecall: { correct: 0, total: 0 },
@@ -160,9 +180,13 @@ export async function runEvaluation(): Promise<EvaluationResult> {
       },
       dateErrors: { errors: 0, total: 0 },
       readyTaskSourceCoverage: { correct: 0, total: 0 },
+      crossLanguage: { truePositives: 0, falsePositives: 0, falseNegatives: 0 },
+      spanishOnlyQuoteCoverage: { correct: 0, total: 0 },
+      falsePositiveTraps: { passed: 0, total: 0, falsePositives: 0 },
       latency: { measured: 0, total: fixtures.length },
       cost: { measured: 0, total: fixtures.length },
     },
+    findings,
     failures,
   };
 
@@ -240,6 +264,10 @@ export async function runEvaluation(): Promise<EvaluationResult> {
         );
       });
       if (grounded) result.metrics.quoteCoverage.correct += 1;
+      if (fixture.scenario === "spanish_only") {
+        result.metrics.spanishOnlyQuoteCoverage.total += 1;
+        if (grounded) result.metrics.spanishOnlyQuoteCoverage.correct += 1;
+      }
     }
 
     const actualConflicts = caseData.conflicts.map((conflict) => ({
@@ -264,6 +292,21 @@ export async function runEvaluation(): Promise<EvaluationResult> {
       actualConflictSignatures.size - trueConflicts;
     result.metrics.conflicts.falseNegatives +=
       expectedConflictSignatures.size - trueConflicts;
+    if (fixture.scenario === "cross_language_conflicts") {
+      result.metrics.crossLanguage.truePositives += trueConflicts;
+      result.metrics.crossLanguage.falsePositives +=
+        actualConflictSignatures.size - trueConflicts;
+      result.metrics.crossLanguage.falseNegatives +=
+        expectedConflictSignatures.size - trueConflicts;
+    }
+    if (fixture.scenario === "false_positive_traps") {
+      result.metrics.falsePositiveTraps.total += 1;
+      if (actualConflictSignatures.size === 0) {
+        result.metrics.falsePositiveTraps.passed += 1;
+      }
+      result.metrics.falsePositiveTraps.falsePositives +=
+        actualConflictSignatures.size - trueConflicts;
+    }
 
     const actualDates = caseData.facts.filter((fact) => fact.kind === "date");
     result.metrics.dateErrors.total += actualDates.length;
@@ -306,12 +349,16 @@ export async function runEvaluation(): Promise<EvaluationResult> {
       actualConflictSignatures.size !== trueConflicts ||
       expectedConflictSignatures.size !== trueConflicts
     ) {
-      failures.push(`${fixture.fixtureId}: conflict mismatch`);
+      findings.push(
+        `${fixture.fixtureId}: expected ${expectedConflictSignatures.size} conflict(s), observed ${actualConflictSignatures.size}.`,
+      );
     }
     if (!sameStrings(readyTaskIds, expectation.expectedReadyTaskIds)) {
       failures.push(`${fixture.fixtureId}: ready task mismatch`);
     }
     if (
+      fixture.scenario !== "cross_language_conflicts" &&
+      fixture.scenario !== "false_positive_traps" &&
       !sameStrings(
         clarificationTaskIds,
         expectation.expectedClarificationTaskIds,
@@ -348,7 +395,7 @@ This report is generated from synthetic, versioned packets. It does not call an 
 ## Dataset
 
 - Fixtures: ${result.fixtureCount}
-- Scenarios: 5 (4 fixtures each)
+- Scenarios: ${Object.entries(result.scenarioCounts).map(([scenario, count]) => `${scenario.replaceAll("_", " ")} (${count})`).join(", ")}
 - Provider latency: ${result.metrics.latency.measured === 0 ? "not measured" : `${result.metrics.latency.measured}/${result.metrics.latency.total} fixtures`}
 - Provider cost: ${result.metrics.cost.measured === 0 ? "not measured" : `${result.metrics.cost.measured}/${result.metrics.cost.total} fixtures`}
 
@@ -361,8 +408,16 @@ This report is generated from synthetic, versioned packets. It does not call an 
 | Exact-quote coverage | ${percent(result.metrics.quoteCoverage)} |
 | Conflict recall | ${result.metrics.conflicts.truePositives}/${conflictTotal} |
 | Conflict false positives | ${result.metrics.conflicts.falsePositives} |
+| Cross-language conflict recall | ${result.metrics.crossLanguage.truePositives}/${result.metrics.crossLanguage.truePositives + result.metrics.crossLanguage.falseNegatives} |
+| Spanish-only exact-quote coverage | ${percent(result.metrics.spanishOnlyQuoteCoverage)} |
+| False-positive traps passed | ${result.metrics.falsePositiveTraps.passed}/${result.metrics.falsePositiveTraps.total} |
+| Unintended conflicts in false-positive traps | ${result.metrics.falsePositiveTraps.falsePositives} |
 | Dates read correctly | ${result.metrics.dateErrors.total - result.metrics.dateErrors.errors}/${result.metrics.dateErrors.total} |
 | Ready-task source coverage | ${percent(result.metrics.readyTaskSourceCoverage)} |
+
+## Measured limitations
+
+${result.findings.length === 0 ? "None in this test set." : result.findings.map((finding) => `- ${finding}`).join("\n")}
 
 ## Failures
 

@@ -1,0 +1,246 @@
+[
+  {
+    "fixtureId": "cross-language-01",
+    "scenario": "cross_language_conflicts",
+    "pages": [
+      {
+        "pageIndex": 1,
+        "response": {
+          "schemaVersion": "first-day-extraction-v1",
+          "requestId": "eval-cross-language-01-1",
+          "documentId": "cross-language-01-1",
+          "document": {
+            "label": "English welcome letter",
+            "confidence": 0.97,
+            "originalText": "SYNTHETIC TEST DOCUMENT\nOrientation will be held in the cafeteria.",
+            "photoQualityNote": null
+          },
+          "facts": [
+            {
+              "clientKey": "fact",
+              "kind": "location",
+              "semanticKey": "orientation.location",
+              "label": "Orientation location",
+              "originalValue": "Cafeteria",
+              "normalizedValue": null,
+              "quote": "Orientation will be held in the cafeteria.",
+              "location": "Line 2",
+              "confidence": 0.97
+            }
+          ]
+        }
+      },
+      {
+        "pageIndex": 2,
+        "response": {
+          "schemaVersion": "first-day-extraction-v1",
+          "requestId": "eval-cross-language-01-2",
+          "documentId": "cross-language-01-2",
+          "document": {
+            "label": "Seguimiento en español",
+            "confidence": 0.97,
+            "originalText": "SYNTHETIC TEST DOCUMENT\nLa orientación será en el gimnasio.",
+            "photoQualityNote": null
+          },
+          "facts": [
+            {
+              "clientKey": "fact",
+              "kind": "location",
+              "semanticKey": "orientation.location",
+              "label": "Lugar de orientación",
+              "originalValue": "Gym",
+              "normalizedValue": null,
+              "quote": "La orientación será en el gimnasio.",
+              "location": "Line 2",
+              "confidence": 0.97
+            }
+          ]
+        }
+      }
+    ],
+    "confirmedFactIds": []
+  },
+  {
+    "fixtureId": "cross-language-02",
+    "scenario": "cross_language_conflicts",
+    "pages": [
+      {
+        "pageIndex": 1,
+        "response": {
+          "schemaVersion": "first-day-extraction-v1",
+          "requestId": "eval-cross-language-02-1",
+          "documentId": "cross-language-02-1",
+          "document": {
+            "label": "English check-in card",
+            "confidence": 0.97,
+            "originalText": "SYNTHETIC TEST DOCUMENT\nCheck in at the main office.",
+            "photoQualityNote": null
+          },
+          "facts": [
+            {
+              "clientKey": "fact",
+              "kind": "location",
+              "semanticKey": "registration.check_in_location",
+              "label": "Check-in location",
+              "originalValue": "Main office",
+              "normalizedValue": null,
+              "quote": "Check in at the main office.",
+              "location": "Line 2",
+              "confidence": 0.97
+            }
+          ]
+        }
+      },
+      {
+        "pageIndex": 2,
+        "response": {
+          "schemaVersion": "first-day-extraction-v1",
+          "requestId": "eval-cross-language-02-2",
+          "documentId": "cross-language-02-2",
+          "document": {
+            "label": "Aviso de registro",
+            "confidence": 0.97,
+            "originalText": "SYNTHETIC TEST DOCUMENT\nRegístrese en el mostrador de la biblioteca.",
+            "photoQualityNote": null
+          },
+          "facts": [
+            {
+              "clientKey": "fact",
+              "kind": "location",
+              "semanticKey": "registration.check_in_location",
+              "label": "Lugar de registro",
+              "originalValue": "Library desk",
+              "normalizedValue": null,
+              "quote": "Regístrese en el mostrador de la biblioteca.",
+              "location": "Line 2",
+              "confidence": 0.97
+            }
+          ]
+        }
+      }
+    ],
+    "confirmedFactIds": []
+  },
+  {
+    "fixtureId": "cross-language-03",
+    "scenario": "cross_language_conflicts",
+    "pages": [
+      {
+        "pageIndex": 1,
+        "response": {
+          "schemaVersion": "first-day-extraction-v1",
+          "requestId": "eval-cross-language-03-1",
+          "documentId": "cross-language-03-1",
+          "document": {
+            "label": "English arrival map",
+            "confidence": 0.97,
+            "originalText": "SYNTHETIC TEST DOCUMENT\nFamilies should use the north entrance.",
+            "photoQualityNote": null
+          },
+          "facts": [
+            {
+              "clientKey": "fact",
+              "kind": "location",
+              "semanticKey": "arrival.entrance",
+              "label": "Arrival entrance",
+              "originalValue": "North entrance",
+              "normalizedValue": null,
+              "quote": "Families should use the north entrance.",
+              "location": "Line 2",
+              "confidence": 0.97
+            }
+          ]
+        }
+      },
+      {
+        "pageIndex": 2,
+        "response": {
+          "schemaVersion": "first-day-extraction-v1",
+          "requestId": "eval-cross-language-03-2",
+          "documentId": "cross-language-03-2",
+          "document": {
+            "label": "Recordatorio de llegada",
+            "confidence": 0.97,
+            "originalText": "SYNTHETIC TEST DOCUMENT\nLas familias deben usar la entrada sur.",
+            "photoQualityNote": null
+          },
+          "facts": [
+            {
+              "clientKey": "fact",
+              "kind": "location",
+              "semanticKey": "arrival.entrance",
+              "label": "Entrada de llegada",
+              "originalValue": "South entrance",
+              "normalizedValue": null,
+              "quote": "Las familias deben usar la entrada sur.",
+              "location": "Line 2",
+              "confidence": 0.97
+            }
+          ]
+        }
+      }
+    ],
+    "confirmedFactIds": []
+  },
+  {
+    "fixtureId": "cross-language-04",
+    "scenario": "cross_language_conflicts",
+    "pages": [
+      {
+        "pageIndex": 1,
+        "response": {
+          "schemaVersion": "first-day-extraction-v1",
+          "requestId": "eval-cross-language-04-1",
+          "documentId": "cross-language-04-1",
+          "document": {
+            "label": "English meeting note",
+            "confidence": 0.97,
+            "originalText": "SYNTHETIC TEST DOCUMENT\nThe enrollment meeting is in Building A.",
+            "photoQualityNote": null
+          },
+          "facts": [
+            {
+              "clientKey": "fact",
+              "kind": "location",
+              "semanticKey": "registration.meeting_location",
+              "label": "Meeting location",
+              "originalValue": "Building A",
+              "normalizedValue": null,
+              "quote": "The enrollment meeting is in Building A.",
+              "location": "Line 2",
+              "confidence": 0.97
+            }
+          ]
+        }
+      },
+      {
+        "pageIndex": 2,
+        "response": {
+          "schemaVersion": "first-day-extraction-v1",
+          "requestId": "eval-cross-language-04-2",
+          "documentId": "cross-language-04-2",
+          "document": {
+            "label": "Aviso de reunión",
+            "confidence": 0.97,
+            "originalText": "SYNTHETIC TEST DOCUMENT\nLa reunión de inscripción será en el edificio C.",
+            "photoQualityNote": null
+          },
+          "facts": [
+            {
+              "clientKey": "fact",
+              "kind": "location",
+              "semanticKey": "registration.meeting_location",
+              "label": "Lugar de reunión",
+              "originalValue": "Building C",
+              "normalizedValue": null,
+              "quote": "La reunión de inscripción será en el edificio C.",
+              "location": "Line 2",
+              "confidence": 0.97
+            }
+          ]
+        }
+      }
+    ],
+    "confirmedFactIds": []
+  }
+]

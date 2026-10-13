@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
+import { competitionProof } from "../app/features/first-day/content/competition-proof";
 import { fictionalCase } from "../app/features/first-day/content/fictional-case";
 
 async function expectNoSeriousAxeViolations(page: Page) {
@@ -458,7 +459,9 @@ test("presenter mode follows the six-beat story and can exit and resume", async 
       name: "AI reads. Evidence constrains. Families decide. Code plans.",
     }),
   ).toBeVisible();
-  await expect(proof.getByText("32/32")).toBeVisible();
+  const quoteMetric = competitionProof.metrics.find((metric) => metric.id === "quotes");
+  if (!quoteMetric) throw new Error("Quote metric missing from evaluation report.");
+  await expect(proof.getByText(quoteMetric.value)).toBeVisible();
   await expect(guide.getByRole("button", { name: "Demo complete" })).toBeDisabled();
   await expectNoSeriousAxeViolations(page);
   await page.getByRole("button", { name: "ES", exact: true }).click();

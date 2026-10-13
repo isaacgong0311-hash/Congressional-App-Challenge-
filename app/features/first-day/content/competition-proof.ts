@@ -10,6 +10,7 @@ export type CompetitionProofMetric = {
 
 export type CompetitionProof = {
   packetCount: number;
+  conflictFalsePositives: number;
   stack: readonly string[];
   metrics: readonly CompetitionProofMetric[];
   aiBoundary: string;
@@ -26,6 +27,7 @@ export function createCompetitionProof(
     metrics.conflicts.truePositives + metrics.conflicts.falseNegatives;
   return {
     packetCount: result.fixtureCount,
+    conflictFalsePositives: metrics.conflicts.falsePositives,
     stack: [
       "Next.js 16",
       "React 19",
@@ -45,7 +47,7 @@ export function createCompetitionProof(
         id: "conflicts",
         value: `${metrics.conflicts.truePositives}/${conflictTotal}`,
         label: "intended conflicts found",
-        detail: `${metrics.conflicts.falsePositives} false positives in the synthetic set.`,
+        detail: `${metrics.conflicts.falsePositives} false positive${metrics.conflicts.falsePositives === 1 ? "" : "s"} in the synthetic set.`,
       },
       {
         id: "dates",

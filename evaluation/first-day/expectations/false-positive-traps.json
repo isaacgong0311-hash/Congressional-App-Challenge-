@@ -1,0 +1,38 @@
+[
+  {
+    "fixtureId": "false-positive-trap-01",
+    "expectedFacts": [
+      {
+        "semanticKey": "orientation.location",
+        "originalValue": "Cafeteria",
+        "quote": "Orientation will be held in the cafeteria."
+      },
+      {
+        "semanticKey": "arrival.entrance",
+        "originalValue": "Gym entrance",
+        "quote": "Entre por la entrada del gimnasio."
+      }
+    ],
+    "expectedConflicts": [],
+    "expectedReadyTaskIds": [],
+    "expectedClarificationTaskIds": []
+  },
+  {
+    "fixtureId": "false-positive-trap-02",
+    "expectedFacts": [
+      {
+        "semanticKey": "orientation.location",
+        "originalValue": "Gymnasium",
+        "quote": "Orientation will be held in the gymnasium."
+      },
+      {
+        "semanticKey": "orientation.location",
+        "originalValue": "Gimnasio",
+        "quote": "La orientación será en el gimnasio."
+      }
+    ],
+    "expectedConflicts": [],
+    "expectedReadyTaskIds": [],
+    "expectedClarificationTaskIds": []
+  }
+]

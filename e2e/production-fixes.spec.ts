@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { competitionProof } from "../app/features/first-day/content/competition-proof";
 
 test("sample loading acknowledges a slow request immediately", async ({ page }) => {
   let release!: () => void;
@@ -73,12 +74,14 @@ test("a Yes answer to the interpreter question updates the card and unlocks the 
 test("audited proof copy keeps spacing and First Day chrome translates", async ({ page }) => {
   await page.goto("/");
   await expect(
-    page.getByText("We checked Lantern against 20 made-up school document sets."),
+    page.getByText(`We checked Lantern against ${competitionProof.packetCount} made-up school document sets.`),
   ).toBeVisible();
 
   await page.goto("/first-day/how-it-works");
+  const quoteMetric = competitionProof.metrics.find((metric) => metric.id === "quotes");
+  if (!quoteMetric) throw new Error("Quote metric missing from evaluation report.");
   await expect(
-    page.getByText(/The versioned evaluation reports 32\/32 exact quotes covered/),
+    page.getByText(`The versioned evaluation reports ${quoteMetric.value} ${quoteMetric.label}`, { exact: false }),
   ).toBeVisible();
 
   await page.goto("/first-day?demo=1");

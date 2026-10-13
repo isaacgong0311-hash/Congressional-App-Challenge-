@@ -218,7 +218,7 @@ export default function HowFirstDayWorksPage() {
             <p className="mt-4 max-w-2xl leading-7 text-[#45567f]">
               {`The versioned evaluation reports ${competitionProof.metrics
                 .map((metric) => `${metric.value} ${metric.label}`)
-                .join(", ")}. ${competitionProof.limitation}`}
+                .join(", ")}. The set also recorded ${competitionProof.conflictFalsePositives} unintended conflict${competitionProof.conflictFalsePositives === 1 ? "" : "s"}. ${competitionProof.limitation}`}
             </p>
           </div>
           <Link

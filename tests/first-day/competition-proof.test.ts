@@ -25,8 +25,10 @@ describe("evaluation proof on public pages", () => {
     expect(home).toContain("27 made-up school document sets");
     expect(home).toContain("50/60");
     expect(home).toContain("9/10");
+    expect(home).toContain("1 unintended conflict");
     expect(how).toContain("27 synthetic held-out packets");
     expect(how).toContain("50/60 exact quotes covered");
     expect(how).toContain("9/10 dates read correctly");
+    expect(how).toContain("1 unintended conflict");
   });
 });

@@ -1,39 +1,66 @@
 {
-  "fixtureCount": 20,
+  "fixtureCount": 28,
+  "scenarioCounts": {
+    "ambiguous_dates": 4,
+    "conflicting_locations": 4,
+    "cross_language_conflicts": 4,
+    "documented_alternatives": 4,
+    "false_positive_traps": 2,
+    "follow_up_corrections": 4,
+    "spanish_only": 2,
+    "straightforward_enrollment": 4
+  },
   "metrics": {
     "factPrecision": {
-      "correct": 32,
-      "total": 32
+      "correct": 46,
+      "total": 46
     },
     "factRecall": {
-      "correct": 32,
-      "total": 32
+      "correct": 46,
+      "total": 46
     },
     "quoteCoverage": {
-      "correct": 32,
-      "total": 32
+      "correct": 46,
+      "total": 46
     },
     "conflicts": {
-      "truePositives": 8,
-      "falsePositives": 0,
+      "truePositives": 12,
+      "falsePositives": 1,
       "falseNegatives": 0
     },
     "dateErrors": {
       "errors": 0,
-      "total": 8
+      "total": 9
     },
     "readyTaskSourceCoverage": {
       "correct": 34,
       "total": 34
     },
+    "crossLanguage": {
+      "truePositives": 4,
+      "falsePositives": 0,
+      "falseNegatives": 0
+    },
+    "spanishOnlyQuoteCoverage": {
+      "correct": 2,
+      "total": 2
+    },
+    "falsePositiveTraps": {
+      "passed": 1,
+      "total": 2,
+      "falsePositives": 1
+    },
     "latency": {
       "measured": 0,
-      "total": 20
+      "total": 28
     },
     "cost": {
       "measured": 0,
-      "total": 20
+      "total": 28
     }
   },
+  "findings": [
+    "false-positive-trap-02: expected 0 conflict(s), observed 1."
+  ],
   "failures": []
 }

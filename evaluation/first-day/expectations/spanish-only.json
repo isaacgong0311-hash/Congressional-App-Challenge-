@@ -1,0 +1,35 @@
+[
+  {
+    "fixtureId": "spanish-only-01",
+    "expectedFacts": [
+      {
+        "semanticKey": "registration.date",
+        "originalValue": "15 de agosto de 2026",
+        "quote": "La inscripción será el 15 de agosto de 2026."
+      }
+    ],
+    "expectedConflicts": [],
+    "expectedReadyTaskIds": [],
+    "expectedClarificationTaskIds": [],
+    "expectedDates": [
+      {
+        "semanticKey": "registration.date",
+        "originalValue": "15 de agosto de 2026",
+        "normalizedValue": "2026-08-15"
+      }
+    ]
+  },
+  {
+    "fixtureId": "spanish-only-02",
+    "expectedFacts": [
+      {
+        "semanticKey": "registration.proof_of_residence",
+        "originalValue": "Factura de servicios",
+        "quote": "Traiga una factura de servicios como comprobante de domicilio."
+      }
+    ],
+    "expectedConflicts": [],
+    "expectedReadyTaskIds": [],
+    "expectedClarificationTaskIds": []
+  }
+]

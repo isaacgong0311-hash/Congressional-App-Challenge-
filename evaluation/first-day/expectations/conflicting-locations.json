@@ -3,9 +3,9 @@
     "fixtureId": "conflicting-location-01",
     "expectedFacts": [
       {"semanticKey": "orientation.location", "originalValue": "Cafeteria", "quote": "Orientation starts in the cafeteria."},
-      {"semanticKey": "orientation.location", "originalValue": "Gym entrance", "quote": "Orientation starts at the gym entrance."}
+      {"semanticKey": "orientation.location", "originalValue": "Gym", "quote": "Orientation starts in the gym."}
     ],
-    "expectedConflicts": [{"semanticKey": "orientation.location", "values": ["Cafeteria", "Gym entrance"]}],
+    "expectedConflicts": [{"semanticKey": "orientation.location", "values": ["Cafeteria", "Gym"]}],
     "expectedReadyTaskIds": [],
     "expectedClarificationTaskIds": ["task-live-clarify-orientation-location", "task-live-review-plan"]
   },
