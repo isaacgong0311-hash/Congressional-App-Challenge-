@@ -12,6 +12,7 @@
     "test:watch": "vitest",
     "evaluate:first-day": "tsx evaluation/first-day/run.ts",
     "evaluate:usability": "tsx evaluation/usability/run.ts",
+    "sync:readme": "tsx scripts/sync-readme.ts",
     "smoke:providers": "tsx scripts/smoke-providers.ts",
     "record:demo-draft": "tsx scripts/record-demo-draft.ts",
     "test:e2e": "playwright test",

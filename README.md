@@ -73,7 +73,7 @@ OpenAI Codex assisted with planning, code and test drafting, debugging, source r
 
 ## Team
 
-- Isaac Gong — student creator and project lead.
+- Isaac Gong — Creator and project lead
 
 ## Project history
 

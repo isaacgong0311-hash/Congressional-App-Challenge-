@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { aboutHeroCopy, team } from "../../content/team";
 import {
   ArrowUpRightIcon,
   DocumentLineIcon,
@@ -13,7 +14,7 @@ import { SiteFooter } from "../components/lantern/site-footer";
 export const metadata: Metadata = {
   title: "About | Lantern",
   description:
-    "Meet the student behind Lantern and see how the project turns source evidence into a family-reviewed plan.",
+    `Meet the ${team.length === 1 ? "student" : "team"} behind Lantern and see how the project turns source evidence into a family-reviewed plan.`,
 };
 
 const principles = [
@@ -45,12 +46,14 @@ export default function AboutPage() {
         <section className="info-shell info-hero">
           <p className="lantern-eyebrow">A student-built public-interest project</p>
           <h1 className="info-display">Paperwork should not decide who feels prepared.</h1>
-          <p className="info-lead">
-            I&apos;m Isaac Gong, the student who built Lantern for the Congressional
-            App Challenge. It began with a simple question: what if a family could
-            turn scattered school instructions into one plan they can inspect,
-            question, and carry?
-          </p>
+          <p className="info-lead">{aboutHeroCopy(team)}</p>
+          <ul className="mt-6 flex flex-wrap gap-2" aria-label="Lantern team">
+            {team.map(({ name, role }) => (
+              <li className="rounded-full border border-cobalt/15 bg-white/75 px-4 py-2 text-sm font-semibold text-ink shadow-sm" key={name}>
+                {name} <span className="font-normal text-slate-600">· {role}</span>
+              </li>
+            ))}
+          </ul>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link className="lantern-primary-cta" href="/first-day?demo=1">
               See the fictional demo <ArrowUpRightIcon className="h-5 w-5" />
