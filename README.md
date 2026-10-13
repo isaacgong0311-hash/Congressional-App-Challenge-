@@ -69,12 +69,11 @@ The app does not intentionally store uploaded images or case history in a databa
 
 ## AI use disclosure
 
-OpenAI Codex assisted with planning, code and test drafting, debugging, source review, browser verification, and documentation. Isaac reviewed and revised work before inclusion and owns the product goal, architecture decisions, evidence rules, evaluation interpretation, visual design, and release decisions. At runtime, Groq can assist with document reading, letter explanation, grounded responses, and field translation when configured; optional ElevenLabs speech and Perplexity local-help integrations are separate. AI does **not** confirm family facts, choose between conflicting sources, resolve tasks, or derive plan states. The fictional demo, planner, exports, and offline evaluation run without an AI request. Isaac should review the complete [submission disclosure](docs/submission/ai-disclosure.md) before submitting the final form.
+OpenAI Codex assisted with planning, code and test drafting, debugging, source review, browser verification, and documentation. Isaac reviewed and revised work before inclusion and owns the product goal, architecture decisions, evidence rules, evaluation interpretation, visual design, and release decisions. At runtime, Groq can assist with document reading, letter explanation, grounded responses, and field translation when configured; optional ElevenLabs speech and Perplexity local-help integrations are separate. AI does **not** confirm family facts, choose between conflicting sources, resolve tasks, or derive plan states. The fictional demo, planner, exports, and offline evaluation run without an AI request. See the complete [submission disclosure](docs/submission/ai-disclosure.md).
 
 ## Team
 
 - Isaac Gong — student creator and project lead.
-- `<NAME — role>` — add a line for each additional contributor, if any, before submission.
 
 ## Project history
 

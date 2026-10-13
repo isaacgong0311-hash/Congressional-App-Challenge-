@@ -2,6 +2,8 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import { fictionalPreview } from "../app/features/first-day/content/fictional-case";
 
+const draftCopy = /\bTODO\b|\bFIXME\b|<NAME\b|Isaac should|\bplaceholder\b|\blorem\b/;
+
 for (const route of [
   "/",
   "/explain",
@@ -16,6 +18,7 @@ for (const route of [
   }) => {
     const response = await page.goto(route);
     expect(response?.status()).toBe(200);
+    expect(await page.locator("body").innerText()).not.toMatch(draftCopy);
     expect(response?.headers()["x-content-type-options"]).toBe("nosniff");
     expect(response?.headers()["x-frame-options"]).toBe("DENY");
     expect(response?.headers()["referrer-policy"]).toBe(
@@ -102,6 +105,7 @@ test("unknown routes use the branded recovery page", async ({ page }) => {
   const response = await page.goto("/about-us");
   expect(response?.status()).toBe(404);
   await expect(page.getByRole("heading", { name: "Page not found." })).toBeVisible();
+  expect(await page.locator("body").innerText()).not.toMatch(draftCopy);
   await expect(page.getByRole("link", { name: "Return home" })).toHaveAttribute("href", "/");
   await expect(page.getByRole("link", { name: /Start guided demo/ })).toHaveAttribute(
     "href",
