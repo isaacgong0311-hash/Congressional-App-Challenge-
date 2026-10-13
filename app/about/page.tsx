@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { aboutHeroCopy, team } from "../../content/team";
+import usabilityReportJson from "../../evaluation/usability/report.json";
+import { parsePublicUsabilityReport } from "../../evaluation/usability/public-report";
 import {
   ArrowUpRightIcon,
   DocumentLineIcon,
@@ -10,6 +12,9 @@ import {
 } from "../components/lantern/brand";
 import { ProductHeader } from "../components/lantern/product-header";
 import { SiteFooter } from "../components/lantern/site-footer";
+import { aboutLimitsCopy, UsabilitySection } from "./usability-section";
+
+const usabilityReport = parsePublicUsabilityReport(usabilityReportJson);
 
 export const metadata: Metadata = {
   title: "About | Lantern",
@@ -123,14 +128,13 @@ export default function AboutPage() {
           </div>
         </section>
 
+        <UsabilitySection report={usabilityReport} />
+
         <section className="info-shell pb-20">
           <div className="rounded-[2rem] border border-amber/35 bg-[#fff8df] p-7 sm:p-10">
             <h2 className="font-serif text-3xl tracking-[-0.035em]">Built to be honest about its limits.</h2>
             <p className="mt-4 max-w-4xl leading-7 text-[#5f512d]">
-              Lantern has synthetic regression tests, not a completed real-family
-              study. It does not replace school staff, legal advice, or the source
-              document. The next responsible step is learning with consenting
-              families and educators—not inventing proof that does not exist yet.
+              {aboutLimitsCopy(usabilityReport)}
             </p>
             <Link className="mt-6 inline-flex font-bold text-cobalt underline decoration-cobalt/30 underline-offset-4" href="/contact">
               Share feedback or discuss a pilot <ArrowUpRightIcon className="ml-2 h-5 w-5" />

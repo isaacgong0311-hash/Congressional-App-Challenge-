@@ -62,7 +62,7 @@ npm run evaluate:first-day
 npm run evaluate:usability
 ```
 
-The First Day evaluation replays versioned synthetic packets without making provider calls and writes a [readable report](evaluation/first-day/report.md) and [machine-readable results](evaluation/first-day/report.json). The site reads its metrics from those results. They measure this test set, not accuracy on real family records. The [usability protocol](evaluation/usability/protocol.md) is prepared for consenting adults using fictional documents; [its report](evaluation/usability/report.md) remains marked **Not started** until sessions occur. GitHub Actions runs lint, unit tests, the deterministic evaluation, build, browser tests, and Lighthouse on each push.
+The First Day evaluation replays versioned synthetic packets without making provider calls and writes a [readable report](evaluation/first-day/report.md) and [machine-readable results](evaluation/first-day/report.json). The site reads its metrics from those results. They measure this test set, not accuracy on real family records. The [usability protocol](evaluation/usability/protocol.md) is prepared for consenting adults using fictional documents; its [readable report](evaluation/usability/report.md) and [public status data](evaluation/usability/report.json) remain **Not started** until sessions occur. GitHub Actions runs lint, unit tests, the deterministic evaluation, build, browser tests, and Lighthouse on each push.
 
 ## Privacy and scope
 

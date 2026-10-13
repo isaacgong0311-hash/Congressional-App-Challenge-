@@ -21,9 +21,11 @@ This directory contains the runnable protocol for a small, formative usability s
 - `protocol.md` — recruitment, consent, moderator script, tasks, scoring, and stop conditions.
 - `session-sheet.md` — one printable worksheet per participant.
 - `sessions.json` — structured anonymous observations used by the report generator.
+- `findings.json` — reviewed, anonymous findings and changes made; keep empty until sessions occur.
 - `summary.ts` — validation and deterministic aggregation.
 - `run.ts` — report runner.
 - `report.md` — generated status or results; never edit it by hand.
+- `report.json` — generated public status and reviewed findings used by the About page.
 
 ## Run the report
 

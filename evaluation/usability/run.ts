@@ -3,6 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { summarizeUsabilityStudy } from "./summary";
+import { buildPublicUsabilityReport } from "./public-report";
 
 const evaluationRoot = path.dirname(fileURLToPath(import.meta.url));
 
@@ -11,8 +12,21 @@ export async function runUsabilityEvaluation() {
     path.join(evaluationRoot, "sessions.json"),
     "utf8",
   );
-  const report = summarizeUsabilityStudy(JSON.parse(source) as unknown);
+  const findingsSource = await readFile(
+    path.join(evaluationRoot, "findings.json"),
+    "utf8",
+  );
+  const dataset = JSON.parse(source) as unknown;
+  const report = summarizeUsabilityStudy(dataset);
+  const publicReport = buildPublicUsabilityReport(
+    dataset,
+    JSON.parse(findingsSource) as unknown,
+  );
   await writeFile(path.join(evaluationRoot, "report.md"), report);
+  await writeFile(
+    path.join(evaluationRoot, "report.json"),
+    `${JSON.stringify(publicReport, null, 2)}\n`,
+  );
   return report;
 }
 
