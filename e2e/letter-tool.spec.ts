@@ -205,7 +205,7 @@ test("no-letter help feels like a complete product path", async ({ page }) => {
   await page.goto("/explain");
   await page.getByRole("button", { name: "Find help without a letter" }).click();
   await expect(
-    page.getByRole("heading", { name: "What's going on?" }),
+    page.getByRole("heading", { name: /What.s going on\?/ }),
   ).toBeVisible();
   await expect(
     page.getByRole("list", { name: "Help categories" }),

@@ -16,12 +16,13 @@ export default async function FirstDayPage({
   searchParams: Promise<{
     demo?: string | string[];
     present?: string | string[];
+    lang?: string | string[];
   }>;
 }) {
   const query = await searchParams;
   return (
     <FirstDayWorkspace
-      initialCase={fictionalCase}
+      initialCase={query.lang === "es" ? { ...fictionalCase, language: "Español" } : fictionalCase}
       initialDemoMode={query.demo === "1"}
       initialPresentationMode={presentationModeFromDemoParam(query.demo, query.present)}
     />

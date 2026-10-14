@@ -42,8 +42,12 @@ const LOADING_STEPS = [
   { label: "Writing your reply", es: "Preparando su respuesta" },
 ];
 
-export default function LetterWorkspace() {
-  const [language, setLanguage] = useState("English");
+export default function LetterWorkspace({
+  initialLanguage = null,
+}: {
+  initialLanguage?: "Spanish" | null;
+}) {
+  const [language, setLanguage] = useState(initialLanguage ?? "English");
   const [simplify, setSimplify] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
@@ -72,6 +76,7 @@ export default function LetterWorkspace() {
   const [formTab, setFormTab] = useState<0 | 1 | 2>(0);
   const previewUrl = useRef<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const initialLanguageAppliedRef = useRef(false);
 
   const lang = LANGUAGES.find((l) => l.label === language) ?? LANGUAGES[0];
   const dir = RTL_LANGS.has(lang.bcp47) ? "rtl" : "ltr";
@@ -79,6 +84,14 @@ export default function LetterWorkspace() {
   useEffect(() => {
     if (!preferencesReady) return;
     const frame = window.requestAnimationFrame(() => {
+      if (initialLanguage && !initialLanguageAppliedRef.current) {
+        initialLanguageAppliedRef.current = true;
+        setLanguage(initialLanguage);
+        if (preferences.preferredLanguage !== "es") {
+          setPreferences((current) => ({ ...current, preferredLanguage: "es" }));
+        }
+        return;
+      }
       const browserLang = navigator.language?.slice(0, 2).toLowerCase();
       const match =
         LANGUAGES.find((item) => item.bcp47 === preferences.preferredLanguage) ??
@@ -89,7 +102,7 @@ export default function LetterWorkspace() {
       if (match) setLanguage(match.label);
     });
     return () => window.cancelAnimationFrame(frame);
-  }, [preferences.preferredLanguage, preferencesReady]);
+  }, [initialLanguage, preferences.preferredLanguage, preferencesReady, setPreferences]);
 
   useEffect(() => {
     document.documentElement.lang = lang.bcp47;
@@ -440,9 +453,11 @@ export default function LetterWorkspace() {
 
       <ProductHeader
         active="explain"
+        language={language === "Spanish" ? "es" : "en"}
         controls={
           <>
             <AccessibilityControls
+              language={language === "Spanish" ? "Español" : "English"}
               highContrast={highContrast}
               largeText={largeText}
               onToggleHighContrast={toggleHC}
@@ -469,6 +484,10 @@ export default function LetterWorkspace() {
 
         {!loading && !result && !error ? (
           <div className="mb-7">
+            <div aria-label={language === "Spanish" ? "Idioma de la explicación" : "Explanation language"} className="letter-language-choice" role="group">
+              <button aria-pressed={language === "English"} onClick={() => chooseLanguage("English")} type="button">English</button>
+              <button aria-pressed={language === "Spanish"} onClick={() => chooseLanguage("Spanish")} type="button">Español</button>
+            </div>
             <p className="lantern-eyebrow">{language === "Spanish" ? "Explicar una carta" : "Explain a letter"}</p>
             <h1 className="mt-3 text-balance font-serif text-4xl leading-tight tracking-[-0.04em] text-ink sm:text-5xl">
               {language === "Spanish"
@@ -477,8 +496,8 @@ export default function LetterWorkspace() {
             </h1>
             <p className="mt-4 max-w-xl text-base leading-7 text-muted">
               {language === "Spanish"
-                ? "Tome una foto clara o elija una imagen. Lantern le mostrará lo urgente, las fechas, los montos, las señales de estafa y los próximos pasos."
-                : "Take a clear photo or choose an image. Lantern will surface urgency, dates, amounts, scam signals, and practical next steps."}
+                ? "Tome una foto clara o pruebe un ejemplo. Lantern le explica la carta con palabras sencillas. Usted decide qué hacer después."
+                : "Take a clear photo or try a sample. Lantern explains the letter in plain language. You decide what to do next."}
             </p>
           </div>
         ) : null}
@@ -613,6 +632,7 @@ export default function LetterWorkspace() {
         {screen === "help" ? (
           <LetterHelpScreen
             category={helpCategory}
+            language={language}
             onBack={() => {
               setHelpCategory(null);
               setScreen("app");
@@ -626,8 +646,7 @@ export default function LetterWorkspace() {
       <footer className="mt-8 border-t border-ink/10 bg-surface/80 py-5 print:hidden">
         <div className="mx-auto max-w-3xl space-y-3 px-6">
           <div className="text-center text-xs text-muted">
-            This tool helps you understand a letter — it is not legal or official
-            advice. Always confirm with the office named on your document.
+            {language === "Spanish" ? "Esta herramienta le ayuda a entender una carta. No ofrece asesoría legal ni oficial. Confirme lo importante con la oficina indicada en el documento." : "This tool helps you understand a letter — it is not legal or official advice. Always confirm with the office named on your document."}
           </div>
           <div className="overflow-hidden rounded-card border border-ink/10 bg-white shadow-[0_14px_38px_rgba(20,36,30,.06)]">
             <button
@@ -636,17 +655,17 @@ export default function LetterWorkspace() {
               className="flex min-h-12 w-full items-center justify-between gap-3 px-4 py-3 text-left text-sm font-bold text-ink focus-visible:outline-3 focus-visible:outline-offset-[-3px] focus-visible:outline-amber"
               aria-expanded={whyNotOpen}
             >
-              <span className="inline-flex items-center gap-2"><ShieldAlertIcon className="h-5 w-5 text-cobalt" /> How Lantern protects your decisions</span>
+              <span className="inline-flex items-center gap-2"><ShieldAlertIcon className="h-5 w-5 text-cobalt" /> {language === "Spanish" ? "Cómo Lantern le ayuda a decidir" : "How Lantern protects your decisions"}</span>
               <svg className={`h-4 w-4 shrink-0 text-muted transition-transform ${whyNotOpen ? "rotate-180" : ""}`} viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
             </button>
             {whyNotOpen && (
               <div className="space-y-2 border-t border-ink/10 px-4 pb-4 pt-3 text-sm leading-6 text-muted">
-                <p>Lantern adds a few safeguards around a general explanation:</p>
+                <p>{language === "Spanish" ? "Lantern añade estas protecciones a la explicación:" : "Lantern adds a few safeguards around a general explanation:"}</p>
                 <ul className="list-disc ps-4 space-y-1">
-                  <li><span className="font-semibold text-ink">Verified resources only.</span> The phone numbers and programs shown here are hand-checked instead of generated for each letter.</li>
-                  <li><span className="font-semibold text-ink">Fixed scam and crisis rules.</span> Certain signals always surface extra safety guidance, independent of the generated explanation.</li>
-                  <li><span className="font-semibold">No account or cloud case history.</span> Lantern does not create a saved family profile or case; provider-side handling is described on the Privacy page.</li>
-                  <li><span className="font-semibold">Ready-to-use outputs.</span> Reply letter, phone script, calendar reminder, and document checklist — all in one step.</li>
+                  <li>{language === "Spanish" ? "Los teléfonos y programas de ayuda se revisan a mano; no se inventan para cada carta." : "The phone numbers and programs shown here are hand-checked instead of generated for each letter."}</li>
+                  <li>{language === "Spanish" ? "Algunas señales de estafa y crisis siempre muestran avisos de seguridad adicionales." : "Certain scam and crisis signals always surface extra safety guidance."}</li>
+                  <li>{language === "Spanish" ? "Lantern no crea un perfil ni un caso familiar guardado. Consulte Privacidad para saber cómo Groq trata la imagen." : "Lantern does not create a saved family profile or case. Provider-side handling is described on the Privacy page."}</li>
+                  <li>{language === "Spanish" ? "Puede obtener una respuesta para imprimir, un guion de llamada, un recordatorio y una lista de documentos." : "You can get a reply letter, phone script, calendar reminder, and document checklist."}</li>
                 </ul>
               </div>
             )}

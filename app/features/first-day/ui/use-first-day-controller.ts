@@ -114,7 +114,12 @@ export function useFirstDayController({
     if (!preferencesReady || preferenceAppliedRef.current) return;
     preferenceAppliedRef.current = true;
     const preferredLanguage =
-      preferences.preferredLanguage === "es" ? "Español" : "English";
+      initialCase.language === "Español" || preferences.preferredLanguage === "es"
+        ? "Español"
+        : "English";
+    if (initialCase.language === "Español" && preferences.preferredLanguage !== "es") {
+      setPreferences((current) => ({ ...current, preferredLanguage: "es" }));
+    }
     const timer = window.setTimeout(
       () =>
         setCaseData((current) => ({
@@ -124,7 +129,7 @@ export function useFirstDayController({
       0,
     );
     return () => window.clearTimeout(timer);
-  }, [preferences.preferredLanguage, preferencesReady]);
+  }, [initialCase.language, preferences.preferredLanguage, preferencesReady, setPreferences]);
 
   function nextEventId(label: string) {
     eventSequence.current += 1;

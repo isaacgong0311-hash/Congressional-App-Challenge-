@@ -18,17 +18,18 @@
   max-width: 1376px;
   min-height: 88px;
 }
-.lantern-home > header a[href="/first-day?demo=1"] {
+.lantern-home > header a[href^="/first-day?demo=1"] {
   background: var(--home-green);
   box-shadow: none;
 }
-.lantern-home > header a[aria-label="Lantern home"] > span:first-child {
+.lantern-home > header a[aria-label="Lantern home"] > span:first-child,
+.lantern-home > header a[aria-label="Inicio de Lantern"] > span:first-child {
   background: var(--home-green);
   box-shadow: none;
 }
 .lantern-home
   > header
-  a[aria-label="Lantern home"]
+  a:is([aria-label="Lantern home"], [aria-label="Inicio de Lantern"])
   > span:last-child
   > span:first-child {
   font-size: 22px;
@@ -36,7 +37,7 @@
 }
 .lantern-home
   > header
-  a[aria-label="Lantern home"]
+  a:is([aria-label="Lantern home"], [aria-label="Inicio de Lantern"])
   > span:last-child
   > span:last-child {
   display: none;
@@ -67,6 +68,32 @@
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--home-green);
+}
+.home-language-choice {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  margin-bottom: 24px;
+  border: 1px solid var(--home-line);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 72%);
+  box-shadow: 0 5px 20px rgb(30 75 58 / 6%);
+}
+.home-language-choice button {
+  min-height: 42px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 750;
+  color: var(--home-green);
+}
+.home-language-choice button[aria-pressed="true"] {
+  background: var(--home-green);
+  color: white;
+}
+.home-language-choice button:focus-visible {
+  outline: 3px solid #b27820;
+  outline-offset: 2px;
 }
 .home-status-dot {
   display: inline-block;
@@ -100,7 +127,7 @@
 .home-hero h1 em {
   color: #456b4b;
   font-weight: 400;
-  white-space: nowrap;
+  white-space: normal;
 }
 .home-lead {
   max-width: 480px;

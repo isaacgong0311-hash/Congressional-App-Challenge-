@@ -8,6 +8,11 @@ export const metadata: Metadata = {
     "Turn a confusing official letter into plain language, next actions, and verified help.",
 };
 
-export default function ExplainPage() {
-  return <LetterWorkspace />;
+export default async function ExplainPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ lang?: string | string[] }>;
+}) {
+  const query = await searchParams;
+  return <LetterWorkspace initialLanguage={query.lang === "es" ? "Spanish" : null} />;
 }

@@ -11,9 +11,11 @@ type NavigationLink = {
 
 export function MobileNavigation({
   active,
+  language = "en",
   links,
 }: {
   active: string;
+  language?: "en" | "es";
   links: readonly NavigationLink[];
 }) {
   const [open, setOpen] = useState(false);
@@ -55,7 +57,7 @@ export function MobileNavigation({
       <button
         aria-controls="lantern-mobile-navigation"
         aria-expanded={open}
-        aria-label={open ? "Close navigation" : "Open navigation"}
+        aria-label={language === "es" ? open ? "Cerrar navegación" : "Abrir navegación" : open ? "Close navigation" : "Open navigation"}
         className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl border border-ink/15 bg-white text-ink shadow-sm transition hover:bg-canvas focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-amber"
         onClick={() => setOpen((current) => !current)}
         ref={buttonRef}
@@ -74,7 +76,7 @@ export function MobileNavigation({
           id="lantern-mobile-navigation"
           ref={panelRef}
         >
-          <nav aria-label="Mobile navigation" className="grid gap-1">
+          <nav aria-label={language === "es" ? "Navegación móvil" : "Mobile navigation"} className="grid gap-1">
             {links.map((link) => (
               <Link
                 aria-current={active === link.id ? "page" : undefined}
@@ -93,10 +95,10 @@ export function MobileNavigation({
           </nav>
           <Link
             className="mt-2 flex min-h-11 items-center justify-center rounded-xl bg-cobalt px-4 text-sm font-bold text-white shadow-[0_10px_25px_rgba(53,86,212,.2)] focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-amber"
-            href="/first-day?demo=1"
+            href={language === "es" ? "/first-day?demo=1&lang=es" : "/first-day?demo=1"}
             onClick={() => setOpen(false)}
           >
-            Start the guided demo
+            {language === "es" ? "Iniciar la demo guiada" : "Start the guided demo"}
           </Link>
         </div>
       ) : null}

@@ -173,6 +173,47 @@ label:active .letter-upload-action {
 }
 
 /* ── High contrast mode ───────────────────────────────────────── */
+.letter-language-choice {
+  display: inline-flex;
+  gap: 4px;
+  margin-bottom: 20px;
+  padding: 4px;
+  border: 1px solid #d4dbd0;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 5px 20px rgb(22 42 34 / 6%);
+}
+.letter-language-choice button {
+  min-height: 42px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  color: #1d4b3a;
+  font-size: 13px;
+  font-weight: 750;
+}
+.letter-language-choice button[aria-pressed="true"] {
+  background: #1d4b3a;
+  color: #fff;
+}
+.letter-language-choice button:focus-visible {
+  outline: 3px solid #b27820;
+  outline-offset: 2px;
+}
+.letter-privacy-note {
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid #c5d9c7;
+  border-radius: 16px;
+  background: #eef6ec;
+  color: #203d2d;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.letter-privacy-note strong { display: block; margin-bottom: 3px; font-size: 15px; }
+.letter-privacy-note button { display: inline-block; min-height: 44px; margin-top: 5px; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+.letter-privacy-note button:focus-visible { outline: 3px solid #b27820; outline-offset: 2px; }
+
 [data-high-contrast="true"] body,
 [data-high-contrast="true"] {
   background: #fff !important;

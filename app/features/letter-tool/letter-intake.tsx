@@ -72,13 +72,16 @@ export function LetterIntake({
       />
 
       <div className="p-5">
-        <p className="mb-4 text-sm leading-6 text-muted">
-          {copy("When you choose Explain, your image is sent to Groq for AI processing.", "Al elegir Explicar, su imagen se envía a Groq para procesarla con IA.")}{" "}
-          <a className="underline" href="/privacy">{copy("Read about provider retention", "Lea sobre la conservación de datos por el proveedor")}</a>.{" "}
-          {copy("Cover sensitive details that are not needed.", "Cubra los datos sensibles que no sean necesarios.")}
-        </p>
         {formTab === 0 ? (
           <div className="space-y-4">
+            <aside aria-label={copy("Before you share a photo", "Antes de compartir una foto")} className="letter-privacy-note">
+              <LockIcon className="h-5 w-5 shrink-0 text-[#1d4b3a]" />
+              <div>
+                <strong>{copy("You decide what to share.", "Usted decide qué compartir.")}</strong>
+                <p>{copy("Cover Social Security numbers, A-numbers, and account numbers you do not need explained. Your photo stays on this page until you press Explain; then Lantern sends it to Groq for AI reading, not to a school or immigration office. Lantern does not create a saved family case.", "Cubra los números de Seguro Social, números A y números de cuenta que no necesite explicar. La foto permanece en esta página hasta que pulse Explicar; entonces Lantern la envía a Groq para leerla con IA, no a una escuela ni a una oficina de inmigración. Lantern no crea un caso familiar guardado.")}</p>
+                <button onClick={() => setFormTab(2)} type="button">{copy("Read how sharing works", "Leer cómo se comparte la imagen")}</button>
+              </div>
+            </aside>
             {!preview ? (
               <>
                 <label className="letter-dropzone flex cursor-pointer flex-col items-center justify-center rounded-feature border-2 border-dashed border-ink/20 bg-canvas/70 px-6 py-12 text-center transition hover:border-cobalt hover:bg-[#eef2ff] focus-within:border-cobalt focus-within:ring-2 focus-within:ring-cobalt/30">
@@ -170,6 +173,7 @@ export function LetterIntake({
             <div className="flex items-center gap-2 rounded-xl border border-confirmed/20 bg-[#e3f4e8] px-3 py-3 text-xs font-bold text-[#24633a]">
               <LockIcon className="h-3.5 w-3.5 shrink-0" /> {copy("No account · No cloud case history · Encrypted in transit", "Sin cuenta · Sin historial en la nube · Cifrado en tránsito")}
             </div>
+            <a className="inline-block min-h-11 py-2 text-sm font-bold text-cobalt underline" href="/privacy">{copy("Full privacy policy", "Política completa de privacidad (en inglés)")}</a>
           </div>
         ) : null}
       </div>
