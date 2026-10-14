@@ -3,7 +3,9 @@ import type { FirstDayCase, PlannerResult } from "../domain/types";
 import { DecisionTracePanel } from "./decision-trace-panel";
 import {
   STATE_META,
+  factDisplayValue,
   localizedTaskCopy,
+  sourceTitle,
   translated,
   type Language,
 } from "./first-day-copy";
@@ -240,7 +242,10 @@ export function PlanStep({
                     const supportCount = task.evidenceIds.length + task.procedureIds.length;
                     const supportingDocument = task.evidenceIds
                       .map((evidenceId) => caseData.evidence.find((evidence) => evidence.id === evidenceId))
-                      .map((evidence) => caseData.documents.find((document) => document.id === evidence?.documentId)?.label)
+                      .map((evidence) => {
+                        const document = caseData.documents.find((item) => item.id === evidence?.documentId);
+                        return document ? sourceTitle(document.id, document.label, language) : undefined;
+                      })
                       .find(Boolean);
                     const primaryEvidence = caseData.evidence.find(
                       (evidence) => evidence.id === task.evidenceIds[0],
@@ -268,7 +273,7 @@ export function PlanStep({
                             <p className="mt-2 text-sm leading-6 text-[#52615a]">{taskCopy.action}</p>
                             {confirmedDate ? (
                               <p className="mt-2 text-sm font-bold text-confirmed">
-                                {translated(language, "Confirmed date", "Fecha confirmada")}: {confirmedDate}
+                                {translated(language, "Confirmed date", "Fecha confirmada")}: {dateFact ? factDisplayValue(dateFact.id, confirmedDate, language) : confirmedDate}
                               </p>
                             ) : null}
                             <details

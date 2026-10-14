@@ -4,7 +4,7 @@ import type {
   FirstDayCase,
   SchoolConfirmationEvent,
 } from "../domain/types";
-import { translated, type Language } from "./first-day-copy";
+import { factDisplayValue, sourceLocation, sourceTitle, translated, type Language } from "./first-day-copy";
 import { Eyebrow, SourceButton, type SourceOpener } from "./first-day-shared";
 import { CheckIcon, MessageIcon, WarningIcon } from "./icons";
 
@@ -82,7 +82,7 @@ export function BlockerStep({
     return [
       {
         factId: fact.id,
-        title: document?.label ?? fact.label,
+        title: document ? sourceTitle(document.id, document.label, language) : fact.label,
         pageIndex: document?.pageIndex,
         value: fact.originalValue,
         evidenceId,
@@ -92,11 +92,11 @@ export function BlockerStep({
     ];
   });
 
-  const comparedValues = options.map((option) => `“${option.value}”`);
+  const comparedValues = options.map((option) => `“${factDisplayValue(option.factId, option.value, language)}”`);
   const preparedQuestion = translated(
     language,
     `I found different instructions for ${conflict.label.toLowerCase()}: ${comparedValues.join(" and ")}. Which should our family follow?`,
-    `Encontré instrucciones diferentes para ${conflict.label.toLowerCase()}: ${comparedValues.join(" y ")}. ¿Cuál debe seguir nuestra familia?`,
+    `Encontré instrucciones diferentes para ${conflict.id === "conflict-orientation-location" ? "el lugar de la orientación" : conflict.label.toLowerCase()}: ${comparedValues.join(" y ")}. ¿Cuál debe seguir nuestra familia?`,
   );
 
   return (
@@ -141,13 +141,13 @@ export function BlockerStep({
                 {option.pageIndex ? translated(language, `Page ${option.pageIndex}`, `Página ${option.pageIndex}`) : translated(language, "Source", "Fuente")} · {option.title}
               </div>
               <p className="mt-5 font-serif text-3xl tracking-[-0.03em]">
-                {option.value}
+                {factDisplayValue(option.factId, option.value, language)}
               </p>
               {option.quote ? (
                 <blockquote className="mt-5 rounded-card border border-[#ead39e] bg-white p-4 text-sm leading-6 text-[#554823]">
                   “{option.quote}”
                   <footer className="mt-2 text-xs font-bold uppercase tracking-[0.1em] text-[#806a34]">
-                    {option.location}
+                    {option.location ? sourceLocation(option.location, language) : null}
                   </footer>
                 </blockquote>
               ) : null}

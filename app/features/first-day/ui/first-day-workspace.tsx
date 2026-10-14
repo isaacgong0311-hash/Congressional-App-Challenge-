@@ -188,6 +188,7 @@ export function FirstDayWorkspace({
               <div className="hidden sm:block">
                 <AccessibilityControls
                   compact
+                  language={language}
                   highContrast={preferences.highContrast}
                   largeText={preferences.largeText}
                   onToggleHighContrast={toggleHighContrast}
@@ -216,6 +217,7 @@ export function FirstDayWorkspace({
           <div className="flex items-center justify-end px-4 pb-3 sm:hidden">
             <AccessibilityControls
               compact
+              language={language}
               highContrast={preferences.highContrast}
               largeText={preferences.largeText}
               onToggleHighContrast={toggleHighContrast}

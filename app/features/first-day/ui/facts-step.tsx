@@ -4,6 +4,9 @@ import type { Fact, FirstDayCase } from "../domain/types";
 import {
   FACT_ES,
   FACT_STATE_META,
+  factDisplayValue,
+  sourceLocation,
+  sourceTitle,
   translated,
   type Language,
 } from "./first-day-copy";
@@ -70,7 +73,7 @@ function FactReviewCard({
           <p className="text-xs font-bold uppercase tracking-[0.15em] text-[#5f6d66]">
             {familyQuestion
               ? translated(language, "Family question", "Pregunta para la familia")
-              : fact.kind.replace("_", " ")}
+                : translated(language, fact.kind.replace("_", " "), ({ date: "fecha", location: "lugar", appointment: "cita", preference: "preferencia", requested_item: "documento solicitado" } as Record<string, string>)[fact.kind] ?? fact.kind.replace("_", " "))}
           </p>
           <h2 className="mt-2 text-base font-semibold">{factLabel}</h2>
           {!familyQuestion && typeof fact.confidence === "number" ? (
@@ -88,7 +91,7 @@ function FactReviewCard({
               {translated(language, "The document asks about this; it does not answer for your family.", "El documento pregunta sobre esto; no responde por su familia.")}
             </p>
           ) : (
-            <p className="mt-5 font-serif text-xl leading-7 text-[#203029]">{view.value}</p>
+            <p className="mt-5 font-serif text-xl leading-7 text-[#203029]">{factDisplayValue(fact.id, view.value, language)}</p>
           )}
 
           {isCorrecting ? (
@@ -171,7 +174,7 @@ function FactReviewCard({
               “{evidence.quote}”
             </blockquote>
             <p className="mt-3 text-xs font-semibold leading-5 text-[#445249]">
-              {document?.label ?? translated(language, "Reviewed procedure", "Procedimiento revisado")} · {evidence.location}
+              {document ? sourceTitle(document.id, document.label, language) : translated(language, "Reviewed procedure", "Procedimiento revisado")} · {sourceLocation(evidence.location, language)}
             </p>
             {sourceId ? (
               <div className="mt-3">

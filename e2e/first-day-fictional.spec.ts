@@ -5,6 +5,7 @@ import { expect, test, type Page } from "@playwright/test";
 
 import { competitionProof } from "../app/features/first-day/content/competition-proof";
 import { fictionalCase } from "../app/features/first-day/content/fictional-case";
+import { sourceLocation } from "../app/features/first-day/ui/first-day-copy";
 
 async function expectNoSeriousAxeViolations(page: Page) {
   const results = await new AxeBuilder({ page })
@@ -264,7 +265,7 @@ test("clean demo carries a sourced plan through English and Spanish", async ({ p
       const printPlan = page.locator(".fd-print-plan");
       await expect(printPlan).toBeVisible();
       await expect(printPlan.getByText(es ? "Fuentes:" : "Sources:").first()).toBeVisible();
-      await expect(printPlan.getByText("Gym", { exact: true })).toBeVisible();
+      await expect(printPlan.getByText(es ? "Gimnasio" : "Gym", { exact: true })).toBeVisible();
 
       await page.getByText(es ? "Más formas de guardar" : "More ways to save").click();
       const downloadPromise = page.waitForEvent("download");
@@ -278,7 +279,7 @@ test("clean demo carries a sourced plan through English and Spanish", async ({ p
         expect(task.evidenceIds.length, `${task.id} must retain a source`).toBeGreaterThan(0);
         const source = fictionalCase.evidence.find((item) => item.id === task.evidenceIds[0]);
         expect(source, `${task.id} must cite case evidence`).toBeDefined();
-        await expect(printPlan).toContainText(source!.location);
+        await expect(printPlan).toContainText(sourceLocation(source!.location, language));
       }
     });
   }

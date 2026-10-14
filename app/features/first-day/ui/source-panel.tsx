@@ -8,6 +8,7 @@ import type {
   Procedure,
 } from "../domain/types";
 import { DocumentIcon, ShieldIcon, XIcon } from "./icons";
+import { sourceLocation, sourceTitle } from "./first-day-copy";
 
 type SourcePanelProps = {
   evidence: Evidence;
@@ -56,10 +57,11 @@ export function SourcePanel({
 
   const isProcedure = Boolean(procedure);
   const isSpanish = language === "Español";
-  const label =
-    sourceDocument?.label ??
-    procedure?.sourceSection ??
-    (isSpanish ? "Fuente" : "Source");
+  const label = sourceDocument
+    ? sourceTitle(sourceDocument.id, sourceDocument.label, language)
+    : procedure
+      ? sourceTitle(procedure.id, procedure.sourceSection, language)
+      : isSpanish ? "Fuente" : "Source";
 
   return (
     <div className="fd-source-backdrop fixed inset-0 z-50 flex items-end justify-end bg-[#0d1b17]/45 p-0 backdrop-blur-sm">
@@ -110,7 +112,7 @@ export function SourcePanel({
               {isSpanish ? "Dónde aparece" : "Where this appears"}
             </p>
             <p className="mt-1 text-sm font-semibold text-[#24342e]">
-              {evidence.location}
+              {sourceLocation(evidence.location, language)}
             </p>
           </div>
 

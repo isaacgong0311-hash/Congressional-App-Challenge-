@@ -12,7 +12,11 @@ import {
 } from "../export/plan-document";
 import {
   FACT_ES,
+  factDisplayValue,
   localizedTaskCopy,
+  readableDate,
+  sourceLocation,
+  sourceTitle,
   STATE_META,
   translated,
   type Language,
@@ -79,7 +83,12 @@ function TaskSources({
     const document = caseData.documents.find((item) => item.id === evidence.documentId);
     const procedure = caseData.procedures.find((item) => item.id === evidence.procedureId);
     if (document?.status === "removed") return [];
-    return [`${document?.label ?? procedure?.sourceSection ?? translated(language, "Source", "Fuente")} · ${evidence.location}`];
+    const title = document
+      ? sourceTitle(document.id, document.label, language)
+      : procedure
+        ? sourceTitle(procedure.id, procedure.sourceSection, language)
+        : translated(language, "Source", "Fuente");
+    return [`${title} · ${sourceLocation(evidence.location, language)}`];
   }))];
   if (sources.length === 0) return null;
   return (
@@ -351,17 +360,17 @@ export function ExportStep({
             </div>
             <div className="space-y-3">
               {unresolved.map((conflict) => {
-                const values = caseData.facts
+                const conflictFacts = caseData.facts
                   .filter((fact) => conflict.factIds.includes(fact.id))
-                  .map((fact) => fact.originalValue);
+                  .map((fact) => factDisplayValue(fact.id, fact.originalValue, language));
                 return (
                   <div
                     className="rounded-2xl border border-[#efd69b] bg-[#fff9e9] p-4"
                     key={conflict.id}
                   >
-                    <p className="font-semibold">{conflict.label}</p>
+                    <p className="font-semibold">{translated(language, conflict.label, conflict.id === "conflict-orientation-location" ? "Lugar de orientación" : conflict.label)}</p>
                     <p className="mt-1 text-sm leading-6 text-[#66572f]">
-                      {values.join(" · ")}
+                      {conflictFacts.join(" · ")}
                     </p>
                   </div>
                 );
@@ -418,7 +427,7 @@ export function ExportStep({
             <ul className="mt-4 space-y-2">
               {dates.map((date) => (
                 <li className="rounded-2xl bg-[#f4f6f2] p-4 text-sm font-semibold" key={`${date.title}-${date.date}`}>
-                  {date.title} · {date.date}
+                  {(language === "Español" ? FACT_ES[date.uid.replace("lantern-", "")] : undefined) ?? date.title} · {readableDate(date.date, language, date.time)}
                 </li>
               ))}
             </ul>
@@ -440,7 +449,7 @@ export function ExportStep({
                       ? FACT_ES[fact.id] ?? fact.label
                       : fact.label}
                   </dt>
-                  <dd className="mt-2 font-semibold text-[#23342d]">{value}</dd>
+                  <dd className="mt-2 font-semibold text-[#23342d]">{factDisplayValue(fact.id, value, language)}</dd>
                 </div>
               ))}
             </dl>

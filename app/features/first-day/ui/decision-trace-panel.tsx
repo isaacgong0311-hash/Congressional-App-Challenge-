@@ -7,6 +7,9 @@ import {
   FACT_ES,
   FACT_STATE_META,
   STATE_META,
+  factDisplayValue,
+  sourceLocation,
+  sourceTitle,
   translated,
   type Language,
 } from "./first-day-copy";
@@ -206,7 +209,7 @@ export function DecisionTracePanel({
                       translated(language, "Procedure record", "Registro del procedimiento")}
                   </p>
                   <blockquote>“{node.detail}”</blockquote>
-                  <p className="fd-trace-provenance">{node.label}</p>
+                  <p className="fd-trace-provenance">{sourceLocation(node.label, language)}</p>
                 </article>
               );
             })}
@@ -222,7 +225,7 @@ export function DecisionTracePanel({
               </summary>
               {procedures.map((node) => (
                 <p key={node.id}>
-                  <b>{node.label}:</b> {node.detail}
+                  <b>{sourceTitle(node.sourceId, node.label, language)}:</b> {node.detail}
                 </p>
               ))}
             </details>
@@ -244,7 +247,7 @@ export function DecisionTracePanel({
                   </p>
                   <StatePill language={language} node={node} />
                 </div>
-                <p className="fd-trace-value">{node.detail}</p>
+                <p className="fd-trace-value">{node.sourceId ? factDisplayValue(node.sourceId, node.detail, language) : node.detail}</p>
               </article>
             ))}
           </div>

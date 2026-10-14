@@ -170,6 +170,72 @@ export const DOCUMENT_ES: Record<string, string> = {
   "doc-follow-up-message": "Mensaje de seguimiento de la escuela",
 };
 
+const PROCEDURE_ES: Record<string, string> = {
+  "procedure-demo-registration": "Procedimiento ficticio de inscripción",
+  "procedure-demo-health": "Alternativa ficticia para el registro de salud",
+};
+
+export function sourceTitle(
+  id: string | undefined,
+  title: string,
+  language: Language,
+) {
+  if (language !== "Español" || !id) return title;
+  return DOCUMENT_ES[id] ?? PROCEDURE_ES[id] ?? title;
+}
+
+export function sourceLocation(location: string, language: Language) {
+  if (language !== "Español") return location;
+  const page = /^Page (\d+)(?:, (.+))?$/.exec(location);
+  if (page) {
+    const section: Record<string, string> = {
+      "enrollment paragraph": "párrafo de inscripción",
+      "orientation paragraph": "párrafo de orientación",
+      "first sentence": "primera oración",
+      "second sentence": "segunda oración",
+      "final sentence": "última oración",
+      "health instructions": "instrucciones de salud",
+    };
+    return `Página ${page[1]}${page[2] ? `, ${section[page[2]] ?? page[2]}` : ""}`;
+  }
+  const rule = /^Fictional demo rule, (registration|health records)$/.exec(location);
+  if (rule) return `Regla de demostración ficticia, ${rule[1] === "registration" ? "inscripción" : "registros de salud"}`;
+  return location;
+}
+
+export function readableDate(date: string, language: Language, time?: string) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date);
+  if (!match) return date;
+  const value = new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3])));
+  if (Number.isNaN(value.getTime()) || value.toISOString().slice(0, 10) !== date) return date;
+  const locale = language === "Español" ? "es-US" : "en-US";
+  const day = new Intl.DateTimeFormat(locale, { dateStyle: "long", timeZone: "UTC" }).format(value);
+  const clock = time && /^(\d{2})(\d{2})\d{2}$/.exec(time);
+  if (!clock) return day;
+  const at = new Date(Date.UTC(2020, 0, 1, Number(clock[1]), Number(clock[2])));
+  return `${day}, ${new Intl.DateTimeFormat(locale, { hour: "numeric", minute: "2-digit", timeZone: "UTC" }).format(at)}`;
+}
+
+export function factDisplayValue(
+  id: string,
+  value: string,
+  language: Language,
+) {
+  if (value === "Yes" || value === "Sí") return translated(language, "Yes", "Sí");
+  if (value === "No") return "No";
+  if (language !== "Español") return value;
+  const demoValues: Record<string, Record<string, string>> = {
+    "fact-registration-date": { "August 12, 2027 at 9:00 a.m.": "12 de agosto de 2027, 9:00 a. m." },
+    "fact-nurse-review": { "August 13, 2027 at 1:30 p.m. at the Welcome Center": "13 de agosto de 2027, 1:30 p. m., en el Centro de Bienvenida" },
+    "fact-registration-location": { "Mesa View Welcome Center, 145 Oak Street": "Centro de Bienvenida de Mesa View, 145 Oak Street" },
+    "fact-orientation-cafeteria": { "School cafeteria": "Cafetería de la escuela" },
+    "fact-orientation-gym": { "Gym": "Gimnasio" },
+    "fact-immunization-record": { "Availability not confirmed": "Disponibilidad sin confirmar" },
+    "fact-interpreter-preference": { "Not answered yet": "Aún no se ha respondido" },
+  };
+  return demoValues[id]?.[value] ?? value;
+}
+
 export const FACT_STATE_META: Record<
   ConfirmationState,
   { en: string; es: string; className: string }

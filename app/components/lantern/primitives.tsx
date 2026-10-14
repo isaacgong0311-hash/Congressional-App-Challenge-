@@ -169,17 +169,20 @@ export function AccessibilityControls({
   onToggleHighContrast,
   onToggleLargeText,
   compact = false,
+  language = "English",
 }: {
   highContrast: boolean;
   largeText: boolean;
   onToggleHighContrast: () => void;
   onToggleLargeText: () => void;
   compact?: boolean;
+  language?: "English" | "Español";
 }) {
+  const spanish = language === "Español";
   return (
-    <div aria-label="Reading preferences" className="flex items-center gap-2" role="group">
+    <div aria-label={spanish ? "Preferencias de lectura" : "Reading preferences"} className="flex items-center gap-2" role="group">
       <button
-        aria-label="Toggle large text"
+        aria-label={spanish ? "Alternar texto grande" : "Toggle large text"}
         aria-pressed={largeText}
         className={`fd-utility-button inline-flex ${
           largeText ? "border-cobalt bg-[#eef2ff] text-cobalt" : ""
@@ -190,7 +193,7 @@ export function AccessibilityControls({
         {compact ? "Aa" : "A+"}
       </button>
       <button
-        aria-label="Toggle high contrast"
+        aria-label={spanish ? "Alternar contraste alto" : "Toggle high contrast"}
         aria-pressed={highContrast}
         className={`fd-utility-button inline-flex ${
           highContrast ? "border-cobalt bg-[#eef2ff] text-cobalt" : ""

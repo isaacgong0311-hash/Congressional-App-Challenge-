@@ -28,6 +28,7 @@ function StepList({
         return (
           <li key={step.id}>
             <button
+              aria-label={language === "Español" ? step.es : step.en}
               aria-current={active ? "step" : undefined}
               className={`fd-step-button ${active ? "is-active" : ""}`}
               disabled={!canEnterLiveStep(caseData, step.id)}
@@ -120,7 +121,7 @@ export function WorkspaceProgress(props: WorkspaceProgressProps) {
         </div>
       </details>
 
-      <nav aria-label="First Day progress" className="fd-step-nav hidden lg:block">
+      <nav aria-label={translated(props.language, "First Day progress", "Progreso del primer día")} className="fd-step-nav hidden lg:block">
         <div className="mb-5 px-3">
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-muted">
             {translated(props.language, "Your path", "Su camino")}
