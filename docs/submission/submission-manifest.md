@@ -29,6 +29,8 @@ This file is the alignment record between code, deployment, video, captions, tra
 
 ## Current verification: 2026-10-10
 
+Note: the evaluation now covers 28 synthetic packets (`evaluation/first-day/report.json`). "20-packet" results below are dated records of earlier commits. No real pilot has run; see `docs/submission/pilot-plan.md`.
+
 The opening-copy and silent-rehearsal candidate is commit `7ac8adbf04c9cb4c52d3b416bbde0a1cc8c4c1eb`. Its [GitHub Actions run](https://github.com/isaacgong0311-hash/Congressional-App-Challenge-/actions/runs/38070837522) passed lint, unit tests, synthetic evaluation, build, Linux browser tests, and Lighthouse. Local checks on this candidate passed 159 unit tests and 85 browser tests with 7 intentional skips; Home Lighthouse performance was 96–97, First Day 95, accessibility 100, and layout shift 0. This candidate is not yet the public production release. The public version in the health response was still the prior `65103bb...` release at the last check.
 
 Local commit `65103bbbd5eb2ce93b097ce8ca0c83bdeef2dc0e` passed lint, 159 unit tests, the 20-packet synthetic evaluation, the production build, and 85 Playwright browser tests with 7 intentional skips. Lighthouse passed all assertions across six runs: Home performance 94–95, First Day 93–95, accessibility 100 on both routes, and cumulative layout shift 0. The public health endpoint returned 200 with `judgeDemo: true` and `liveDocumentReading: true`. Production smoke requests with the synthetic `public/sample-letter.png` returned a schema-valid First Day extraction in 3,946 ms and a schema-valid general Explain response in 3,424 ms. Optional speech and local-help integrations were unavailable. These checks establish availability and contract shape, not real-document accuracy or human usability.
@@ -41,7 +43,7 @@ The October 7 local test target is commit `12b7052` on `codex/frontend-overhaul`
 
 - `npm run lint`: passed.
 - `npm test`: 153 passed.
-- `npm run evaluate:first-day`: 20 synthetic packets, with the versioned results in `evaluation/first-day/report.md`.
+- `npm run evaluate:first-day`: 28 synthetic packets (current; earlier checks below used 20), with the versioned results in `evaluation/first-day/report.md`.
 - `npm run test:e2e`: 81 passed and 7 intentional skips on mobile and desktop Chromium against a production build.
 - `npx playwright test e2e/print-export.spec.ts`: 3 passed and 1 intentional mobile skip. The new test reads the downloaded JSON and checks unresolved conflict, source references, and omitted extracted text; it also checks printed unresolved/source details.
 
