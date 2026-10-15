@@ -4,8 +4,8 @@ This report is generated from synthetic, versioned packets. It does not call an 
 
 ## Dataset
 
-- Fixtures: 28
-- Scenarios: ambiguous dates (4), conflicting locations (4), cross language conflicts (4), documented alternatives (4), false positive traps (2), follow up corrections (4), spanish only (2), straightforward enrollment (4)
+- Fixtures: 32
+- Scenarios: ambiguous dates (5), conflicting locations (5), cross language conflicts (4), documented alternatives (4), false positive traps (4), follow up corrections (4), spanish only (2), straightforward enrollment (4)
 - Provider latency: not measured
 - Provider cost: not measured
 
@@ -13,21 +13,21 @@ This report is generated from synthetic, versioned packets. It does not call an 
 
 | Metric | Result |
 | --- | --- |
-| Fact precision | 46/46 (100.0%) |
-| Fact recall | 46/46 (100.0%) |
-| Exact-quote coverage | 46/46 (100.0%) |
-| Conflict recall | 12/12 |
-| Conflict false positives | 1 |
+| Fact precision | 54/54 (100.0%) |
+| Fact recall | 54/54 (100.0%) |
+| Exact-quote coverage | 54/54 (100.0%) |
+| Conflict recall | 14/14 |
+| Conflict false positives | 0 |
 | Cross-language conflict recall | 4/4 |
 | Spanish-only exact-quote coverage | 2/2 (100.0%) |
-| False-positive traps passed | 1/2 |
-| Unintended conflicts in false-positive traps | 1 |
-| Dates read correctly | 9/9 |
+| False-positive traps passed | 4/4 |
+| Unintended conflicts in false-positive traps | 0 |
+| Dates read correctly | 13/13 |
 | Ready-task source coverage | 34/34 (100.0%) |
 
 ## Measured limitations
 
-- false-positive-trap-02: expected 0 conflict(s), observed 1.
+None in this test set.
 
 ## Failures
 

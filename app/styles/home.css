@@ -1220,3 +1220,51 @@
     }
   }
 }
+
+.home-versus {
+  margin: 56px 0;
+}
+.home-versus h2 {
+  margin-bottom: 24px;
+  font-family: var(--font-playfair), Georgia, serif;
+  font-size: clamp(26px, 3vw, 36px);
+  line-height: 1.23;
+}
+.home-versus-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.home-versus-card {
+  border: 1px solid #c9cdb9;
+  border-radius: 13px;
+  padding: 22px;
+  background: #f4f3e9;
+  color: #2c4738;
+}
+.home-versus-card.is-lantern {
+  border-color: #2c4738;
+  border-width: 2px;
+}
+.home-versus-card > p {
+  margin-top: 10px;
+  font-size: 15px;
+  line-height: 1.6;
+}
+.home-versus-card .home-versus-note {
+  font-size: 13px;
+  color: #5e7257;
+}
+.home-versus .home-example-label {
+  color: #5e7257;
+}
+@media (max-width: 720px) {
+  .home-versus-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.home-versus-card .home-label {
+  display: block;
+  font-size: 11px;
+  color: #4d5d52;
+}

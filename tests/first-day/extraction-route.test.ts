@@ -178,6 +178,31 @@ describe("First Day extraction route", () => {
     });
   });
 
+  it("returns the verified facts when only some proposals are unsupported", async () => {
+    const log = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const handler = createExtractionHandler({
+      providerAvailable: () => true,
+      extractPage: async () => ({
+        ...providerResponse,
+        facts: [
+          providerResponse.facts[0],
+          {
+            ...providerResponse.facts[0],
+            clientKey: "invented",
+            quote: "Bring a passport.",
+          },
+        ],
+      }),
+      timeoutMs: 100,
+    });
+
+    const response = await handler(extractionRequest());
+    expect(response.status).toBe(200);
+    const body = await response.json() as { facts: Array<{ clientKey: string }> };
+    expect(body.facts.map((fact) => fact.clientKey)).toEqual(["registration-date"]);
+    expect(JSON.stringify(log.mock.calls)).not.toContain("Bring a passport");
+  });
+
   it("rejects a well-shaped fact whose quote is absent from the page", async () => {
     const log = vi.spyOn(console, "error").mockImplementation(() => undefined);
     const handler = createExtractionHandler({

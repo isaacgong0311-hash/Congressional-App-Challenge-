@@ -1,5 +1,6 @@
 import { validateEvidence } from "../domain/evidence";
 import type { AdaptedExtraction } from "../domain/extraction";
+import { canonicalizeSemanticKey } from "../domain/semantic-keys";
 import type {
   Evidence,
   Fact,
@@ -45,7 +46,7 @@ export function adaptLiveExtraction(
     facts.push({
       id: `fact-${response.documentId}-${proposal.clientKey}`,
       kind: proposal.kind,
-      semanticKey: proposal.semanticKey,
+      semanticKey: canonicalizeSemanticKey(proposal.semanticKey),
       label: proposal.label,
       originalValue: proposal.originalValue,
       ...(proposal.normalizedValue

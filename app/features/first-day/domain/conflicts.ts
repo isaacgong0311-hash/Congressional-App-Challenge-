@@ -1,4 +1,6 @@
 import { appendSchoolConfirmation } from "./events";
+import { canonicalizeSemanticKey } from "./semantic-keys";
+import { valuesEquivalent } from "./value-normalization";
 import type {
   Conflict,
   Dependency,
@@ -45,15 +47,24 @@ function activeFacts(caseData: FirstDayCase) {
   });
 }
 
-function comparisonValue(fact: Fact) {
-  return (fact.normalizedValue ?? fact.originalValue).trim();
+// Counts how many genuinely different values a group of facts carries.
+// Equivalent wording (case, accents, English/Spanish names, the same date in
+// different forms) collapses into one value.
+function distinctValueCount(facts: Fact[]): number {
+  const representatives: Fact[] = [];
+  for (const fact of facts) {
+    if (!representatives.some((item) => valuesEquivalent(item, fact))) {
+      representatives.push(fact);
+    }
+  }
+  return representatives.length;
 }
 
 export function detectConflicts(caseData: FirstDayCase): Conflict[] {
   const groups = new Map<string, Fact[]>();
   for (const fact of activeFacts(caseData)) {
-    const semanticKey = fact.semanticKey;
-    if (!semanticKey) continue;
+    if (!fact.semanticKey) continue;
+    const semanticKey = canonicalizeSemanticKey(fact.semanticKey);
     groups.set(semanticKey, [...(groups.get(semanticKey) ?? []), fact]);
   }
 
@@ -63,7 +74,7 @@ export function detectConflicts(caseData: FirstDayCase): Conflict[] {
   const conflicts: Conflict[] = [];
 
   for (const [semanticKey, facts] of groups) {
-    if (new Set(facts.map(comparisonValue)).size < 2) continue;
+    if (distinctValueCount(facts) < 2) continue;
 
     const id = `conflict-${semanticKey.replaceAll(".", "-")}`;
     const factIds = facts.map((fact) => fact.id).sort();

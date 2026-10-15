@@ -128,6 +128,12 @@ Provider pricing and retention terms are external and may change. The project do
 - Repaired the six-beat screen rehearsal for the reviewed school-answer step and source questions. The October 14 silent local draft runs 2:40; inspected frames show both orientation quotes together and the final synthetic-evidence panel. It still needs narration, captions, a public upload, and release alignment.
 - Final local gate: lint, 188 unit tests, and a production build passed. TypeScript passed after the build refreshed generated Next.js types. The updated macOS visual references passed all four viewports; four focused mobile/desktop live-source and empty-page checks passed. Linux visual references and remote CI have not been refreshed for this candidate.
 
+## 2026-10-15 — Production release and main integration
+
+- Pushed the source-question release and refreshed 26 Linux visual references from GitHub Actions captures. CI passed on `4c1c8d3`; the public site served that commit with live document reading enabled, 13 signed-out smoke checks passed, and a synthetic source question returned only supplied IDs.
+- Added `.vercelignore` after a local rehearsal artifact exceeded Vercel's deployment file limit. A production-environment build then uploaded only app inputs and passed the provider preflight.
+- Integrated the newer `main` extraction and conflict improvements into the source-question branch. The combined 32-packet evaluation reports 54/54 exact quotes, 14/14 intended conflicts, and no unintended conflicts. Local lint, 205 unit tests, and build passed. A 1024 px fact-review visual changed because the equivalent orientation time is no longer counted as a second conflict; the updated image passed the focused four-viewport rerun. Remote CI and deployment for this integration remain pending.
+
 ## AI assistance disclosure
 
 OpenAI Codex assisted with:

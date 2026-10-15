@@ -1,7 +1,7 @@
 # Lantern submission manifest
 
 **Manifest status:** Preparation in progress  
-**Last local verification:** 2026-10-14
+**Last local verification:** 2026-10-15
 **Submission target:** 2026-10-24, ahead of the official deadline
 
 This file is the alignment record between code, deployment, video, captions, transcript, written answers, evidence, and the final form. A status changes only after its evidence exists.
@@ -10,14 +10,14 @@ This file is the alignment record between code, deployment, video, captions, tra
 | --- | --- | --- |
 | Decision Trace code | Implemented and locally verified | Commits `05218e2`, `0ba9527`, and `5f4f0bf` |
 | Editorial frontend renovation | Implemented and locally verified | Approved design and implementation plan; code commit `90b3ae9`; Home, First Day, and Explain visual baselines refreshed |
-| First Day trust and mobile repair | Implemented and locally verified; release verification pending | Shared readiness summary, school-answer review and confirmation, outcome-aware plan and export, linear flow, and 390 px visibility assertions. Local visual captures reviewed; Linux visual baselines and remote CI verification are pending. |
-| Source-cited questions | Implemented and locally verified; release verification pending | Fictional bilingual local matching, live Groq source-ID ranking with exact original quotes, two-sided conflict display, and local fallback. Focused mobile and desktop checks passed; a synthetic live Groq call returned only supplied IDs. Linux visual baselines and remote CI verification are pending. |
+| First Day trust and mobile repair | Implemented and verified on the October 15 source-question release; integrated release pending | Shared readiness summary, school-answer review and confirmation, outcome-aware plan and export, linear flow, and 390 px visibility assertions. Source-question CI passed; the integrated candidate needs its own CI and deployment checks. |
+| Source-cited questions | Live on the October 15 source-question release; integrated release pending | Fictional bilingual local matching, live Groq source-ID ranking with exact original quotes, two-sided conflict display, and local fallback. Public synthetic source-ranking request returned only the two supplied IDs. |
 | Backend trust boundary | Implemented and locally verified | Release-candidate code commit `7c55e22`; shared contracts, capability reporting, bounded provider routes, safe diagnostics, zero-API judge-path test, and live synthetic Groq smoke evidence |
 | Usability protocol | Ready; zero sessions recorded | `evaluation/usability/report.md` says Not started; `docs/submission/usability-run-kit.md` provides the invitation and session checklist |
 | Written answers | Form-ready draft prepared; personal fields still need confirmation | `docs/submission/form-ready-answers.md` and `docs/submission/written-answers.md` |
 | Demo script | Drafted for a 2:45–2:55 take | `docs/submission/demo-script.md` |
 | Cover image | 600×800 JPEG captured from the public app; not uploaded to the form | `docs/submission/cover-photo.jpg` (56 KB) |
-| Decision Trace deployment | Current working tree is not deployed | On 2026-10-10, the public `/api/health` reported version `65103bbbd5eb2ce93b097ce8ca0c83bdeef2dc0e`, matching local `HEAD` at the time; `/` and `/first-day?demo=1` returned 200. Recheck the public version after the next release. |
+| Integrated deployment | Pending | On October 15, the public `/api/health` reported source-question commit `4c1c8d3ff976ff520d63c3fda3e4c7110b6d3919` on deployment `dpl_GscDmDxtb9gRab2LaZfuryxRyDrJ`, with live document reading enabled. The merged 32-packet candidate still needs deployment. |
 | Final release commit | Not selected | Select only after deployment verification and any final fixes |
 | Final Git tag | Not created | Create an immutable annotated tag after selecting the release commit |
 | Video | Not recorded | Record from the verified Decision Trace deployment |
@@ -29,11 +29,13 @@ This file is the alignment record between code, deployment, video, captions, tra
 | Congressional App Challenge form | Not submitted | Submit only after every required field and link is verified |
 | Submission confirmation | Does not exist | Save the confirmation only after successful submission |
 
-## Current verification: 2026-10-14
+## Current verification: 2026-10-15
 
-The October 14 candidate passed lint, 188 unit tests in 44 files, the 28-packet synthetic evaluation, a production build, 133 browser checks with 7 intentional skips on the refreshed macOS references, and 8 focused browser checks with 4 intentional skips after the last copy and Documents-step changes. Local Lighthouse assertions and a production dependency audit with zero findings also passed. The Linux visual baseline and remote CI status are recorded in the [fact sheet](fact-sheet.md). These local checks are not a CI or public deployment result. The public video, human usability findings, final release commit, captions, transcript, and submission confirmation do not yet exist.
+The integrated candidate passed lint, 205 unit tests in 46 files, the 32-packet synthetic evaluation, and a production build. The local browser suite passed 132 checks with 7 intentional skips; one expected macOS fact-review image was refreshed and the focused four-viewport visual rerun passed. The preceding source-question release passed [GitHub Actions CI](https://github.com/isaacgong0311-hash/Congressional-App-Challenge-/actions/runs/38741219210), deployed, passed 13 signed-out public smoke tests, and answered a synthetic source-ranking request with only supplied IDs. These results do not establish real-document accuracy or human usability. The integrated candidate has no CI or deployment result yet. The public video, human usability findings, final release commit, captions, transcript, and submission confirmation do not yet exist.
 
 ## Prior verification: 2026-10-10
+
+Note: the evaluation now covers 32 synthetic packets (`evaluation/first-day/report.json`). "20-packet" and "28-packet" results below are dated records of earlier commits. No real pilot has run; see `docs/submission/pilot-plan.md`.
 
 The opening-copy and silent-rehearsal candidate is commit `7ac8adbf04c9cb4c52d3b416bbde0a1cc8c4c1eb`. Its [GitHub Actions run](https://github.com/isaacgong0311-hash/Congressional-App-Challenge-/actions/runs/38070837522) passed lint, unit tests, synthetic evaluation, build, Linux browser tests, and Lighthouse. Local checks on this candidate passed 159 unit tests and 85 browser tests with 7 intentional skips; Home Lighthouse performance was 96–97, First Day 95, accessibility 100, and layout shift 0. This candidate is not yet the public production release. The public version in the health response was still the prior `65103bb...` release at the last check.
 
@@ -47,7 +49,7 @@ The October 7 local test target is commit `12b7052` on `codex/frontend-overhaul`
 
 - `npm run lint`: passed.
 - `npm test`: 153 passed.
-- `npm run evaluate:first-day`: 20 synthetic packets, with the versioned results in `evaluation/first-day/report.md`.
+- `npm run evaluate:first-day`: 20 synthetic packets at this older checkpoint, with the current 32-packet versioned results in `evaluation/first-day/report.md`.
 - `npm run test:e2e`: 81 passed and 7 intentional skips on mobile and desktop Chromium against a production build.
 - `npx playwright test e2e/print-export.spec.ts`: 3 passed and 1 intentional mobile skip. The new test reads the downloaded JSON and checks unresolved conflict, source references, and omitted extracted text; it also checks printed unresolved/source details.
 
@@ -68,7 +70,7 @@ This local gate does not verify a public deployment of commit `12b7052`.
 
 Optional server speech and local-help search were not exercised because their provider credentials are not configured. The app reports those capabilities as unavailable and retains its documented fallbacks; they are not required for the judge demo or the verified First Day journey.
 
-The earlier checks alone did not prove deployment. The public health version matched the October 10 audited code commit, before the subsequent opening-copy candidate. The video does not yet exist and the application has not been submitted.
+Those earlier checks alone did not prove deployment. The public health version at that time matched the October 10 audited code commit. The current public version is recorded above; the video does not yet exist and the application has not been submitted.
 
 ## Final alignment record
 

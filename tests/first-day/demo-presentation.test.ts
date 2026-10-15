@@ -101,15 +101,15 @@ describe("guided competition presentation", () => {
   });
 
   it("uses the versioned evaluation proof expected by every frontend surface", () => {
-    expect(competitionProof.packetCount).toBe(28);
+    expect(competitionProof.packetCount).toBe(32);
     expect(
       Object.fromEntries(
         competitionProof.metrics.map((metric) => [metric.id, metric.value]),
       ),
     ).toEqual({
-      quotes: "46/46",
-      conflicts: "12/12",
-      dates: "9/9",
+      quotes: "54/54",
+      conflicts: "14/14",
+      dates: "13/13",
       tasks: "34/34",
     });
   });

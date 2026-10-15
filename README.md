@@ -35,7 +35,7 @@ The Documents step also lets a family ask a question and inspect matching source
 | `/first-day/how-it-works` | Technical explanation and evaluation limits |
 | `/explain` | General letter explanation tool |
 | `/about` | Project background and independent public-source example |
-| `/contact` | Feedback and pilot inquiries |
+| `/contact` | Feedback and future-pilot inquiries |
 | `/privacy` | Data handling and provider boundaries |
 
 Unknown paths use a branded 404 page. The server also provides validated API routes for page extraction, source ranking, letter explanation, grounded follow-up, field translation, optional speech, optional local help, and capability health checks.

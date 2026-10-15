@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { validatePageProposals } from "../../app/features/first-day/server/validate-page";
+import {
+  filterPageProposals,
+  validatePageProposals,
+} from "../../app/features/first-day/server/validate-page";
 import { FirstDayExtractionSchema } from "../../app/features/first-day/server/extraction-schema";
 
 const page = FirstDayExtractionSchema.parse({
@@ -43,5 +46,28 @@ describe("provider page proposal validation", () => {
       ...page,
       facts: [page.facts[0], { ...page.facts[0] }],
     })).toContain("duplicate_client_key");
+  });
+
+  it("rejects a value the quote does not state", () => {
+    expect(validatePageProposals({
+      ...page,
+      facts: [{ ...page.facts[0], originalValue: "Passport" }],
+    })).toEqual(["value_not_in_quote"]);
+  });
+
+  it("keeps verified proposals and drops only the unsupported ones", () => {
+    const result = filterPageProposals({
+      ...page,
+      facts: [
+        page.facts[0],
+        { ...page.facts[0], clientKey: "invented", quote: "Bring a passport." },
+        { ...page.facts[0], clientKey: "wrong-value", originalValue: "Passport" },
+      ],
+    });
+    expect(result.page.facts.map((fact) => fact.clientKey)).toEqual(["birth-certificate"]);
+    expect(result.dropped).toEqual([
+      { clientKey: "invented", issue: "quote_not_found" },
+      { clientKey: "wrong-value", issue: "value_not_in_quote" },
+    ]);
   });
 });

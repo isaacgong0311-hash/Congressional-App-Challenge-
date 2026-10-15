@@ -270,6 +270,24 @@ export default function HomeContent() {
             </div>
           </div>
         </section>
+        <section className="home-container" aria-labelledby="versus-title">
+          <div className="home-versus">
+            <h2 id="versus-title">{copy("A smooth summary can hide the problem.", "Un resumen fluido puede ocultar el problema.")}</h2>
+            <div className="home-versus-grid">
+              <article className="home-versus-card">
+                <span className="home-label">{copy("A generic summary (illustrative)", "Un resumen genérico (ilustrativo)")}</span>
+                <p>{copy("“Orientation is coming up. Go to the cafeteria and bring your documents.”", "“La orientación se acerca. Vaya a la cafetería y lleve sus documentos.”")}</p>
+                <p className="home-versus-note">{copy("Sounds sure. Never mentions the second letter said gym.", "Suena seguro. No menciona que la segunda carta decía gimnasio.")}</p>
+              </article>
+              <article className="home-versus-card is-lantern">
+                <span className="home-label">Lantern</span>
+                <p>{copy("“Two documents disagree: cafeteria vs. gym. Ask the school before you go.”", "“Dos documentos no coinciden: cafetería o gimnasio. Pregunte a la escuela antes de ir.”")}</p>
+                <p className="home-versus-note">{copy("Both exact quotes stay visible. You confirm the answer.", "Ambas citas exactas quedan visibles. Usted confirma la respuesta.")}</p>
+              </article>
+            </div>
+            <p className="home-example-label">{copy("The generic summary is an invented example of the failure Lantern is built to avoid, not output from a named product.", "El resumen genérico es un ejemplo inventado del error que Lantern busca evitar, no la respuesta de un producto específico.")}</p>
+          </div>
+        </section>
         <section
           className="home-section home-container home-support"
           aria-labelledby="trust-title"

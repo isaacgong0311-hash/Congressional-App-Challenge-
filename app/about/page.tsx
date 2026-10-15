@@ -123,7 +123,7 @@ export default function AboutPage() {
               tested with families and educators before pricing is set.
             </p>
             <Link className="mt-5 inline-flex font-bold text-cobalt underline decoration-cobalt/30 underline-offset-4" href="/contact">
-              Share feedback or ask about a pilot <ArrowUpRightIcon className="ml-2 h-5 w-5" />
+              Share feedback or ask about a future pilot <ArrowUpRightIcon className="ml-2 h-5 w-5" />
             </Link>
           </div>
         </section>
@@ -137,7 +137,7 @@ export default function AboutPage() {
               {aboutLimitsCopy(usabilityReport)}
             </p>
             <Link className="mt-6 inline-flex font-bold text-cobalt underline decoration-cobalt/30 underline-offset-4" href="/contact">
-              Share feedback or discuss a pilot <ArrowUpRightIcon className="ml-2 h-5 w-5" />
+              Share feedback or discuss a future pilot <ArrowUpRightIcon className="ml-2 h-5 w-5" />
             </Link>
           </div>
         </section>

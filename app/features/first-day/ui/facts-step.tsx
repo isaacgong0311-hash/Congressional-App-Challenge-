@@ -199,7 +199,18 @@ export function FactsStep(props: FactsStepProps) {
   const historyFacts = ordered.filter((fact) => currentFactView(caseData, fact).state === "superseded");
   const nextUnresolved = ordered.find((fact) => currentFactView(caseData, fact).state === "proposed");
   const pending = facts.filter((fact) => currentFactView(caseData, fact).state === "proposed").length;
-  const conflicts = facts.filter((fact) => currentFactView(caseData, fact).state === "conflicted").length;
+  const conflictedFactIds = new Set(
+    facts
+      .filter((fact) => currentFactView(caseData, fact).state === "conflicted")
+      .map((fact) => fact.id),
+  );
+  // Two disagreeing facts are one conflict, not two.
+  const openConflicts = caseData.conflicts.filter(
+    (conflict) =>
+      conflict.status === "open" &&
+      conflict.factIds.some((factId) => conflictedFactIds.has(factId)),
+  ).length;
+  const conflicts = openConflicts || conflictedFactIds.size;
 
   return (
     <section className="fd-enter">

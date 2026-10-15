@@ -187,7 +187,7 @@ export function demoOutcome(
     case "engineering_proof":
       return es
         ? `${competitionProof.packetCount} paquetes de prueba · límites de IA y código visibles`
-        : `${competitionProof.packetCount} held-out packets · AI and code boundaries made visible`;
+        : `${competitionProof.packetCount} test packets · AI and code boundaries made visible`;
   }
 }
 

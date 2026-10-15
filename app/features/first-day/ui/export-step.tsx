@@ -310,7 +310,7 @@ export function ExportStep({
             <p className="fd-proof-limit">
               {translated(
                 language,
-                `${competitionProof.packetCount} synthetic held-out packets. ${competitionProof.limitation}`,
+                `${competitionProof.packetCount} synthetic regression packets. ${competitionProof.limitation}`,
                 `${competitionProof.packetCount} paquetes sintéticos reservados. ${PROOF_LIMITATION_ES}`,
               )}
             </p>

@@ -8,7 +8,7 @@ import { SiteFooter } from "../components/lantern/site-footer";
 export const metadata: Metadata = {
   title: "Contact | Lantern",
   description:
-    "Share feedback on Lantern or start a conversation about a family or school pilot.",
+    "Share feedback on Lantern. No pilot has run yet. Pilot partners are welcome.",
 };
 
 const inquiryPaths = [
@@ -38,7 +38,7 @@ export default function ContactPage() {
       <ProductHeader active="contact" />
       <main className="info-page">
         <section className="info-shell info-hero">
-          <p className="lantern-eyebrow">Contact / pilot interest</p>
+          <p className="lantern-eyebrow">Contact / feedback</p>
           <h1 className="info-display">Help shape the next honest test.</h1>
           <p className="info-lead">
             Lantern is a student project, not a district service. If you see a
