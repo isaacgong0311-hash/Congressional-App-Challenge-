@@ -10,7 +10,7 @@
 
 ## What was verified
 
-- Lint, production build, 159 unit tests, and the 20-packet synthetic evaluation passed.
+- Lint, production build, 159 unit tests, and the 20-packet synthetic evaluation passed (dated record; current evaluation is 28 packets).
 - Playwright passed 85 browser checks across mobile and desktop Chromium; seven platform-specific checks were intentionally skipped. The suite covers the six-beat fictional case, source evidence, conflict resolution, Decision Trace, Spanish copy, keyboard access, exports, print, and controlled live-intake failures.
 - Lighthouse passed its configured thresholds in six runs. Home performance scored 94–95, First Day 93–95, accessibility 100 on both routes, and cumulative layout shift was 0. Largest contentful paint was roughly 2.7–3.2 seconds in the local runs.
 - The public home and judge URLs returned HTTP 200. `/api/health` reported the exact local commit, `judgeDemo: true`, and `liveDocumentReading: true`. Synthetic production requests returned valid First Day and general Explain contracts in 3,946 ms and 3,424 ms, respectively. These check availability and response shape; they do not establish real-document accuracy.

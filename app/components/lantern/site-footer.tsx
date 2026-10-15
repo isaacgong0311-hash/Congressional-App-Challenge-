@@ -26,7 +26,7 @@ export function SiteFooter({ language = "en" }: { language?: "en" | "es" }) {
           <Link className="hover:text-white" href={spanish ? "/explain?lang=es" : "/explain"}>{spanish ? "Explicar una carta" : "Explain a letter"}</Link>
           <Link className="hover:text-white" href="/first-day/how-it-works">{spanish ? "Cómo funciona" : "How it works"}</Link>
           <Link className="hover:text-white" href="/about">{spanish ? "Acerca del proyecto" : "About the project"}</Link>
-          <Link className="hover:text-white" href="/contact">{spanish ? "Contacto" : "Contact / pilot interest"}</Link>
+          <Link className="hover:text-white" href="/contact">{spanish ? "Contacto" : "Contact / feedback"}</Link>
           <Link className="hover:text-white" href="/privacy">{spanish ? "Privacidad" : "Privacy"}</Link>
           <a className="hover:text-white" href="https://github.com/isaacgong0311-hash/Congressional-App-Challenge-" rel="noreferrer" target="_blank">{spanish ? "Código fuente" : "Source code"}</a>
         </nav>
