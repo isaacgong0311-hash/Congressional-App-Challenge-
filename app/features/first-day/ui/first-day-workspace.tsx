@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import {
@@ -12,7 +13,6 @@ import { BlockerStep } from "./blocker-step";
 import { CaseSnapshot } from "./case-snapshot";
 import { DemoRibbon } from "./demo-ribbon";
 import { demoBeatIndex } from "./demo-presentation";
-import { DocumentsStep } from "./documents-step";
 import { ExportStep } from "./export-step";
 import { FactsStep } from "./facts-step";
 import { translated } from "./first-day-copy";
@@ -26,6 +26,8 @@ import {
   useFirstDayController,
 } from "./use-first-day-controller";
 import { WorkspaceProgress } from "./workspace-progress";
+
+const DocumentsStep = dynamic(() => import("./documents-step").then((module) => module.DocumentsStep));
 
 export function FirstDayWorkspace({
   initialCase,
@@ -159,13 +161,13 @@ export function FirstDayWorkspace({
                 </span>
               </Link>
               <span className="hidden h-5 w-px bg-ink/15 sm:block" />
-              <div className="flex min-w-0 items-center gap-2 font-bold tracking-[-0.02em]">
+              <div className="fd-header-identity flex min-w-0 items-center gap-2 font-bold tracking-[-0.02em]">
                 <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-ink text-amber shadow-sm">
                   <LanternIcon className="h-5 w-5" />
                 </span>
-                <span className="truncate">
-                  {translated(language, "Lantern", "Lantern")}{" "}
-                  <span className="font-medium text-muted">
+                <span className="fd-header-name">
+                  <span>Lantern</span>
+                  {" "}<span className="fd-header-subtitle font-medium text-muted">
                     {translated(language, "/ First Day", "/ Primer Día")}
                   </span>
                 </span>
@@ -244,7 +246,7 @@ export function FirstDayWorkspace({
         {demoMode && presentationMode === "standard" ? (
           <aside
             aria-label={translated(language, "Fictional demo", "Demo ficticia")}
-            className="fd-demo-notice print:hidden"
+            className={`fd-demo-notice print:hidden ${currentStep === "start" ? "" : "is-compact"}`}
           >
             <div>
               <strong>{translated(language, "Fictional demo", "Demo ficticia")}</strong>
@@ -308,6 +310,7 @@ export function FirstDayWorkspace({
                 onOpenSource={openSource}
                 onRemove={liveCase.remove}
                 onRetry={liveCase.retry}
+                providerCapability={providerCapability}
                 showDemoPrelude={
                   presentationMode === "guided_demo" &&
                   demoBeatId === "before_lantern"

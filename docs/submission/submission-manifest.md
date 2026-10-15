@@ -1,7 +1,7 @@
 # Lantern submission manifest
 
 **Manifest status:** Preparation in progress  
-**Last local verification:** 2026-10-10
+**Last local verification:** 2026-10-14
 **Submission target:** 2026-10-24, ahead of the official deadline
 
 This file is the alignment record between code, deployment, video, captions, transcript, written answers, evidence, and the final form. A status changes only after its evidence exists.
@@ -10,16 +10,18 @@ This file is the alignment record between code, deployment, video, captions, tra
 | --- | --- | --- |
 | Decision Trace code | Implemented and locally verified | Commits `05218e2`, `0ba9527`, and `5f4f0bf` |
 | Editorial frontend renovation | Implemented and locally verified | Approved design and implementation plan; code commit `90b3ae9`; Home, First Day, and Explain visual baselines refreshed |
+| First Day trust and mobile repair | Implemented and locally verified; release verification pending | Shared readiness summary, school-answer review and confirmation, outcome-aware plan and export, linear flow, and 390 px visibility assertions. Local visual captures reviewed; Linux visual baselines and remote CI verification are pending. |
+| Source-cited questions | Implemented and locally verified; release verification pending | Fictional bilingual local matching, live Groq source-ID ranking with exact original quotes, two-sided conflict display, and local fallback. Focused mobile and desktop checks passed; a synthetic live Groq call returned only supplied IDs. Linux visual baselines and remote CI verification are pending. |
 | Backend trust boundary | Implemented and locally verified | Release-candidate code commit `7c55e22`; shared contracts, capability reporting, bounded provider routes, safe diagnostics, zero-API judge-path test, and live synthetic Groq smoke evidence |
 | Usability protocol | Ready; zero sessions recorded | `evaluation/usability/report.md` says Not started; `docs/submission/usability-run-kit.md` provides the invitation and session checklist |
 | Written answers | Form-ready draft prepared; personal fields still need confirmation | `docs/submission/form-ready-answers.md` and `docs/submission/written-answers.md` |
 | Demo script | Drafted for a 2:45–2:55 take | `docs/submission/demo-script.md` |
 | Cover image | 600×800 JPEG captured from the public app; not uploaded to the form | `docs/submission/cover-photo.jpg` (56 KB) |
-| Decision Trace deployment | Prior audited code is live; the opening-copy candidate is not deployed | On 2026-10-10, the public `/api/health` reported version `65103bbbd5eb2ce93b097ce8ca0c83bdeef2dc0e`, matching local `HEAD` at the time; `/` and `/first-day?demo=1` returned 200. Recheck after the next release. |
+| Decision Trace deployment | Current working tree is not deployed | On 2026-10-10, the public `/api/health` reported version `65103bbbd5eb2ce93b097ce8ca0c83bdeef2dc0e`, matching local `HEAD` at the time; `/` and `/first-day?demo=1` returned 200. Recheck the public version after the next release. |
 | Final release commit | Not selected | Select only after deployment verification and any final fixes |
 | Final Git tag | Not created | Create an immutable annotated tag after selecting the release commit |
 | Video | Not recorded | Record from the verified Decision Trace deployment |
-| Silent rehearsal | Local 2:33 draft recorded from the opening-copy candidate; not a submission video | `tmp/judge-demo-draft.webm` is intentionally ignored by Git; regenerate with `npm run record:demo-draft` |
+| Silent rehearsal | Local 2:40 draft recorded October 14 from this working tree; both source quotes and final proof panel reviewed; not a submission video | `tmp/judge-demo-draft.webm` is intentionally ignored by Git; regenerate with `npm run record:demo-draft` |
 | Public video URL | Does not exist | Upload the accepted final take and test it signed out |
 | Captions | Not created | Create and review against the final take |
 | Transcript | Draft script only; final transcript does not exist | Transcribe the accepted final take |
@@ -27,7 +29,11 @@ This file is the alignment record between code, deployment, video, captions, tra
 | Congressional App Challenge form | Not submitted | Submit only after every required field and link is verified |
 | Submission confirmation | Does not exist | Save the confirmation only after successful submission |
 
-## Current verification: 2026-10-10
+## Current verification: 2026-10-14
+
+The October 14 candidate passed lint, 188 unit tests in 44 files, the 28-packet synthetic evaluation, a production build, 133 browser checks with 7 intentional skips on the refreshed macOS references, and 8 focused browser checks with 4 intentional skips after the last copy and Documents-step changes. Local Lighthouse assertions and a production dependency audit with zero findings also passed. The Linux visual baseline and remote CI status are recorded in the [fact sheet](fact-sheet.md). These local checks are not a CI or public deployment result. The public video, human usability findings, final release commit, captions, transcript, and submission confirmation do not yet exist.
+
+## Prior verification: 2026-10-10
 
 The opening-copy and silent-rehearsal candidate is commit `7ac8adbf04c9cb4c52d3b416bbde0a1cc8c4c1eb`. Its [GitHub Actions run](https://github.com/isaacgong0311-hash/Congressional-App-Challenge-/actions/runs/38070837522) passed lint, unit tests, synthetic evaluation, build, Linux browser tests, and Lighthouse. Local checks on this candidate passed 159 unit tests and 85 browser tests with 7 intentional skips; Home Lighthouse performance was 96–97, First Day 95, accessibility 100, and layout shift 0. This candidate is not yet the public production release. The public version in the health response was still the prior `65103bb...` release at the last check.
 

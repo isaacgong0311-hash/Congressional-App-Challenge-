@@ -107,6 +107,18 @@ export const fictionalCase: FirstDayCase = {
       location: "Page 3, second sentence",
     },
     {
+      id: "evidence-orientation-time-welcome",
+      documentId: "doc-welcome-letter",
+      quote: "on August 14, 2027 at 5:30 p.m.",
+      location: "Page 1, orientation paragraph",
+    },
+    {
+      id: "evidence-orientation-time-follow-up",
+      documentId: "doc-follow-up-message",
+      quote: "la orientación es el 14 de agosto de 2027 a las 5:30 p. m.",
+      location: "Page 3, first sentence",
+    },
+    {
       id: "evidence-interpreter-offer",
       documentId: "doc-follow-up-message",
       quote:
@@ -162,6 +174,16 @@ export const fictionalCase: FirstDayCase = {
       normalizedValue: "2027-08-13T13:30:00",
       evidenceIds: ["evidence-nurse-review", "evidence-nurse-alternative"],
       confirmationState: "proposed",
+    },
+    {
+      id: "fact-orientation-time",
+      kind: "appointment",
+      semanticKey: "orientation.time",
+      label: "Family orientation",
+      originalValue: "August 14, 2027 at 5:30 p.m.",
+      normalizedValue: "2027-08-14T17:30:00",
+      evidenceIds: ["evidence-orientation-time-welcome", "evidence-orientation-time-follow-up"],
+      confirmationState: "confirmed",
     },
     {
       id: "fact-orientation-cafeteria",
@@ -244,6 +266,7 @@ export const fictionalCase: FirstDayCase = {
           { type: "fact", factId: "fact-orientation-gym" },
         ],
       },
+      targetDateFactId: "fact-orientation-time",
     },
     {
       id: "task-interpreter",

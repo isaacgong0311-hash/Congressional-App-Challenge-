@@ -2,6 +2,8 @@ export type TeamMember = { name: string; role: string };
 
 export const team: readonly TeamMember[] = [
   { name: "Isaac Gong", role: "Creator and project lead" },
+  { name: "Karthik Devarasetty", role: "Project partner" },
+  { name: "Vihan Santhosh", role: "Project partner" },
 ];
 
 function names(members: readonly TeamMember[], language: "en" | "es") {

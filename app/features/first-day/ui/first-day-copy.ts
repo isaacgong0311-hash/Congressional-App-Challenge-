@@ -98,7 +98,22 @@ export const TASK_ES: Record<
   },
 };
 
-export function localizedTaskCopy(task: DerivedTask, language: Language) {
+export function localizedTaskCopy(task: DerivedTask, language: Language, caseData?: FirstDayCase) {
+  if (task.id === "task-orientation" && caseData) {
+    const answer = [...caseData.events].reverse().find(
+      (event) => event.type === "school_confirmation_recorded" && event.conflictId === "conflict-orientation-location",
+    );
+    if (answer?.type === "school_confirmation_recorded") {
+      const place = factDisplayValue(answer.selectedFactId, answer.reportedValue, language);
+      const article = answer.selectedFactId === "fact-orientation-cafeteria" ? "la" : "el";
+      return {
+        ...task,
+        title: translated(language, "Orientation location confirmed", "Lugar de orientación confirmado"),
+        action: translated(language, `Attend orientation at the ${place.toLowerCase()}.`, `Asista a la orientación en ${article} ${place.toLowerCase()}.`),
+        detail: translated(language, `The school confirmed: ${place}.`, `La escuela confirmó: ${place}.`),
+      };
+    }
+  }
   if (language !== "Español") return task;
   const fictional = TASK_ES[task.id];
   if (fictional) return { ...task, ...fictional };
@@ -159,6 +174,7 @@ export const FACT_ES: Record<string, string> = {
   "fact-registration-location": "Lugar de inscripción",
   "fact-immunization-record": "¿Tiene el registro de vacunas de Maya?",
   "fact-nurse-review": "Revisión con la enfermera",
+  "fact-orientation-time": "Orientación familiar",
   "fact-orientation-cafeteria": "Carta de bienvenida: cafetería",
   "fact-orientation-gym": "Mensaje de seguimiento: gimnasio",
   "fact-interpreter-preference": "¿Necesita un intérprete?",

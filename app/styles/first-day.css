@@ -18,6 +18,18 @@
   backdrop-filter: blur(18px);
 }
 
+.fd-header-name {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  column-gap: 0.35rem;
+  line-height: 1.2;
+}
+
+.fd-header-subtitle {
+  white-space: nowrap;
+}
+
 .fd-back-link,
 .fd-utility-button,
 .fd-icon-button,
@@ -94,6 +106,17 @@
   padding: 0.9rem 1rem;
 }
 
+@media (max-width: 480px) {
+  .fd-header .fd-header-name { display: flex; flex-direction: column; font-size: 0.8125rem; }
+  .fd-header .fd-header-subtitle { font-size: 0.6875rem; }
+  .fd-header .fd-header-identity { gap: 0.4rem; }
+  .fd-header .fd-header-identity > span:first-child { width: 2rem; height: 2rem; }
+  .fd-header > div:first-child { gap: 0.5rem; padding-block: 0.5rem; }
+  .fd-header > div:nth-child(2) { padding-bottom: 0.4rem; }
+  .fd-mobile-progress summary { align-items: flex-start; flex-direction: column; gap: 0.4rem; min-height: 0; padding: 0.7rem 0.85rem; }
+  .fd-mobile-progress summary > span:last-child { justify-content: flex-start; text-align: left; width: 100%; }
+}
+
 .fd-mobile-progress summary::-webkit-details-marker {
   display: none;
 }
@@ -123,6 +146,14 @@
   background: #eaf1e8;
   padding: 0.7rem max(1rem, calc((100vw - 1400px) / 2 + 2.5rem));
   color: #1d4b3a;
+}
+
+.fd-demo-notice.is-compact {
+  padding-block: 0.2rem;
+}
+
+.fd-demo-notice.is-compact > div:first-child > span {
+  display: none;
 }
 
 .fd-demo-notice > div:first-child {

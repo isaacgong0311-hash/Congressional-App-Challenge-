@@ -7,6 +7,7 @@ import { providerErrorSummary } from "../../lib/provider-error";
 import { readingUnavailable } from "../../lib/reading-service";
 import { READING_MODEL } from "../../lib/reading-model";
 import { apiError, apiJson, requestIdFrom, type ApiErrorCode } from "../../lib/server/http";
+import { isTrustedMutationRequest } from "../../lib/server/origin";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -197,6 +198,9 @@ export async function POST(req: Request) {
   const startedAt = Date.now();
   const fail = (code: ApiErrorCode, message: string, status: number, retryable: boolean) =>
     apiError({ code, message, requestId, retryable, status });
+  if (!isTrustedMutationRequest(req, process.env.NODE_ENV === "production")) {
+    return fail("INVALID_REQUEST", "This request is not allowed.", 403, false);
+  }
   let form: FormData;
   try {
     form = await req.formData();

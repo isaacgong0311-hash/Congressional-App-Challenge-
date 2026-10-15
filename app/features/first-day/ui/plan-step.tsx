@@ -1,4 +1,5 @@
 import { buildDecisionTrace } from "../domain/decision-trace";
+import { caseReadiness } from "../domain/readiness";
 import type { FirstDayCase, PlannerResult } from "../domain/types";
 import { DecisionTracePanel } from "./decision-trace-panel";
 import {
@@ -76,13 +77,11 @@ export function PlanStep({
               ?.relatedTaskIds.includes(highlightedTaskId),
         )
     : undefined;
+  const readiness = caseReadiness(caseData, plan);
   const summary = {
-    attention: plan.tasks.filter(
-      (task) =>
-        task.state === "needs_clarification" || task.state === "needs_review",
-    ).length,
+    attention: readiness.attentionTaskCount,
     ready: plan.tasks.filter((task) => task.state === "ready").length,
-    waiting: plan.tasks.filter((task) => task.state === "waiting").length,
+    waiting: readiness.waitingTaskCount,
     done: plan.tasks.filter((task) => task.state === "done").length,
   };
 
@@ -104,8 +103,8 @@ export function PlanStep({
         <p className="max-w-xs text-sm leading-6 text-muted">
           {translated(
             language,
-            "Task states come from confirmed facts, explicit dependencies, and reviewed procedures.",
-            "Los estados usan datos confirmados, dependencias explícitas y procedimientos revisados.",
+            "Your answers and the school pages shape each step. Anything uncertain stays visible.",
+            "Sus respuestas y las páginas escolares guían cada paso. Las dudas siguen a la vista.",
           )}
         </p>
       </div>
@@ -135,7 +134,7 @@ export function PlanStep({
                 {translated(
                   language,
                   `School answer: ${highlightedAnswer.reportedValue}`,
-                  `Respuesta de la escuela: ${highlightedAnswer.reportedValue}`,
+                  `Respuesta de la escuela: ${factDisplayValue(highlightedAnswer.selectedFactId, highlightedAnswer.reportedValue, language)}`,
                 )}
               </p>
             ) : null}
@@ -173,6 +172,16 @@ export function PlanStep({
         ))}
       </dl>
 
+      {readiness.unresolvedCount > 0 ? (
+        <p className="mt-4 rounded-xl border border-[#efd69b] bg-[#fff9e9] px-4 py-3 text-sm font-semibold text-[#684e18]" role="status">
+          {translated(
+            language,
+            `${readiness.unresolvedCount} items still need an answer or review before this plan is complete.`,
+            `${readiness.unresolvedCount} asuntos aún necesitan una respuesta o revisión antes de que este plan esté completo.`,
+          )}
+        </p>
+      ) : null}
+
       {bestNext ? (
         <div className="mt-5 rounded-feature border border-cobalt/20 bg-[#eef2ff] p-6 sm:flex sm:items-center sm:justify-between sm:gap-6">
           <div>
@@ -180,10 +189,10 @@ export function PlanStep({
               {translated(language, "Best next step", "Mejor paso siguiente")}
             </p>
             <p className="mt-2 text-sm font-bold text-ink">
-              {translated(language, "See the highlighted task in the plan below.", "Vea el paso destacado en el plan de abajo.")}
+              {localizedTaskCopy(bestNext, language, caseData).title}
             </p>
             <p className="mt-2 text-sm leading-6 text-[#53628b]">
-              {localizedTaskCopy(bestNext, language).action}
+              {localizedTaskCopy(bestNext, language, caseData).action}
             </p>
           </div>
           {bestNext.state === "needs_clarification" ? (
@@ -238,7 +247,7 @@ export function PlanStep({
                 </div>
                 <div className="space-y-3">
                   {tasks.map((task) => {
-                    const taskCopy = localizedTaskCopy(task, language);
+                    const taskCopy = localizedTaskCopy(task, language, caseData);
                     const supportCount = task.evidenceIds.length + task.procedureIds.length;
                     const supportingDocument = task.evidenceIds
                       .map((evidenceId) => caseData.evidence.find((evidence) => evidence.id === evidenceId))
@@ -271,6 +280,9 @@ export function PlanStep({
                               <span className={`fd-fact-state ${meta.className}`}>{language === "Español" ? meta.es : meta.en}</span>
                             </div>
                             <p className="mt-2 text-sm leading-6 text-[#52615a]">{taskCopy.action}</p>
+                            {task.id === "task-orientation" && taskCopy.title !== task.title ? (
+                              <p className="mt-1 text-sm font-semibold text-[#52615a]">{taskCopy.detail}</p>
+                            ) : null}
                             {confirmedDate ? (
                               <p className="mt-2 text-sm font-bold text-confirmed">
                                 {translated(language, "Confirmed date", "Fecha confirmada")}: {dateFact ? factDisplayValue(dateFact.id, confirmedDate, language) : confirmedDate}
@@ -285,7 +297,7 @@ export function PlanStep({
                               </summary>
                               <div className="border-t border-ink/10 pb-4 pt-3">
                                 <p className="text-xs font-medium leading-5 text-[#5f6d66]">
-                                  {language === "Español" ? taskCopy.detail : `${task.detail} ${task.reason}`}
+                                  {language === "Español" || task.id === "task-orientation" && taskCopy.title !== task.title ? taskCopy.detail : `${task.detail} ${task.reason}`}
                                 </p>
                                 <p className="mt-3 text-xs font-semibold text-muted">
                                   {translated(language, "Supported by", "Respaldado por")}: {supportingDocument ?? translated(language, `${supportCount} source record${supportCount === 1 ? "" : "s"}`, `${supportCount} registro${supportCount === 1 ? "" : "s"} de fuente`)}

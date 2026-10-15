@@ -4,7 +4,7 @@ import type {
   FirstDayCase,
   PlannerResult,
 } from "../domain/types";
-import { factHasActiveSource } from "../domain/evidence";
+import { caseReadiness } from "../domain/readiness";
 
 export type TaskFilter = "all" | "attention" | "ready" | "done";
 export type PresentationMode = "standard" | "guided_demo";
@@ -20,7 +20,10 @@ export type CaseSnapshotView = {
   documentCount: number;
   processedDocumentCount: number;
   pendingFactCount: number;
+  unclearFactCount: number;
   openConflictCount: number;
+  unresolvedCount: number;
+  attentionTaskCount: number;
   readyTaskCount: number;
   waitingTaskCount: number;
   completedTaskCount: number;
@@ -62,25 +65,17 @@ export function caseSnapshot(
   const activeDocuments = caseData.documents.filter(
     (document) => document.status !== "removed",
   );
+  const readiness = caseReadiness(caseData, plan);
   return {
     documentCount: activeDocuments.length,
     processedDocumentCount: activeDocuments.filter(
       (document) => document.status === "ready",
     ).length,
-    pendingFactCount: caseData.facts.filter((fact) => {
-      if (!factHasActiveSource(caseData, fact)) return false;
-      if (fact.confirmationState !== "proposed") return false;
-      return !caseData.events.some(
-        (event) =>
-          (event.type === "fact_confirmed" ||
-            event.type === "fact_corrected" ||
-            event.type === "fact_marked_unclear") &&
-          event.factId === fact.id,
-      );
-    }).length,
-    openConflictCount: caseData.conflicts.filter(
-      (conflict) => conflict.status === "open",
-    ).length,
+    pendingFactCount: readiness.pendingFactCount,
+    unclearFactCount: readiness.unclearFactCount,
+    openConflictCount: readiness.openConflictCount,
+    unresolvedCount: readiness.unresolvedCount,
+    attentionTaskCount: readiness.attentionTaskCount,
     readyTaskCount: plan.tasks.filter((task) => task.state === "ready").length,
     waitingTaskCount: plan.tasks.filter((task) => task.state === "waiting")
       .length,

@@ -5,6 +5,7 @@ import { providerErrorSummary } from "../../../lib/provider-error";
 import { readingUnavailable } from "../../../lib/reading-service";
 import { READING_MODEL } from "../../../lib/reading-model";
 import { apiError, apiJson, readBoundedJson, requestIdFrom } from "../../../lib/server/http";
+import { isTrustedMutationRequest } from "../../../lib/server/origin";
 
 const Message = z.object({ role: z.enum(["user", "assistant"]), content: z.string().trim().min(1).max(2_000) }).strict();
 const Context = z.object({
@@ -26,6 +27,7 @@ function prompt(body: AskBody) {
 export function createAskHandler(deps: AskDependencies) {
   return async (request: Request) => {
     const requestId = requestIdFrom(request.headers); const startedAt = Date.now();
+    if (!isTrustedMutationRequest(request, process.env.NODE_ENV === "production")) return apiError({ code: "INVALID_REQUEST", message: "This request is not allowed.", requestId, retryable: false, status: 403 });
     const parsed = await readBoundedJson(request, Body, 32_000);
     if (!parsed.ok) return apiError({ code: parsed.reason === "payload_too_large" ? "PAYLOAD_TOO_LARGE" : "INVALID_REQUEST", message: "Invalid request.", requestId, retryable: false, status: 400 });
     if (!deps.available()) return apiError({ code: "PROVIDER_UNAVAILABLE", message: readingUnavailable(parsed.data.language), requestId, retryable: true, status: 503 });

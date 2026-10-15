@@ -5,6 +5,7 @@ import { providerErrorSummary } from "../../../lib/provider-error";
 import { readingUnavailable } from "../../../lib/reading-service";
 import { READING_MODEL } from "../../../lib/reading-model";
 import { apiError, apiJson, readBoundedJson, requestIdFrom } from "../../../lib/server/http";
+import { isTrustedMutationRequest } from "../../../lib/server/origin";
 
 const Body = z.object({ text: z.string().trim().min(1).max(6_000), language: z.string().trim().min(2).max(40) }).strict();
 type Input = z.infer<typeof Body> & { signal: AbortSignal };
@@ -13,6 +14,7 @@ export type TranslateDependencies = { available: () => boolean; translate: (inpu
 export function createTranslateHandler(deps: TranslateDependencies) {
   return async (request: Request) => {
     const requestId = requestIdFrom(request.headers); const startedAt = Date.now();
+    if (!isTrustedMutationRequest(request, process.env.NODE_ENV === "production")) return apiError({ code: "INVALID_REQUEST", message: "This request is not allowed.", requestId, retryable: false, status: 403 });
     const parsed = await readBoundedJson(request, Body, 8_000);
     if (!parsed.ok) return apiError({ code: parsed.reason === "payload_too_large" ? "PAYLOAD_TOO_LARGE" : "INVALID_REQUEST", message: "Invalid translation request.", requestId, retryable: false, status: 400 });
     if (parsed.data.language.toLowerCase() === "english") return apiJson({ translation: parsed.data.text });

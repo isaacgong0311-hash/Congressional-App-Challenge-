@@ -4,9 +4,9 @@ import HomeContent from "./home-content";
 import "./styles/home.css";
 
 export const metadata: Metadata = {
-  title: "Lantern — Understand a letter. Know what to do next.",
+  title: "Lantern — A clear first day of school",
   description:
-    "Understand a confusing letter in your language, or turn school papers into a clear first-day plan.",
+    "First Day helps newcomer families review school letters, resolve conflicting instructions, and carry a source-linked enrollment plan.",
 };
 
 export default function HomePage() {

@@ -46,7 +46,7 @@ describe("DecisionTracePanel", () => {
     expect(html).not.toContain("fact-orientation-");
 
     const source = html.indexOf("Source evidence");
-    const facts = html.indexOf("Proposed facts");
+    const facts = html.indexOf("Details to review");
     const decision = html.indexOf("Human decision");
     const dependency = html.indexOf("Dependency logic");
     const result = html.indexOf("Plan result");

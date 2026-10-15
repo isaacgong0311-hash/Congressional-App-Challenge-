@@ -24,6 +24,8 @@ import {
   WarningIcon,
 } from "./icons";
 import { factHasActiveSource } from "./use-live-case";
+import { SourceQuestionPanel } from "./source-question-panel";
+import type { ProviderCapability } from "./use-provider-capability";
 
 export type DocumentsStepProps = {
   caseData: FirstDayCase;
@@ -35,6 +37,7 @@ export type DocumentsStepProps = {
   onRetry: (documentId: string) => void;
   onRemove: (documentId: string) => void;
   onOpenSource: SourceOpener;
+  providerCapability: ProviderCapability;
 };
 
 export function DocumentsStep({
@@ -46,6 +49,7 @@ export function DocumentsStep({
   onRetry,
   onRemove,
   onOpenSource,
+  providerCapability,
   showDemoPrelude,
 }: DocumentsStepProps) {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -92,8 +96,8 @@ export function DocumentsStep({
       <p className="fd-page-intro">
         {translated(
           language,
-          "Each page keeps its own identity, extracted text, and processing status. A failed page would not erase the others.",
-          "Cada página conserva su identidad, texto extraído y estado. Una página con error no borraría las demás.",
+          "Keep each school page together with the words Lantern read from it. If one page cannot be read, the others stay available.",
+          "Conserve cada página escolar junto con las palabras que Lantern leyó. Si una página no se puede leer, las demás siguen disponibles.",
         )}
       </p>
 
@@ -155,11 +159,20 @@ export function DocumentsStep({
           [visibleDocuments.length, "Pages added", "Páginas añadidas"],
           [readyPages, "Successfully read", "Leídas correctamente"],
           [failedPages, "Need attention", "Necesitan atención"],
-          [proposedFacts, "Proposed facts", "Datos propuestos"],
+          [proposedFacts, "Facts to check", "Datos por revisar"],
         ].map(([value, en, es]) => (
           <MetricCard key={String(en)} label={translated(language, String(en), String(es))} value={value} />
         ))}
       </div>
+
+      {caseData.mode === "fictional" ? (
+        <SourceQuestionPanel
+          caseData={caseData}
+          language={language}
+          onOpenSource={onOpenSource}
+          providerCapability={providerCapability}
+        />
+      ) : null}
 
       {caseData.mode === "live" ? (
         <div
@@ -331,8 +344,8 @@ export function DocumentsStep({
                     <p className="mt-2 text-xs font-semibold text-cobalt">
                       {translated(
                         language,
-                        `${documentFactCount} proposed fact${documentFactCount === 1 ? "" : "s"}`,
-                        `${documentFactCount} dato${documentFactCount === 1 ? "" : "s"} propuesto${documentFactCount === 1 ? "" : "s"}`,
+                        `${documentFactCount} fact${documentFactCount === 1 ? "" : "s"} to check`,
+                        `${documentFactCount} dato${documentFactCount === 1 ? "" : "s"} por revisar`,
                       )}
                     </p>
                   </div>
@@ -368,8 +381,8 @@ export function DocumentsStep({
                       <summary className="cursor-pointer text-sm font-semibold text-[#35453e]">
                         {translated(
                           language,
-                          "Read extracted text",
-                          "Leer el texto extraído",
+                          "Read page text",
+                          "Leer el texto de la página",
                         )}
                       </summary>
                       <p className="mt-4 whitespace-pre-wrap text-sm leading-6 text-[#5d6963]">
@@ -442,6 +455,15 @@ export function DocumentsStep({
         })}
       </div>
 
+      {caseData.mode === "live" && readyPages > 0 && activeFactCount > 0 ? (
+        <SourceQuestionPanel
+          caseData={caseData}
+          language={language}
+          onOpenSource={onOpenSource}
+          providerCapability={providerCapability}
+        />
+      ) : null}
+
       {caseData.mode === "live" && visibleDocuments.length === 0 ? (
         <div className="mt-5 rounded-3xl border border-dashed border-[#bfc9c2] bg-white/50 p-6 text-center">
           <p className="font-semibold">
@@ -474,8 +496,8 @@ export function DocumentsStep({
             <p className="mt-1">
               {translated(
                 language,
-                "Continue to compare each proposed fact with its exact source.",
-                "Continúe para comparar cada dato propuesto con su fuente exacta.",
+                "Continue to check each detail against the exact words on its page.",
+                "Continúe para comparar cada dato con las palabras exactas de su página.",
               )}
             </p>
           ) : null}

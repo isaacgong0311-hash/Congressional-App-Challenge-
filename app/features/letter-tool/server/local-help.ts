@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { providerErrorSummary } from "../../../lib/provider-error";
 import { apiError, apiJson, readBoundedJson, requestIdFrom } from "../../../lib/server/http";
+import { isTrustedMutationRequest } from "../../../lib/server/origin";
 
 const RequestSchema = z.object({ category: z.string().trim().min(1).max(60), city: z.string().trim().max(60).default(""), state: z.string().trim().min(2).max(60), language: z.string().trim().min(2).max(40).default("English") }).strict();
 const ResourceSchema = z.object({ name: z.string().trim().min(1).max(160), phone: z.string().trim().max(80).nullable(), address: z.string().trim().max(240).nullable(), url: z.string().url().refine((value) => /^https?:/i.test(value)).nullable(), desc: z.string().trim().min(1).max(500) }).strict();
@@ -10,6 +11,7 @@ export type LocalHelpDependencies = { available: () => boolean; search: (input: 
 export function createLocalHelpHandler(deps: LocalHelpDependencies) {
   return async (request: Request) => {
     const requestId = requestIdFrom(request.headers); const startedAt = Date.now();
+    if (!isTrustedMutationRequest(request, process.env.NODE_ENV === "production")) return apiError({ code: "INVALID_REQUEST", message: "This request is not allowed.", requestId, retryable: false, status: 403 });
     const parsed = await readBoundedJson(request, RequestSchema, 2_000);
     if (!parsed.ok) return apiError({ code: parsed.reason === "payload_too_large" ? "PAYLOAD_TOO_LARGE" : "INVALID_REQUEST", message: "Invalid search request.", requestId, retryable: false, status: 400 });
     if (!deps.available()) return apiError({ code: "PROVIDER_UNAVAILABLE", message: "Local search is unavailable. Use the verified directory below.", requestId, retryable: true, status: 503 });

@@ -117,6 +117,17 @@ Provider pricing and retention terms are external and may change. The project do
 - Rejected zero-byte images before the live queue creates a page. Added a bilingual in-place retry for provider availability and an explicit bilingual explanation when a successfully read page contains no reviewable facts. The mobile progress summary now reflects the locked next step.
 - Verified with lint, 159 unit tests, 20 synthetic held-out packets, a production build, and 85 passing browser tests with 7 intentional device skips. Local Lighthouse assertions passed on six runs: Home performance 96/96/96, First Day 94/94/94, accessibility 100 in every run, and CLS 0 throughout. These are local checks, not provider uptime or observed family outcomes.
 
+## 2026-10-14 — Source questions and trust sweep
+
+- Added bilingual source questions on the Documents step. The fictional case matches locally; configured live cases can ask Groq to rank IDs from short, source-checked excerpts. The server validates every returned ID and the interface displays the stored exact quotes, including both sides of a relevant conflict.
+- Added a separate, agreed orientation time to the fictional pages and a confirmed calendar date while preserving the disputed location as a school question.
+- Moved live source lookup below page intake, kept local matching available when the provider fails, and stated the extra provider data flow in the interface and privacy materials.
+- Enforced JSON request size while streaming and added production origin checks to text provider routes. Added focused unit and browser coverage for source questions, route limits, privacy-safe failures, and the bilingual no-provider demo.
+- A synthetic local-production request to the configured Groq route selected only the two supplied source IDs and returned HTTP 200. This verified provider wiring and the response contract, not performance or accuracy on real family records.
+- Split the Documents step from the initial First Day client bundle and checked that guided-demo and source-finder states still pass local visual comparisons. A second local Lighthouse run passed its assertions with First Day median performance 92, accessibility 100, and layout shift 0; run-to-run variation limits any claim about the exact gain.
+- Repaired the six-beat screen rehearsal for the reviewed school-answer step and source questions. The October 14 silent local draft runs 2:40; inspected frames show both orientation quotes together and the final synthetic-evidence panel. It still needs narration, captions, a public upload, and release alignment.
+- Final local gate: lint, 188 unit tests, and a production build passed. TypeScript passed after the build refreshed generated Next.js types. The updated macOS visual references passed all four viewports; four focused mobile/desktop live-source and empty-page checks passed. Linux visual references and remote CI have not been refreshed for this candidate.
+
 ## AI assistance disclosure
 
 OpenAI Codex assisted with:

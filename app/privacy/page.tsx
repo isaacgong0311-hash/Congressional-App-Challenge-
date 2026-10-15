@@ -17,7 +17,7 @@ const commitments = [
   {
     title: "Live uploads use an external provider",
     detail:
-      "Live reading sends each image to Groq over an encrypted connection. Follow-up questions and translations also send text to Groq. Closing the page clears Lantern’s in-memory case, not any provider logs.",
+      "Live reading sends each image to Groq over an encrypted connection. Asking a source question sends the question, page and fact labels, and short source quotes to Groq for matching; letter follow-ups and translations also send text. Closing the page clears Lantern’s in-memory case, not any provider logs.",
   },
   {
     title: "The fictional demo needs no provider",

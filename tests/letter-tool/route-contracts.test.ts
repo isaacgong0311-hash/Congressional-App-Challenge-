@@ -15,9 +15,23 @@ function jsonRequest(path: string, body: unknown) {
 
 afterEach(() => {
   vi.restoreAllMocks();
+  vi.unstubAllEnvs();
 });
 
 describe("grounded assistant route contract", () => {
+  it("rejects a foreign browser origin in production before calling the provider", async () => {
+    vi.stubEnv("NODE_ENV", "production");
+    const generate = vi.fn(async () => "unused");
+    const handler = createAskHandler({ available: () => true, generate, timeoutMs: 100 });
+    const response = await handler(new Request("https://lantern.test/api/ask", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", host: "lantern.test", origin: "https://foreign.test" },
+      body: JSON.stringify({ context: {} }),
+    }));
+    expect(response.status).toBe(403);
+    expect(generate).not.toHaveBeenCalled();
+  });
+
   it("rejects oversized messages before calling the provider", async () => {
     const generate = vi.fn(async () => "unused");
     const handler = createAskHandler({

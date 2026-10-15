@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { providerErrorSummary } from "../../../lib/provider-error";
 import { apiError, noStoreHeaders, readBoundedJson, requestIdFrom } from "../../../lib/server/http";
+import { isTrustedMutationRequest } from "../../../lib/server/origin";
 
 const RequestSchema = z.object({ text: z.string().trim().min(1).max(2_500), bcp47: z.string().trim().min(2).max(35).default("en") }).strict();
 type SpeechInput = z.infer<typeof RequestSchema> & { languageCode: string; signal: AbortSignal };
@@ -11,6 +12,7 @@ const decode = (text: string) => text.replace(/&amp;/g, "&").replace(/&lt;/g, "<
 export function createSpeechHandler(deps: SpeechDependencies) {
   return async (request: Request) => {
     const requestId = requestIdFrom(request.headers); const startedAt = Date.now();
+    if (!isTrustedMutationRequest(request, process.env.NODE_ENV === "production")) return apiError({ code: "INVALID_REQUEST", message: "This request is not allowed.", requestId, retryable: false, status: 403 });
     const parsed = await readBoundedJson(request, RequestSchema, 4_000);
     if (!parsed.ok) return apiError({ code: parsed.reason === "payload_too_large" ? "PAYLOAD_TOO_LARGE" : "INVALID_REQUEST", message: "Invalid speech request.", requestId, retryable: false, status: 400 });
     if (!deps.available()) return apiError({ code: "PROVIDER_UNAVAILABLE", message: "Server speech is unavailable. Browser speech is still available.", requestId, retryable: true, status: 503 });

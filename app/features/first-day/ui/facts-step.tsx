@@ -78,7 +78,7 @@ function FactReviewCard({
           <h2 className="mt-2 text-base font-semibold">{factLabel}</h2>
           {!familyQuestion && typeof fact.confidence === "number" ? (
             <p className="mt-2 text-xs text-[#68756e]">
-              {translated(language, `${fact.confidence}% extraction confidence`, `${fact.confidence}% de confianza de extracción`)}
+              {translated(language, `AI reading estimate: ${fact.confidence}%`, `Estimación de lectura de IA: ${fact.confidence}%`)}
             </p>
           ) : null}
             </div>

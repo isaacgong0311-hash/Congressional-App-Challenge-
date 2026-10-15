@@ -71,6 +71,18 @@ describe("server HTTP boundary", () => {
         32,
       ),
     ).resolves.toEqual({ ok: false, reason: "payload_too_large" });
+
+    await expect(
+      readBoundedJson(
+        new Request("http://lantern.test/api", {
+          method: "POST",
+          headers: { "Content-Length": "1000" },
+          body: JSON.stringify({ text: "safe" }),
+        }),
+        schema,
+        32,
+      ),
+    ).resolves.toEqual({ ok: false, reason: "payload_too_large" });
   });
 
   it("rejects a mismatched production browser origin", () => {

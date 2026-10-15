@@ -29,6 +29,7 @@ describe("provider API rate limit", () => {
   it("covers every provider-backed API route", () => {
     const limits = {
       "/api/first-day/extract": 10,
+      "/api/first-day/rank-sources": 20,
       "/api/ask": 40,
       "/api/translate-field": 20,
       "/api/speak": 30,

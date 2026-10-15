@@ -163,7 +163,7 @@ test("live intake preserves partial success, retry, removal, and late-response r
 
   await page.goto("/first-day");
   await page
-    .getByRole("button", { name: "Try the public-source example" })
+    .getByRole("button", { name: "Open the sample-page upload workspace" })
     .click();
   await page.getByLabel("School page images").setInputFiles([
     { name: "success.png", mimeType: "image/png", buffer: Buffer.from("synthetic-one") },
@@ -207,6 +207,64 @@ test("live intake preserves partial success, retry, removal, and late-response r
   await expectNoSeriousAxeViolations(page);
 });
 
+test("live source questions cite only supplied passages and recover from AI failure", async ({ page }) => {
+  await page.route("**/api/health", (route) => route.fulfill({
+    status: 200,
+    contentType: "application/json",
+    body: JSON.stringify({ status: "ok", capabilities: { liveDocumentReading: true } }),
+  }));
+  await page.route("**/api/first-day/extract", (route) => {
+    const documentId = multipartField(route, "documentId");
+    const requestId = multipartField(route, "requestId");
+    if (!documentId || !requestId) return route.fulfill({ status: 400, body: "{}" });
+    return route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify(extractionResponse(documentId, requestId, {
+        label: "Synthetic requirements",
+        text: "SYNTHETIC TEST PAGE\nBring a certified birth certificate.",
+        clientKey: "birth-certificate",
+        kind: "requested_item",
+        semanticKey: "registration.birth_certificate",
+        factLabel: "Certified birth certificate",
+        value: "Certified birth certificate",
+        quote: "Bring a certified birth certificate.",
+      })),
+    });
+  });
+
+  let rankingCalls = 0;
+  await page.route("**/api/first-day/rank-sources", (route) => {
+    rankingCalls += 1;
+    const body = route.request().postDataJSON() as { question: string; sources: Array<{ id: string; quote: string }> };
+    expect(body.question).toBe("What birth certificate is needed?");
+    expect(body.sources.map((source) => source.quote)).toContain("Bring a certified birth certificate.");
+    if (rankingCalls === 2) return route.fulfill({ status: 502, body: "{}" });
+    return route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ sourceIds: [body.sources[0].id], method: "ai-ranked" }),
+    });
+  });
+
+  await page.goto("/first-day");
+  await page.getByRole("button", { name: "Open the sample-page upload workspace" }).click();
+  await expect(page.getByRole("region", { name: "Ask about these pages." })).toHaveCount(0);
+  await page.getByLabel("School page images").setInputFiles({
+    name: "requirements.png", mimeType: "image/png", buffer: Buffer.from("synthetic"),
+  });
+  const panel = page.getByRole("region", { name: "Ask about these pages." });
+  await expect(panel).toBeVisible();
+  await panel.getByRole("textbox", { name: "Question about these pages" }).fill("What birth certificate is needed?");
+  await panel.getByRole("button", { name: "Find sources" }).click();
+  await expect(panel).toContainText("AI matched sources");
+  await expect(panel).toContainText("Bring a certified birth certificate.");
+  await panel.getByRole("button", { name: "Find sources" }).click();
+  await expect(panel).toContainText("Local source match · AI unavailable");
+  await expect(panel).toContainText("Bring a certified birth certificate.");
+  expect(rankingCalls).toBe(2);
+});
+
 test("live entry explains an unavailable provider and retries without reloading", async ({
   page,
 }) => {
@@ -224,7 +282,7 @@ test("live entry explains an unavailable provider and retries without reloading"
 
   await page.goto("/first-day");
   const liveButton = page.getByRole("button", {
-    name: "Try the public-source example",
+    name: "Open the sample-page upload workspace",
   });
   await expect(liveButton).toBeDisabled();
   await expect(
@@ -270,7 +328,7 @@ test("source-backed facts can be confirmed, corrected, or marked unclear in EN a
   for (const spanish of [false, true]) {
     await page.goto("/first-day");
     if (spanish) await page.getByRole("button", { name: "ES", exact: true }).click();
-    await page.getByRole("button", { name: spanish ? "Probar el ejemplo con fuentes públicas" : "Try the public-source example" }).click();
+    await page.getByRole("button", { name: spanish ? "Abrir espacio para subir páginas de ejemplo" : "Open the sample-page upload workspace" }).click();
     await page.getByLabel(spanish ? "Imágenes de páginas escolares" : "School page images").setInputFiles({
       name: "synthetic.png", mimeType: "image/png", buffer: Buffer.from("synthetic-test-page"),
     });
@@ -327,7 +385,7 @@ test("a successfully read page with no facts explains the next action", async ({
   });
 
   await page.goto("/first-day");
-  await page.getByRole("button", { name: "Try the public-source example" }).click();
+  await page.getByRole("button", { name: "Open the sample-page upload workspace" }).click();
   await page.getByLabel("School page images").setInputFiles({
     name: "unclear.png",
     mimeType: "image/png",
@@ -335,6 +393,7 @@ test("a successfully read page with no facts explains the next action", async ({
   });
   await expect(page.getByRole("article").filter({ hasText: "Unclear sample page" }).getByText("Text ready")).toBeVisible();
   await expect(page.getByText("No facts were found in the pages read so far.", { exact: false })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Ask about these pages." })).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Continue" })).toHaveCount(0);
   if (testInfo.project.name === "mobile-chromium") {
     await expect(page.getByText("Add a page with a fact")).toBeVisible();

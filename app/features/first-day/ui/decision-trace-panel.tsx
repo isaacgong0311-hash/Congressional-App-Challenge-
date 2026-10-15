@@ -234,7 +234,7 @@ export function DecisionTracePanel({
 
         <Stage
           index={2}
-          title={translated(language, "Proposed facts", "Datos propuestos")}
+          title={translated(language, "Details to review", "Datos por revisar")}
         >
           <div className="fd-trace-grid">
             {facts.map((node) => (
@@ -271,8 +271,8 @@ export function DecisionTracePanel({
                 <p className="fd-trace-provenance">
                   {translated(
                     language,
-                    "Recorded as an immutable case event",
-                    "Registrada como un evento inmutable del caso",
+                    "Your answer was recorded in this session",
+                    "Su respuesta quedó registrada en esta sesión",
                   )}
                 </p>
               </article>

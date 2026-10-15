@@ -14,15 +14,15 @@ Lantern helps newcomer families turn scattered school-enrollment instructions in
 
 School enrollment instructions often arrive across letters, health-office notes, follow-up messages, and web pages. Important dates and requirements are easy to separate from their source, and two messages can disagree. This is especially stressful for a family navigating a new school system or language.
 
-I built Lantern around a specific question: can software make the next step clearer without pretending uncertainty disappeared? The result is not a chatbot that simply summarizes a packet. Lantern keeps source passages attached to facts, asks the family to confirm what documents cannot know, preserves conflicts, and shows why each plan step is ready, waiting, or blocked.
+My project partners and I built Lantern around a specific question: can software make the next step clearer without pretending uncertainty disappeared? The result is not a chatbot that simply summarizes a packet. Lantern keeps source passages attached to facts, asks the family to confirm what documents cannot know, preserves conflicts, and shows why each plan step is ready, waiting, or blocked.
 
 ## Target audience
 
-The primary audience is newcomer families navigating school enrollment, including bilingual households and people helping a family interpret school instructions. The current complete demonstration uses a fictional district and family so it is safe, repeatable, and independent of private records. A secondary Round Rock ISD workflow is an independent, source-checked local pilot; it is not affiliated with, reviewed by, or endorsed by the district.
+The primary audience is newcomer families navigating school enrollment, including bilingual households and people helping a family interpret school instructions. The current complete demonstration uses a fictional district and family so it is safe, repeatable, and independent of private records. A secondary Round Rock ISD workflow is an independent, source-checked local example; it is not affiliated with, reviewed by, or endorsed by the district.
 
 ## How the app works
 
-First Day collects related pages as one case while preserving each document's identity. Runtime AI can propose structured facts only with exact supporting quotations. The family reviews unanswered questions. Deterministic TypeScript then evaluates explicit fact and task dependencies to build a plan.
+First Day collects related pages as one case while preserving each document's identity. A family can ask a question and inspect the matching original passages. Runtime AI can propose structured facts only with exact supporting quotations and, in a live case, rank supplied source IDs for the question. The family reviews unanswered questions. Deterministic TypeScript then evaluates explicit fact and task dependencies to build a plan.
 
 If sources disagree, Lantern creates a conflict instead of choosing an answer. The family can record what the school reports, which appends an immutable event. The planner recomputes only dependent steps. Decision Trace then shows the full path from source evidence to proposed facts, the human decision, dependency logic, and final task state. The family can switch between English and Spanish, print or save the plan, download its event history, and add complete confirmed dates to a calendar.
 
@@ -58,7 +58,7 @@ The next responsible step is not broad automatic advice. It is completing the sm
 
 ## AI assistance and reused code
 
-OpenAI Codex assisted with repository inspection, planning, code and test drafting, debugging, official-source review, browser verification, and documentation drafting. I reviewed and revised the work and am responsible for understanding every submitted component. Runtime AI is constrained to reading assistance and structured proposals; it does not resolve conflicts or derive task states.
+OpenAI Codex assisted with repository inspection, planning, code and test drafting, debugging, official-source review, browser verification, and documentation drafting. Karthik Devarasetty and Vihan Santhosh were my project partners. I reviewed and revised the work and am responsible for understanding every submitted component. Runtime AI is constrained to reading assistance, source matching, and structured proposals; it does not resolve conflicts or derive task states.
 
 Lantern: First Day builds from my public `TRANSLATEtheform` project. The original revision and imported capabilities are identified in the repository, alongside libraries, platforms, and the complete AI-development disclosure.
 

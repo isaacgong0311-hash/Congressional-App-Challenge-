@@ -168,8 +168,8 @@ export function demoOutcome(
                 : "still need family review"
           }`
         : es
-          ? "Todos los datos propuestos fueron revisados por la familia"
-          : "Every proposed fact has been reviewed by the family";
+          ? "Todos los datos sugeridos fueron revisados por la familia"
+          : "Every suggested detail has been reviewed by the family";
     case "uncertainty_preserved":
       return `${countLabel(snapshot.openConflictCount, language, ["conflict", "conflicts"], ["conflicto", "conflictos"])} ${
         es
@@ -181,9 +181,9 @@ export function demoOutcome(
             : "stay visible until a person decides"
       }`;
     case "focused_update":
-      return `${countLabel(snapshot.readyTaskCount, language, ["step ready", "steps ready"], ["paso listo", "pasos listos"])} · ${countLabel(snapshot.openConflictCount, language, ["open blocker", "open blockers"], ["bloqueo abierto", "bloqueos abiertos"])}`;
+      return `${countLabel(snapshot.readyTaskCount, language, ["step ready", "steps ready"], ["paso listo", "pasos listos"])} · ${countLabel(snapshot.unresolvedCount, language, ["unresolved item", "unresolved items"], ["asunto pendiente", "asuntos pendientes"])}`;
     case "family_outcome":
-      return `${countLabel(snapshot.readyTaskCount, language, ["step ready", "steps ready"], ["paso listo", "pasos listos"])} · ${countLabel(snapshot.completedTaskCount, language, ["completed", "completed"], ["terminado", "terminados"])}`;
+      return `${countLabel(snapshot.readyTaskCount, language, ["step ready", "steps ready"], ["paso listo", "pasos listos"])} · ${countLabel(snapshot.unresolvedCount, language, ["unresolved item", "unresolved items"], ["asunto pendiente", "asuntos pendientes"])}`;
     case "engineering_proof":
       return es
         ? `${competitionProof.packetCount} paquetes de prueba · límites de IA y código visibles`

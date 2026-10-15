@@ -41,6 +41,73 @@ async function reviewProposedFacts(page: Page) {
   await expect(interpreter.getByText("No", { exact: true })).toBeVisible();
 }
 
+async function expectFullyVisibleInside(page: Page, selector: string, containerSelector: string) {
+  const bounds = await page.locator(selector).first().evaluate((element, containerSelector) => {
+    const elementRect = element.getBoundingClientRect();
+    const containerRect = element.closest(containerSelector)?.getBoundingClientRect();
+    return {
+      element: { left: elementRect.left, right: elementRect.right, top: elementRect.top, bottom: elementRect.bottom },
+      container: containerRect && { left: containerRect.left, right: containerRect.right, top: containerRect.top, bottom: containerRect.bottom },
+      viewportWidth: window.innerWidth,
+    };
+  }, containerSelector);
+  expect(bounds.container).toBeTruthy();
+  expect(bounds.element.left).toBeGreaterThanOrEqual(bounds.container!.left - 1);
+  expect(bounds.element.right).toBeLessThanOrEqual(bounds.container!.right + 1);
+  expect(bounds.element.top).toBeGreaterThanOrEqual(bounds.container!.top - 1);
+  expect(bounds.element.bottom).toBeLessThanOrEqual(bounds.container!.bottom + 1);
+  expect(bounds.element.right).toBeLessThanOrEqual(bounds.viewportWidth + 1);
+}
+
+test("source questions cite both sides of a conflict in English and Spanish without an AI call", async ({ page }) => {
+  const apiRequests: string[] = [];
+  page.on("request", (request) => {
+    if (new URL(request.url()).pathname.startsWith("/api/")) apiRequests.push(request.url());
+  });
+  await page.goto("/first-day?demo=1");
+  await page.getByRole("button", { name: "Try the fictional case" }).click();
+  const panel = page.getByRole("region", { name: "Ask about these pages." });
+  await panel.getByRole("button", { name: "Where is orientation?" }).click();
+  await expect(panel).toContainText("These pages disagree.");
+  await expect(panel).toContainText(fictionalCase.evidence.find((item) => item.id === "evidence-orientation-cafeteria")!.quote);
+  await expect(panel).toContainText(fictionalCase.evidence.find((item) => item.id === "evidence-orientation-gym")!.quote);
+  await expectNoSeriousAxeViolations(page);
+  await panel.getByRole("button", { name: "Open source" }).first().click();
+  await expect(page.getByRole("dialog")).toBeVisible();
+  await page.getByRole("button", { name: "Close source" }).click();
+
+  await panel.getByRole("button", { name: "When is enrollment?" }).click();
+  await expect(panel.getByRole("button", { name: "Open source" })).toHaveCount(1);
+  await expect(panel).toContainText("on August 12, 2027 at 9:00 a.m.");
+
+  await page.getByRole("button", { name: "ES", exact: true }).click();
+  const spanishPanel = page.getByRole("region", { name: "Pregunte sobre estas páginas." });
+  await spanishPanel.getByRole("button", { name: "¿Dónde es la orientación?" }).click();
+  await expect(spanishPanel).toContainText("Estas páginas no coinciden.");
+  await expect(spanishPanel.getByRole("button", { name: "Abrir fuente" })).toHaveCount(2);
+  expect(apiRequests).toEqual([]);
+});
+
+test("390px header, progress counts, and navigation stay fully visible in both languages", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  for (const spanish of [false, true]) {
+    await page.goto("/first-day?demo=1");
+    if (spanish) await page.locator(".fd-header").getByRole("button", { name: "ES", exact: true }).click();
+    await page.getByRole("button", { name: spanish ? "Probar el caso ficticio" : "Try the fictional case" }).click();
+    await expect(page.locator(".fd-header-name")).toContainText(spanish ? "Primer Día" : "First Day");
+    await expectFullyVisibleInside(page, ".fd-header-name", ".fd-header");
+    await expectFullyVisibleInside(page, ".fd-header button:has-text('EN')", ".fd-header");
+    await expectFullyVisibleInside(page, ".fd-header button:has-text('ES')", ".fd-header");
+    const progress = page.locator(".fd-mobile-progress summary");
+    await expect(progress).toContainText(spanish ? "3 por revisar" : "3 to check");
+    await expect(progress).toContainText(spanish ? "1 bloqueo" : "1 blocker");
+    await expectFullyVisibleInside(page, spanish ? '.fd-mobile-progress summary span:text-is("3 por revisar")' : '.fd-mobile-progress summary span:text-is("3 to check")', ".fd-mobile-progress summary");
+    await expectFullyVisibleInside(page, spanish ? '.fd-mobile-progress summary span:text-is("1 bloqueo")' : '.fd-mobile-progress summary span:text-is("1 blocker")', ".fd-mobile-progress summary");
+    await expect(page.locator(".fd-action-dock").getByRole("button", { name: spanish ? "Atrás" : "Back" })).toBeInViewport();
+    await expect(page.locator(".fd-action-dock").getByRole("button", { name: spanish ? "Continuar" : "Continue" })).toBeInViewport();
+  }
+});
+
 test("fictional case completes all six screens with sources and Spanish output", async ({
   page,
 }) => {
@@ -110,9 +177,9 @@ test("fictional case completes all six screens with sources and Spanish output",
   await expectNoSeriousAxeViolations(page);
 
   await page
-    .getByRole("button", { name: "Record what the school told me" })
-    .last()
+    .getByRole("button", { name: "The school confirmed gym" })
     .click();
+  await page.getByRole("button", { name: "Confirm school answer" }).click();
   await expect(
     page.getByRole("heading", { name: "What to do next, and why." }),
   ).toBeVisible();
@@ -257,15 +324,26 @@ test("clean demo carries a sourced plan through English and Spanish", async ({ p
       await expect(conflict.nth(0)).toContainText(fictionalCase.evidence.find((item) => item.id === "evidence-orientation-cafeteria")!.quote);
       await expect(conflict.nth(1)).toContainText(fictionalCase.evidence.find((item) => item.id === "evidence-orientation-gym")!.quote);
       await expect(page.getByText(es ? "Pregunta preparada" : "Prepared question")).toBeVisible();
-      await conflict.last().getByRole("button", { name: es ? "Registrar lo que me dijo la escuela" : "Record what the school told me" }).click();
+      await conflict.last().getByRole("button", { name: es ? "La escuela confirmó el gimnasio" : "The school confirmed gym" }).click();
+      await expect(page.getByRole("button", { name: es ? "Confirmar respuesta de la escuela" : "Confirm school answer" })).toBeVisible();
+      await expect(page.locator(".fd-mobile-progress")).toContainText(es ? "1 bloqueo" : "1 blocker");
+      await page.getByRole("button", { name: es ? "Elegir de nuevo" : "Choose again" }).click();
+      await expect(page.getByRole("button", { name: es ? "Confirmar respuesta de la escuela" : "Confirm school answer" })).toHaveCount(0);
+      await conflict.last().getByRole("button", { name: es ? "La escuela confirmó el gimnasio" : "The school confirmed gym" }).click();
+      await page.getByRole("button", { name: es ? "Confirmar respuesta de la escuela" : "Confirm school answer" }).click();
 
-      const progress = page.locator(".fd-mobile-progress summary");
-      if (await progress.isVisible()) await progress.click();
-      await page.getByRole("button", { name: es ? /Llevar conmigo/ : /Take it with me/ }).click();
+      await expect(page.locator(".fd-task-card h3").filter({ hasText: es ? "Lugar de orientación confirmado" : "Orientation location confirmed" })).toBeVisible();
+      await expect(page.getByText(es ? "La escuela confirmó: Gimnasio." : "The school confirmed: Gym.").first()).toBeVisible();
+      await page.getByRole("button", { name: es ? "Continuar" : "Continue" }).click();
+      await expect(page.locator('.fd-step-nav [aria-current="step"]')).toContainText(es ? "Llevar conmigo" : "Take it with me");
+
       const printPlan = page.locator(".fd-print-plan");
       await expect(printPlan).toBeVisible();
       await expect(printPlan.getByText(es ? "Fuentes:" : "Sources:").first()).toBeVisible();
       await expect(printPlan.getByText(es ? "Gimnasio" : "Gym", { exact: true })).toBeVisible();
+      await expect(printPlan.getByText(es ? /asuntos pendientes/ : /unresolved items/)).toBeVisible();
+      await expect(printPlan.getByText(es ? "Plan incompleto" : "Plan incomplete")).toBeVisible();
+      await expect(printPlan.getByText(es ? "Asista a la orientación en el gimnasio." : "Attend orientation at the gym.")).toBeVisible();
 
       await page.getByText(es ? "Más formas de guardar" : "More ways to save").click();
       const downloadPromise = page.waitForEvent("download");
@@ -273,6 +351,8 @@ test("clean demo carries a sourced plan through English and Spanish", async ({ p
       const download = await downloadPromise;
       const portable = JSON.parse(await readFile((await download.path())!, "utf8"));
       expect(portable.confirmedFacts.find((item: { id: string }) => item.id === "fact-orientation-gym")?.value).toBe("Gym");
+      expect(portable.readiness.unresolvedCount).toBeGreaterThan(0);
+      expect(portable.tasks.find((task: { id: string }) => task.id === "task-orientation")?.schoolAnswer).toBe("Gym");
       const readyTasks = portable.tasks.filter((task: { state: string }) => task.state === "ready");
       expect(readyTasks.length).toBeGreaterThan(0);
       for (const task of readyTasks as Array<{ id: string; evidenceIds: string[] }>) {
@@ -382,7 +462,7 @@ test("presenter mode follows the six-beat story and can exit and resume", async 
   });
   await nurseReview.getByRole("button", { name: "Confirm this" }).click();
   await expect(
-    guide.getByText("Every proposed fact has been reviewed by the family"),
+    guide.getByText("Every suggested detail has been reviewed by the family"),
   ).toBeVisible();
   await expect(guide.getByRole("button", { name: "Next beat" })).toBeEnabled();
   await guide.getByRole("button", { name: "Next beat" }).click();
@@ -396,15 +476,15 @@ test("presenter mode follows the six-beat story and can exit and resume", async 
   await expect(guide.getByText("Record what the school told the family.")).toBeVisible();
 
   await page
-    .getByRole("button", { name: "Record what the school told me" })
-    .last()
+    .getByRole("button", { name: "The school confirmed gym" })
     .click();
+  await page.getByRole("button", { name: "Confirm school answer" }).click();
   await expect(guide.getByText("Fictional demo · Story beat 4 of 6")).toBeVisible();
   await expect(page.getByText("One answer · one focused update")).toBeVisible();
   await expect(page.getByText("Only the plan steps that depended on this answer were updated.")).toBeVisible();
   await expect(page.getByText("School answer: Gym")).toBeVisible();
   const trace = page.getByLabel(
-    "Decision trace: Confirm where orientation begins",
+    "Decision trace: Orientation location confirmed",
   );
   await expect(trace).toBeVisible();
   await expect(trace.getByText("School confirmation recorded")).toBeVisible();
@@ -420,7 +500,7 @@ test("presenter mode follows the six-beat story and can exit and resume", async 
   await expect(trace).toBeHidden();
   const orientationTask = page.getByRole("article").filter({
     has: page.getByRole("heading", {
-      name: "Confirm where orientation begins",
+      name: "Orientation location confirmed",
     }),
   });
   const traceButton = orientationTask.getByRole("button", {
@@ -447,7 +527,7 @@ test("presenter mode follows the six-beat story and can exit and resume", async 
   await expect(
     page.getByRole("heading", { name: "A plan the family can carry." }),
   ).toBeVisible();
-  await expect(page.getByText("0 unresolved items")).toBeVisible();
+  await expect(page.locator(".fd-print-plan").getByText("0 unresolved items")).toBeVisible();
   const confirmedFacts = page.getByRole("heading", { name: "Confirmed facts" }).locator("..");
   await expect(confirmedFacts.getByText("Gym", { exact: true })).toBeVisible();
 
@@ -485,9 +565,9 @@ test("presenter mode follows the six-beat story and can exit and resume", async 
   await expect(page.getByLabel(/Rastro de decisión:/)).toHaveCount(0);
   const blockerMetric = page
     .getByRole("region", { name: "Resumen del caso" })
-    .getByText("bloqueos", { exact: true })
+    .getByText("asuntos pendientes", { exact: true })
     .locator("..");
-  await expect(blockerMetric.getByText("1", { exact: true })).toBeVisible();
+  await expect(blockerMetric.getByText("5", { exact: true })).toBeVisible();
   await expect(
     spanishGuide.getByRole("button", { name: "Siguiente momento" }),
   ).toBeEnabled();
@@ -548,6 +628,8 @@ test("confirmed dates download as a real calendar file", async ({ page }) => {
   expect(contents).toContain("BEGIN:VCALENDAR");
   expect(contents).toContain("UID:lantern-fact-registration-date");
   expect(contents).toContain("DTSTART:20270812T090000");
+  expect(contents).toContain("UID:lantern-fact-orientation-time");
+  expect(contents).toContain("DTSTART:20270814T173000");
   await expect(page.getByText("Calendar file downloaded.", { exact: false })).toBeVisible();
 });
 

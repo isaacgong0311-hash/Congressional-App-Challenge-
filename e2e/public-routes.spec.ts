@@ -40,6 +40,15 @@ for (const route of [
   });
 }
 
+test("About credits every project partner", async ({ page }) => {
+  await page.goto("/about");
+  const credits = page.getByRole("list", { name: "Lantern team" });
+  await expect(credits.getByRole("listitem")).toHaveCount(3);
+  await expect(credits).toContainText("Isaac Gong");
+  await expect(credits).toContainText("Karthik Devarasetty · Project partner");
+  await expect(credits).toContainText("Vihan Santhosh · Project partner");
+});
+
 test("public examples show the same fictional source quotes as the demo", async ({ page }) => {
   await page.goto("/first-day/how-it-works");
   await expect(
@@ -61,6 +70,16 @@ test("landing page explains the evidence without engineering jargon", async ({ p
   const visibleCopy = await page.locator("body").innerText();
   expect(visibleCopy).not.toMatch(/synthetic held-out|\bprovider\b|\bdeterministic\b|regression checks|0\/8 date errors/i);
   await expect(page.getByRole("link", { name: "See the test details" })).toHaveAttribute("href", "/first-day/how-it-works");
+});
+
+test("First Day is the primary homepage action on a phone", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+  await expect(page.getByRole("heading", { name: "School letters, one clear first day." })).toBeVisible();
+  const primary = page.locator(".home-hero-actions .home-button");
+  await expect(primary).toHaveAttribute("href", "/first-day?demo=1");
+  await expect(primary).toBeInViewport();
+  await expect(page.locator(".home-hero-actions .home-text-link")).toHaveAttribute("href", "/explain");
 });
 
 test("mobile navigation is keyboard reachable and closes on Escape", async ({

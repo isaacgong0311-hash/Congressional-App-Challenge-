@@ -4,6 +4,8 @@
 
 Lantern can send user-provided page images to Groq for document reading, grounded explanations, assistant responses, and field translation when `GROQ_API_KEY` is configured. The First Day extraction route asks the model for structured fact proposals and exact supporting quotes; Zod schema validation and an exact-quote check run before proposals enter the case.
 
+In the First Day source finder, a live question, page and fact labels, and up to 24 short, source-checked passages can be sent to Groq. The model returns only IDs for up to three matching passages. The server accepts only IDs from the supplied set, and the interface displays the original quotes. A local matcher handles the fictional demo and provider failures. The model does not write the displayed answer, choose a side in a conflict, or validate its own quotes.
+
 Optional integrations inherited from the upstream application can use ElevenLabs for server speech and Perplexity for local-help search when their separate keys are configured. Each optional integration fails independently. Provider pricing, availability, and retention terms are external and can change.
 
 AI does not decide which source is correct, confirm a family fact, resolve a conflict, mark a task done, or derive a task state. Decision Trace is also not a second AI explanation: it is a deterministic, read-only projection of the cited sources, immutable case events, explicit dependency rules, and planner result. The fictional workflow, domain planner, Decision Trace, exports, held-out evaluation, and automated browser journeys run without a provider request.
@@ -12,9 +14,9 @@ AI does not decide which source is correct, confirm a family fact, resolve a con
 
 OpenAI Codex assisted with repository inspection, implementation planning, code and test drafting, debugging, official-source review, browser verification, and documentation drafting. AI-generated suggestions were reviewed and revised within the repository before inclusion.
 
-## Student-authored and student-owned work
+## Student work and project partnership
 
-Isaac Gong is responsible for the product goal, audience, architecture choices, privacy boundaries, evidence model, confirmation and correction rules, conflict behavior, deterministic task families and dependencies, Round Rock ISD source review, test expectations, evaluation interpretation, visual design decisions, release decisions, and presentation. The student is responsible for understanding and explaining every submitted component.
+Isaac Gong led the product goal, audience, architecture choices, privacy boundaries, evidence model, confirmation and correction rules, conflict behavior, deterministic task families and dependencies, Round Rock ISD source review, test expectations, evaluation interpretation, visual design decisions, release decisions, and presentation. Karthik Devarasetty and Vihan Santhosh were project partners. This disclosure does not assign specific components to any person without verified contribution details. The submitting students are responsible for understanding and explaining the submitted work.
 
 ## Reused source
 

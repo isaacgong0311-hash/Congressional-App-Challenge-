@@ -7,6 +7,7 @@ import type {
   PlanState,
   ProcedureReviewState,
 } from "../domain/types";
+import { caseReadiness, type CaseReadiness } from "../domain/readiness";
 
 export type PortablePlan = {
   schemaVersion: "lantern-plan-v1";
@@ -18,6 +19,8 @@ export type PortablePlan = {
   tasks: Array<{
     id: string;
     title: string;
+    action: string;
+    schoolAnswer?: string;
     state: PlanState;
     reason: string;
     evidenceIds: string[];
@@ -29,7 +32,8 @@ export type PortablePlan = {
     value: string;
     evidenceIds: string[];
   }>;
-  unresolved: Array<{ id: string; label: string; factIds: string[] }>;
+  readiness: CaseReadiness;
+  unresolved: CaseReadiness["unresolved"];
   procedures: Array<{
     id: string;
     ruleVersion: string;
@@ -157,6 +161,7 @@ export function createPortablePlan(
   plan: PlannerResult,
   generatedAt: string,
 ): PortablePlan {
+  const readiness = caseReadiness(caseData, plan);
   return {
     schemaVersion: "lantern-plan-v1",
     generatedAt,
@@ -164,27 +169,31 @@ export function createPortablePlan(
     district: caseData.district,
     language: caseData.language,
     events: structuredClone(caseData.events),
-    tasks: plan.tasks.map((task) => ({
-      id: task.id,
-      title: task.title,
-      state: task.state,
-      reason: task.reason,
-      evidenceIds: [...task.evidenceIds],
-      procedureIds: [...task.procedureIds],
-    })),
+    tasks: plan.tasks.map((task) => {
+      const schoolAnswer = task.id === "task-orientation"
+        ? [...caseData.events].reverse().find(
+            (event) => event.type === "school_confirmation_recorded" && event.conflictId === "conflict-orientation-location",
+          )
+        : undefined;
+      return {
+        id: task.id,
+        title: schoolAnswer?.type === "school_confirmation_recorded" ? "Orientation location confirmed" : task.title,
+        action: schoolAnswer?.type === "school_confirmation_recorded" ? `Attend orientation at the ${schoolAnswer.reportedValue.toLowerCase()}.` : task.action,
+        ...(schoolAnswer?.type === "school_confirmation_recorded" ? { schoolAnswer: schoolAnswer.reportedValue } : {}),
+        state: task.state,
+        reason: task.reason,
+        evidenceIds: [...task.evidenceIds],
+        procedureIds: [...task.procedureIds],
+      };
+    }),
     confirmedFacts: effectiveConfirmedFacts(caseData).map(({ fact, value }) => ({
       id: fact.id,
       label: fact.label,
       value,
       evidenceIds: [...fact.evidenceIds],
     })),
-    unresolved: caseData.conflicts
-      .filter((conflict) => conflict.status === "open")
-      .map((conflict) => ({
-        id: conflict.id,
-        label: conflict.label,
-        factIds: [...conflict.factIds],
-      })),
+    readiness,
+    unresolved: readiness.unresolved,
     procedures: caseData.procedures.map((procedure) => ({
       id: procedure.id,
       ruleVersion: procedure.ruleVersion,

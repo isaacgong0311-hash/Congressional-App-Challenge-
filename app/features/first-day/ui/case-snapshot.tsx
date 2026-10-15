@@ -15,7 +15,7 @@ export function CaseSnapshot({
   const metrics = [
     [snapshot.processedDocumentCount, translated(language, "pages ready", "páginas listas")],
     [snapshot.pendingFactCount, translated(language, "facts to check", "datos por revisar")],
-    [snapshot.openConflictCount, translated(language, "blockers", "bloqueos")],
+    [snapshot.unresolvedCount, translated(language, "unresolved items", "asuntos pendientes")],
     [snapshot.readyTaskCount, translated(language, "steps ready", "pasos listos")],
   ] as const;
 
@@ -34,7 +34,7 @@ export function CaseSnapshot({
               : translated(language, "Sample district workflow", "Ejemplo de proceso distrital")}
           </p>
         </div>
-        {snapshot.openConflictCount ? (
+        {snapshot.unresolvedCount ? (
           <WarningIcon className="h-5 w-5 text-[#9a6b12]" />
         ) : (
           <ShieldIcon className="h-5 w-5 text-confirmed" />

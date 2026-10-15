@@ -29,6 +29,7 @@ export function BlockerStep({
 }: BlockerStepProps) {
   const [copied, setCopied] = useState(false);
   const [practiceNote, setPracticeNote] = useState("");
+  const [selection, setSelection] = useState<{ conflictId: string; factId: string } | null>(null);
   const conflict =
     caseData.conflicts.find((item) => item.id === conflictId) ??
     caseData.conflicts.find((item) => item.status === "open") ??
@@ -91,6 +92,9 @@ export function BlockerStep({
       },
     ];
   });
+  const selectedOption = selection?.conflictId === conflict.id
+    ? options.find((option) => option.factId === selection.factId)
+    : undefined;
 
   const comparedValues = options.map((option) => `“${factDisplayValue(option.factId, option.value, language)}”`);
   const preparedQuestion = translated(
@@ -163,20 +167,15 @@ export function BlockerStep({
                 {!resolution ? (
                   <button
                     className="fd-confirm-button"
-                    onClick={() =>
-                      onResolveConflict(
-                        conflict.id,
-                        option.factId,
-                        option.value,
-                      )
-                    }
+                    aria-pressed={selectedOption?.factId === option.factId}
+                    onClick={() => setSelection({ conflictId: conflict.id, factId: option.factId })}
                     type="button"
                   >
                     <CheckIcon className="h-4 w-4" />
                     {translated(
                       language,
-                      "Record what the school told me",
-                      "Registrar lo que me dijo la escuela",
+                      `The school confirmed ${option.factId === "fact-orientation-cafeteria" ? "cafeteria" : option.value.toLowerCase()}`,
+                      `La escuela confirmó ${option.factId === "fact-orientation-cafeteria" ? "la cafetería" : option.factId === "fact-orientation-gym" ? "el gimnasio" : factDisplayValue(option.factId, option.value, language).toLowerCase()}`,
                     )}
                   </button>
                 ) : selected ? (
@@ -194,6 +193,23 @@ export function BlockerStep({
           );
         })}
       </div>
+
+      {selectedOption && !resolution ? (
+        <div className="mt-5 rounded-feature border-2 border-cobalt bg-[#eef2ff] p-5" role="group" aria-label={translated(language, "Review school answer", "Revisar respuesta de la escuela")}>
+          <h2 className="text-lg font-bold">{translated(language, "Review before recording", "Revise antes de registrar")}</h2>
+          <p className="mt-2 text-sm leading-6">
+            {translated(language, `The school told your family: ${selectedOption.value}. Is this what they said?`, `La escuela le dijo a su familia: ${factDisplayValue(selectedOption.factId, selectedOption.value, language)}. ¿Es lo que dijeron?`)}
+          </p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <button className="fd-confirm-button" onClick={() => onResolveConflict(conflict.id, selectedOption.factId, selectedOption.value)} type="button">
+              {translated(language, "Confirm school answer", "Confirmar respuesta de la escuela")}
+            </button>
+            <button className="fd-secondary-button" onClick={() => setSelection(null)} type="button">
+              {translated(language, "Choose again", "Elegir de nuevo")}
+            </button>
+          </div>
+        </div>
+      ) : null}
 
       <div className="mt-6 rounded-[2rem] border border-[#ccd6ff] bg-[#eef2ff] p-6 sm:p-8">
         <div className="flex items-start gap-4">

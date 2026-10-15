@@ -37,7 +37,7 @@ test("conflict headings use source page numbers and fact cards hide internal key
   await nurseReview.getByRole("button", { name: "Confirm this" }).click();
   await expect(interpreter.getByText("Not answered yet")).toHaveCount(0);
   await expect(interpreter.getByText("No", { exact: true })).toBeVisible();
-  await expect(page.getByText("Every proposed fact has been reviewed by the family")).toBeVisible();
+  await expect(page.getByText("Every suggested detail has been reviewed by the family")).toBeVisible();
   await expect(page.getByText("Story beat 2 of 6", { exact: false })).toBeVisible();
   await expect(page.getByText("Step 3 · Review facts")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Welcome letter: cafeteria" })).toHaveCount(1);
@@ -67,7 +67,7 @@ test("a Yes answer to the interpreter question updates the card and unlocks the 
 
   await expect(interpreter.getByText("Not answered yet")).toHaveCount(0);
   await expect(interpreter.getByText("Yes", { exact: true })).toBeVisible();
-  await expect(guide.getByText("Every proposed fact has been reviewed by the family")).toBeVisible();
+  await expect(guide.getByText("Every suggested detail has been reviewed by the family")).toBeVisible();
   await expect(guide.getByRole("button", { name: "Next beat" })).toBeEnabled();
 });
 

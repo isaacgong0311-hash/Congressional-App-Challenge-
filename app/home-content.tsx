@@ -49,26 +49,26 @@ export default function HomeContent() {
                 <button aria-pressed={spanish} onClick={() => chooseLanguage("es")} type="button">Español</button>
               </div>
               <p className="home-kicker">
-                <span className="home-status-dot" /> {copy("A little clarity when a letter feels confusing", "Un poco de claridad cuando una carta confunde")}
+                <span className="home-status-dot" /> {copy("For newcomer families navigating school enrollment", "Para familias recién llegadas que inician la inscripción escolar")}
               </p>
               <h1 id="home-title">
-                {copy("Understand the letter.", "Entienda la carta.")}
+                {copy("School letters,", "Cartas escolares,")}
                 <br />
-                <em>{copy("Know what to do next.", "Sepa qué hacer después.")}</em>
+                <em>{copy("one clear first day.", "un primer día más claro.")}</em>
               </h1>
               <p className="home-lead">
-                {copy("A bill, school note, or official letter can be hard to read. Lantern explains it in plain language. You decide what to do next.", "Una factura, nota escolar o carta oficial puede ser difícil de entender. Lantern se la explica con palabras sencillas. Usted decide qué hacer después.")}
+                {copy("School letters and reminders can disagree. First Day keeps the original words beside each step, shows what needs a school answer, and helps your family carry a clear plan.", "Las cartas y los recordatorios escolares pueden contradecirse. Primer Día muestra las palabras originales junto a cada paso, señala qué debe confirmar la escuela y ayuda a su familia a llevar un plan claro.")}
               </p>
               <div className="home-hero-actions">
-                <Link className="home-button" href={spanish ? "/explain?lang=es" : "/explain"}>
-                  {copy("Explain a letter", "Explicar una carta")} <ArrowUpRightIcon />
+                <Link className="home-button" href={spanish ? "/first-day?demo=1&lang=es" : "/first-day?demo=1"}>
+                  {copy("Try the fictional First Day demo", "Probar la demo ficticia de Primer Día")} <ArrowUpRightIcon />
                 </Link>
-                <Link className="home-text-link" href={spanish ? "/first-day?demo=1&lang=es" : "/first-day?demo=1"}>
-                  {copy("Try the school demo", "Probar la demo escolar")} <ArrowUpRightIcon />
+                <Link className="home-text-link" href={spanish ? "/explain?lang=es" : "/explain"}>
+                  {copy("Explain a letter", "Explicar una carta")} <ArrowUpRightIcon />
                 </Link>
               </div>
               <p className="home-small-note">
-                <CheckCircleIcon /> {copy("Try a sample letter without uploading yours", "Pruebe una carta de ejemplo sin subir la suya")}
+                <CheckCircleIcon /> {copy("Explore a fictional family’s case without uploading yours", "Explore el caso de una familia ficticia sin subir sus documentos")}
               </p>
             </div>
             <figure

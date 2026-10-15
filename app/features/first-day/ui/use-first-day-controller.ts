@@ -86,7 +86,10 @@ export function useFirstDayController({
           ? snapshot.openConflictCount === 0
           : true;
   const activeStepIndex = STEPS.findIndex((step) => step.id === currentStep);
-  const nextStep = STEPS[activeStepIndex + 1];
+  const skipResolvedBlocker = caseData.conflicts.every((conflict) => conflict.status === "resolved");
+  const nextStep = currentStep === "plan" && skipResolvedBlocker
+    ? STEPS.find((step) => step.id === "export")
+    : STEPS[activeStepIndex + 1];
   const canGoForward = nextStep
     ? canEnterLiveStep(caseData, nextStep.id)
     : false;
@@ -365,9 +368,8 @@ export function useFirstDayController({
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
-    const next = STEPS[Math.min(activeStepIndex + 1, STEPS.length - 1)];
-    if (!next) return;
-    selectStep(next.id);
+    if (!nextStep) return;
+    selectStep(nextStep.id);
   }
 
   function goBack() {
@@ -392,7 +394,9 @@ export function useFirstDayController({
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
-    const previous = STEPS[Math.max(activeStepIndex - 1, 0)];
+    const previous = currentStep === "export" && skipResolvedBlocker
+      ? STEPS.find((step) => step.id === "plan")
+      : STEPS[Math.max(activeStepIndex - 1, 0)];
     if (!previous) return;
     selectStep(previous.id);
   }

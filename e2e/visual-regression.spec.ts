@@ -38,8 +38,8 @@ test.describe("visual regression and responsive layout", () => {
       page,
     }, testInfo) => {
       test.skip(
-        testInfo.project.name !== "desktop-chromium",
-        "A single browser project owns deterministic multi-viewport baselines.",
+        testInfo.project.name !== "desktop-chromium" || process.platform === "win32",
+        "Linux CI owns the visual baselines; Windows runs the behavioral suite without platform snapshots.",
       );
       await page.setViewportSize(viewport);
 
@@ -106,10 +106,12 @@ test.describe("visual regression and responsive layout", () => {
           name: "Three pages. Two languages. One family trying not to miss a step.",
         }),
       ).toBeVisible();
+      await expect(page.getByRole("region", { name: "Ask about these pages." })).toBeVisible();
       await capture(page, `first-day-guided-demo-${viewport.name}`);
 
       await page.goto("/first-day");
       await page.getByRole("button", { name: "Try the fictional case" }).click();
+      await expect(page.getByRole("region", { name: "Ask about these pages." })).toBeVisible();
       await capture(page, `first-day-documents-${viewport.name}`);
 
       await page.getByRole("button", { name: "Continue" }).click();
@@ -129,11 +131,11 @@ test.describe("visual regression and responsive layout", () => {
       await capture(page, `first-day-blocker-${viewport.name}`);
 
       await page
-        .getByRole("button", { name: "Record what the school told me" })
-        .last()
+        .getByRole("button", { name: "The school confirmed gym" })
         .click();
+      await page.getByRole("button", { name: "Confirm school answer" }).click();
       const decisionTrace = page.getByLabel(
-        "Decision trace: Confirm where orientation begins",
+        "Decision trace: Orientation location confirmed",
       );
       await expect(decisionTrace).toBeVisible();
       await page.getByRole("button", { name: "Dismiss message" }).click();

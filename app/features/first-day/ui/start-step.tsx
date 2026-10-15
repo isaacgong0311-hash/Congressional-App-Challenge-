@@ -92,8 +92,8 @@ export function StartStep({
                   <DocumentIcon className="h-4 w-4" />
                   {translated(
                     language,
-                    "Try the public-source example",
-                    "Probar el ejemplo con fuentes públicas",
+                    "Open the sample-page upload workspace",
+                    "Abrir espacio para subir páginas de ejemplo",
                   )}
                 </button>
               ) : null}

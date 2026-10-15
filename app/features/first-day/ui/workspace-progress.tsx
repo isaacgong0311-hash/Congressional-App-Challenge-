@@ -59,7 +59,9 @@ function StepList({
 export function WorkspaceProgress(props: WorkspaceProgressProps) {
   const activeStepIndex = STEPS.findIndex((step) => step.id === props.currentStep);
   const current = STEPS[activeStepIndex];
-  const next = STEPS[activeStepIndex + 1];
+  const next = props.currentStep === "plan" && props.caseData.conflicts.every((conflict) => conflict.status === "resolved")
+    ? STEPS.find((step) => step.id === "export")
+    : STEPS[activeStepIndex + 1];
 
   return (
     <>
@@ -83,12 +85,19 @@ export function WorkspaceProgress(props: WorkspaceProgressProps) {
                 )}
               </span>
             ) : null}
-            {props.snapshot.openConflictCount > 0 ? (
+            <span className="rounded-full bg-[#fbe8e3] px-2 py-1 text-review">
+              {translated(
+                props.language,
+                `${props.snapshot.openConflictCount} ${props.snapshot.openConflictCount === 1 ? "blocker" : "blockers"}`,
+                `${props.snapshot.openConflictCount} ${props.snapshot.openConflictCount === 1 ? "bloqueo" : "bloqueos"}`,
+              )}
+            </span>
+            {props.snapshot.unresolvedCount > 0 ? (
               <span className="rounded-full bg-[#fbe8e3] px-2 py-1 text-review">
                 {translated(
                   props.language,
-                  `${props.snapshot.openConflictCount} blocker`,
-                  `${props.snapshot.openConflictCount} bloqueo`,
+                  `${props.snapshot.unresolvedCount} unresolved`,
+                  `${props.snapshot.unresolvedCount} pendientes`,
                 )}
               </span>
             ) : (
@@ -110,7 +119,7 @@ export function WorkspaceProgress(props: WorkspaceProgressProps) {
             {[
               [props.snapshot.processedDocumentCount, translated(props.language, "pages", "páginas")],
               [props.snapshot.readyTaskCount, translated(props.language, "ready", "listos")],
-              [props.snapshot.openConflictCount, translated(props.language, "blockers", "bloqueos")],
+              [props.snapshot.unresolvedCount, translated(props.language, "unresolved", "pendientes")],
             ].map(([value, label]) => (
               <div className="rounded-xl bg-canvas px-2 py-2" key={String(label)}>
                 <span className="block text-base font-black text-ink">{value}</span>

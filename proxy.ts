@@ -8,6 +8,7 @@ import { NextRequest, NextResponse } from "next/server";
 const WINDOW_MS = 60_000; // 1-minute sliding window
 const LIMITS: Record<string, number> = {
   "/api/first-day/extract": 10,
+  "/api/first-day/rank-sources": 20,
   "/api/explain": 10,        // vision + generation — most expensive
   "/api/speak": 30,          // ElevenLabs audio
   "/api/local-help": 10,     // Perplexity search

@@ -50,7 +50,7 @@ test("technical download and print keep unresolved items and source references",
 
   await page.emulateMedia({ media: "print" });
   const printPlan = page.locator(".fd-print-plan");
-  await expect(printPlan.getByText("1 unresolved item")).toBeVisible();
+  await expect(printPlan.getByText("5 unresolved items")).toBeVisible();
   await expect(
     printPlan.getByText("Resolve before relying on this plan"),
   ).toBeVisible();
@@ -65,7 +65,8 @@ test("family plan shows each source passage once", async ({ page }) => {
   const mobileProgress = page.locator(".fd-mobile-progress summary");
   if (await mobileProgress.isVisible()) await mobileProgress.click();
   await page.getByRole("button", { name: "Resolve", exact: false }).first().click();
-  await page.getByRole("button", { name: "Record what the school told me" }).last().click();
+  await page.getByRole("button", { name: "The school confirmed gym" }).click();
+  await page.getByRole("button", { name: "Confirm school answer" }).click();
   if (await mobileProgress.isVisible()) await mobileProgress.click();
   await page.getByRole("button", { name: "Take it with me" }).click();
 

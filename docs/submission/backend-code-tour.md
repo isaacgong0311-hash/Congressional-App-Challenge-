@@ -9,11 +9,12 @@ Lantern's backend is deliberately narrow. It processes bounded live requests wit
 3. **Provider services:** `app/features/letter-tool/server/` owns strict request schemas, time budgets, provider adapters, and safe failure mapping.
 4. **Live extraction:** `app/api/first-day/extract/route.ts` accepts one JPG or PNG page, overwrites model-supplied identifiers, and validates the response schema.
 5. **Evidence check:** `app/features/first-day/domain/evidence.ts` requires supporting quotations to occur in their source text.
-6. **Immutable history:** `app/features/first-day/domain/events.ts` appends confirmations, corrections, completions, removals, and school-reported answers.
-7. **Deterministic plan:** `app/features/first-day/domain/planner.ts` evaluates explicit dependencies; a model cannot assign task state.
-8. **Inspectable result:** `app/features/first-day/domain/decision-trace.ts` explains the same records and planner result without changing them.
-9. **Privacy-safe operations:** `app/lib/provider-error.ts` accepts operational metadata but no prompts, document text, response bodies, or thrown messages.
-10. **Proof:** `tests/letter-tool/route-contracts.test.ts`, `tests/first-day/extraction-route.test.ts`, and `e2e/first-day-fictional.spec.ts` cover input limits, provider failures, partial recovery, and the zero-API judge path.
+6. **Source questions:** `app/features/first-day/domain/source-questions.ts` builds answers from valid excerpts and keeps competing passages visible; `app/features/first-day/server/rank-sources.ts` can ask Groq to rank supplied source IDs without accepting model-written facts.
+7. **Immutable history:** `app/features/first-day/domain/events.ts` appends confirmations, corrections, completions, removals, and school-reported answers.
+8. **Deterministic plan:** `app/features/first-day/domain/planner.ts` evaluates explicit dependencies; a model cannot assign task state.
+9. **Inspectable result:** `app/features/first-day/domain/decision-trace.ts` explains the same records and planner result without changing them.
+10. **Privacy-safe operations:** `app/lib/provider-error.ts` accepts operational metadata but no prompts, document text, response bodies, or thrown messages.
+11. **Proof:** `tests/letter-tool/route-contracts.test.ts`, `tests/first-day/extraction-route.test.ts`, `tests/first-day/source-ranking-route.test.ts`, and `e2e/first-day-fictional.spec.ts` cover input limits, provider failures, partial recovery, and the zero-API judge path.
 
 ## 60-second explanation
 

@@ -4,7 +4,7 @@ Use this checklist for the exact public 1–3 minute Congressional App Challenge
 
 ## Optional screen rehearsal
 
-The repository can record a **silent draft** of the working six-beat fictional path. With a production build running on port 3100, run `npm run record:demo-draft`. It saves `tmp/judge-demo-draft.webm` and makes no provider request. Set `LANTERN_BASE_URL` to a verified deployment to rehearse that release. The October 10 local draft lasts 2:33; it is useful for checking shot order and readable source text, but it is not the accepted submission video. Record the student's narration, then make captions and transcript from the accepted final take.
+The repository can record a **silent draft** of the working six-beat fictional path. With a production build running on port 3100, run `npm run record:demo-draft`. It saves `tmp/judge-demo-draft.webm` and makes no provider request. Set `LANTERN_BASE_URL` to a verified deployment to rehearse that release. The October 14 local draft lasts 2:40 and shows both orientation quotes and the final proof panel; it is useful for checking shot order and readable source text, but it is not the accepted submission video. Record the student's narration, then make captions and transcript from the accepted final take.
 
 ## Before recording
 
@@ -26,6 +26,7 @@ The repository can record a **silent draft** of the working six-beat fictional p
 ## Required spoken content
 
 - [ ] “Isaac Gong.”
+- [ ] Credit Karthik Devarasetty and Vihan Santhosh as project partners.
 - [ ] “Lantern: First Day.”
 - [ ] The purpose sentence.
 - [ ] Newcomer families as the target audience.
@@ -37,6 +38,7 @@ The repository can record a **silent draft** of the working six-beat fictional p
 ## Required visual proof
 
 - [ ] Fictional-data label and three separate document identities.
+- [ ] Source finder question with both original orientation passages and its no-provider demo note.
 - [ ] Exact source quote linked to a fact.
 - [ ] Two unanswered family questions.
 - [ ] Both conflicting orientation sources.

@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import type { DerivedTask, FirstDayCase, PlannerResult } from "../domain/types";
+import { caseReadiness } from "../domain/readiness";
 import { competitionProof } from "../content/competition-proof";
 import {
   calendarEvents,
@@ -111,9 +112,8 @@ export function ExportStep({
   >("idle");
   const confirmedFacts = effectiveConfirmedFacts(caseData);
   const dates = calendarEvents(caseData);
-  const unresolved = caseData.conflicts.filter(
-    (conflict) => conflict.status === "open",
-  );
+  const readiness = caseReadiness(caseData, plan);
+  const unresolved = readiness.unresolved;
   const orderedTasks = [...plan.tasks].sort(
     (left, right) => TASK_ORDER[left.state] - TASK_ORDER[right.state],
   );
@@ -182,6 +182,12 @@ export function ExportStep({
             "Imprima o descargue el plan con referencias, asuntos pendientes y solo las fechas que confirmó.",
           )}
         </p>
+        {!readiness.isComplete ? (
+          <p className="mt-4 rounded-xl border border-[#efd69b] bg-[#fff9e9] p-4 text-sm font-semibold text-[#684e18]" role="status">
+            {translated(language, "This plan is incomplete. Review the unresolved items below before relying on it.", "Este plan está incompleto. Revise los asuntos pendientes antes de confiar en él.")}
+            {readiness.waitingTaskCount > 0 ? ` ${translated(language, `${readiness.waitingTaskCount} steps are also waiting on earlier actions.`, `${readiness.waitingTaskCount} pasos también esperan acciones anteriores.`)}` : null}
+          </p>
+        ) : null}
       </div>
 
       <div className="mt-6 grid gap-3 print:hidden md:grid-cols-[1.25fr_1fr]">
@@ -335,7 +341,7 @@ export function ExportStep({
             </p>
           </div>
           <div className="rounded-2xl bg-[#fff5d8] px-4 py-3 text-sm font-semibold text-[#795a18]">
-            {unresolved.length}{" "}
+            {readiness.unresolvedCount}{" "}
             {translated(
               language,
               unresolved.length === 1 ? "unresolved item" : "unresolved items",
@@ -343,6 +349,14 @@ export function ExportStep({
                 ? "asunto pendiente"
                 : "asuntos pendientes",
             )}
+            {readiness.waitingTaskCount > 0 ? (
+              <span className="block text-xs">
+                {translated(language, `${readiness.waitingTaskCount} waiting steps`, `${readiness.waitingTaskCount} pasos en espera`)}
+              </span>
+            ) : null}
+            {!readiness.isComplete ? (
+              <span className="block text-xs font-bold">{translated(language, "Plan incomplete", "Plan incompleto")}</span>
+            ) : null}
           </div>
         </div>
 
@@ -359,18 +373,27 @@ export function ExportStep({
               </h3>
             </div>
             <div className="space-y-3">
-              {unresolved.map((conflict) => {
-                const conflictFacts = caseData.facts
-                  .filter((fact) => conflict.factIds.includes(fact.id))
-                  .map((fact) => factDisplayValue(fact.id, fact.originalValue, language));
+              {unresolved.map((item) => {
+                const conflictFacts = item.kind === "conflict" ? caseData.facts
+                  .filter((fact) => item.factIds.includes(fact.id))
+                  .map((fact) => factDisplayValue(fact.id, fact.originalValue, language))
+                  : [];
                 return (
                   <div
                     className="rounded-2xl border border-[#efd69b] bg-[#fff9e9] p-4"
-                    key={conflict.id}
+                    key={item.id}
                   >
-                    <p className="font-semibold">{translated(language, conflict.label, conflict.id === "conflict-orientation-location" ? "Lugar de orientación" : conflict.label)}</p>
+                    <p className="font-semibold">{item.kind === "task"
+                      ? localizedTaskCopy(plan.tasks.find((task) => task.id === item.id)!, language, caseData).title
+                      : item.kind === "fact"
+                        ? language === "Español" ? FACT_ES[item.id] ?? item.label : item.label
+                        : translated(language, item.label, item.id === "conflict-orientation-location" ? "Lugar de orientación" : item.label)}</p>
                     <p className="mt-1 text-sm leading-6 text-[#66572f]">
-                      {conflictFacts.join(" · ")}
+                      {item.kind === "conflict"
+                        ? conflictFacts.join(" · ")
+                        : item.kind === "fact"
+                          ? translated(language, "Family answer still needs review or clarification.", "La respuesta familiar aún necesita revisión o aclaración.")
+                          : translated(language, "This plan step still needs clarification or review.", "Este paso aún necesita aclaración o revisión.")}
                     </p>
                   </div>
                 );
@@ -384,8 +407,11 @@ export function ExportStep({
             <h3 className="text-sm font-bold uppercase tracking-[0.15em] text-cobalt">
               {translated(language, "Best next step", "Mejor paso siguiente")}
             </h3>
-            <p className="mt-3 text-lg font-bold text-ink">{localizedTaskCopy(bestNext, language).title}</p>
-            <p className="mt-1 text-sm leading-6 text-[#53628b]">{localizedTaskCopy(bestNext, language).action}</p>
+            <p className="mt-3 text-lg font-bold text-ink">{localizedTaskCopy(bestNext, language, caseData).title}</p>
+            <p className="mt-1 text-sm leading-6 text-[#53628b]">{localizedTaskCopy(bestNext, language, caseData).action}</p>
+            {bestNext.id === "task-orientation" && caseData.conflicts.some((conflict) => conflict.id === "conflict-orientation-location" && conflict.status === "resolved") ? (
+              <p className="mt-1 text-sm font-semibold text-[#53628b]">{localizedTaskCopy(bestNext, language, caseData).detail}</p>
+            ) : null}
             <TaskSources caseData={caseData} language={language} task={bestNext} />
           </section>
         ) : null}
@@ -397,7 +423,7 @@ export function ExportStep({
           <div className="space-y-4">
             {remainingTasks.map((task) => {
               const meta = STATE_META[task.state];
-              const taskCopy = localizedTaskCopy(task, language);
+              const taskCopy = localizedTaskCopy(task, language, caseData);
               return (
                 <div
                   className="flex break-inside-avoid gap-4 rounded-2xl border border-[#e0e5e1] p-4"
@@ -411,6 +437,9 @@ export function ExportStep({
                     <p className="mt-1 text-sm leading-6 text-[#5d6963]">
                       {taskCopy.action}
                     </p>
+                    {task.id === "task-orientation" && caseData.conflicts.some((conflict) => conflict.id === "conflict-orientation-location" && conflict.status === "resolved") ? (
+                      <p className="mt-1 text-sm font-semibold text-[#5d6963]">{taskCopy.detail}</p>
+                    ) : null}
                     <TaskSources caseData={caseData} language={language} task={task} />
                   </div>
                 </div>

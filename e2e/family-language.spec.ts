@@ -16,7 +16,7 @@ test("a new Spanish reader can find Explain, review sharing, and try a sample", 
   await page.goto("/");
   await expect(page.getByRole("button", { name: "Español" })).toBeVisible();
   await page.getByRole("button", { name: "Español" }).click();
-  await expect(page.getByRole("heading", { name: /Entienda la carta/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Cartas escolares, un primer día más claro/ })).toBeVisible();
   await expect(page.locator("html")).toHaveAttribute("lang", "es");
   await expectNoHorizontalOverflow(page);
   await expect(page.locator(".home-hero-actions").getByRole("link", { name: "Explicar una carta" })).toHaveAttribute("href", "/explain?lang=es");

@@ -93,6 +93,7 @@ describe("confirmed date calendar export", () => {
   it("includes confirmed appointments with their stated local time", () => {
     expect(calendarEvents(fictionalCase).map((event) => event.title)).toEqual([
       "Enrollment meeting",
+      "Family orientation",
     ]);
     const reviewed = structuredClone(fictionalCase);
     reviewed.events.push({
@@ -105,10 +106,12 @@ describe("confirmed date calendar export", () => {
     expect(events.map((event) => event.title)).toEqual([
       "Enrollment meeting",
       "Nurse review",
+      "Family orientation",
     ]);
     const ics = createCalendarFile(events);
     expect(ics).toContain("DTSTART:20270812T090000");
     expect(ics).toContain("DTSTART:20270813T133000");
+    expect(ics).toContain("DTSTART:20270814T173000");
   });
 
   it("excludes a confirmed date after its source is removed", () => {

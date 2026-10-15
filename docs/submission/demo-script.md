@@ -10,15 +10,15 @@
 
 ## 0:00–0:20 — Identity, audience, and purpose
 
-> I’m Isaac Gong, and I built Lantern: First Day for newcomer families navigating school enrollment. Lantern turns scattered school instructions into one bilingual plan a family can inspect, question, and carry—without hiding uncertainty or pretending AI knows more than the source documents.
+> I’m Isaac Gong. Together with my project partners, Karthik Devarasetty and Vihan Santhosh, I built Lantern: First Day for newcomer families navigating school enrollment. Lantern turns scattered school instructions into one bilingual plan a family can inspect, question, and carry—without hiding uncertainty or pretending AI knows more than the source documents.
 
 **On screen:** Begin on the homepage with the Lantern name visible. Open the guided demo and pause on its fictional-data label.
 
 ## 0:20–0:45 — Before Lantern
 
-> This fictional family received three pages. The enrollment appointment is in one letter, the health instructions are in another, and two pages disagree about where orientation begins. The family has to connect every detail while working across languages and avoiding a missed step.
+> This fictional family received three pages. The enrollment date is in one letter, the health instructions are in another, and two pages disagree about orientation. I can ask where it is and see both original passages. The demo finds those sources in the browser without an AI call.
 
-**On screen:** Show all three document identities, “3 facts to check,” and the visible blocker. Do not scroll past the fictional district notice.
+**On screen:** Show the fictional district notice and document identities. On Documents, choose **Where is orientation?** in Source finder, show both quotes, then continue. Keep this click brief so the later human confirmation remains the focus.
 
 ## 0:45–1:10 — Evidence before answers
 
@@ -30,7 +30,7 @@
 
 > The hardest design problem was preserving disagreement. One source says orientation is in the cafeteria; another says it is in the gym. Lantern keeps both quotes, marks the task as needing clarification, and prepares the question to ask. It never silently chooses the newer-looking message.
 
-**On screen:** Advance to the conflict. Point to both locations and both source cards. Record the fictional school response: **Gym**.
+**On screen:** Advance to the conflict. Point to both locations and both source cards. Select **The school confirmed gym**, review the choice, then press **Confirm school answer**.
 
 ## 1:40–2:00 — Focused update and Decision Trace
 
@@ -46,7 +46,7 @@
 
 ## 2:25–2:50 — Engineering proof and close
 
-> I built Lantern with Next.js, TypeScript, Zod, Vitest, and Playwright. In 28 synthetic packets it kept 46 of 46 exact quotes and found 12 of 12 intended conflicts. One equivalent English-Spanish location also triggered a false conflict; the report shows that limit. AI-assisted development is disclosed, while people confirm facts and code derives the plan. Lantern helps a family leave with a plan they can explain.
+> We built Lantern with Next.js, TypeScript, Zod, Vitest, and Playwright. In 28 synthetic packets it kept 46 of 46 exact quotes and found 12 of 12 intended conflicts. One equivalent English-Spanish location also triggered a false conflict; the report shows that limit. AI-assisted development is disclosed, while people confirm facts and code derives the plan. Lantern helps a family leave with a plan they can explain.
 
 **On screen:** Open **See how Lantern earns trust**. Show the tool list, AI/code/family boundary, synthetic result denominators, and limitation statement. End with the Lantern name visible.
 
