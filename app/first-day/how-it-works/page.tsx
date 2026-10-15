@@ -213,7 +213,7 @@ export default function HowFirstDayWorksPage() {
               Measured offline
             </p>
             <h2 className="mt-3 font-serif text-3xl tracking-[-0.03em]">
-              {`${competitionProof.packetCount} synthetic held-out packets`}
+              {`${competitionProof.packetCount} synthetic regression packets`}
             </h2>
             <p className="mt-4 max-w-2xl leading-7 text-[#45567f]">
               {`The versioned evaluation reports ${competitionProof.metrics
@@ -235,7 +235,7 @@ export default function HowFirstDayWorksPage() {
           </summary>
           <div className="mt-4 grid gap-5 text-sm leading-6 text-muted md:grid-cols-2">
             <p>
-              These results use synthetic, held-out packets—not real family documents. They test quote coverage, conflict detection, date normalization, and source retention; they do not establish accuracy for every school or document format.
+              These results use synthetic regression packets—not real family documents. They test quote coverage, conflict detection, date normalization, and source retention; they do not establish accuracy for every school or document format.
             </p>
             <p>
               Live page reading depends on an external provider. Planning, dependency evaluation, conflict preservation, completion history, and portable export remain explicit code paths after extraction.

@@ -42,11 +42,11 @@ Checked locally: October 13, 2026.
 | Command | Latest local result |
 | --- | --- |
 | `npm run lint` | Passed |
-| `npm test` | 175 passed in 41 test files |
+| `npm test` | Rerun on the final release commit; record the count here |
 | `npm run build` | Passed |
 | `npm run test:e2e` | 115 passed, 7 intentional skips across 8 spec files |
 | `npm run smoke -- --base-url http://127.0.0.1:3101` | 13 passed against the local production build |
-| `npm run evaluate:first-day` | 28 synthetic packets across 8 scenarios; report generated without provider calls |
+| `npm run evaluate:first-day` | 32 synthetic packets across 8 scenarios; report generated without provider calls |
 | `npm run evaluate:usability` | Status: Not started; no participant sessions recorded |
 | GitHub Actions `ci` | [Passed on presenter revision `0e8d846`](https://github.com/isaacgong0311-hash/Congressional-App-Challenge-/actions/runs/38357034239) |
 
@@ -54,14 +54,14 @@ Checked locally: October 13, 2026.
 
 | Measure | Result |
 | --- | --- |
-| Fact precision and recall | 46/46 each |
-| Exact source quotes covered | 46/46 |
-| Intended conflicts found | 12/12 |
+| Fact precision and recall | 54/54 each |
+| Exact source quotes covered | 54/54 |
+| Intended conflicts found | 14/14 |
 | Cross-language conflicts found | 4/4 |
-| False-positive traps passed | 1/2 |
-| Unintended conflicts | 1 |
+| False-positive traps passed | 4/4 |
+| Unintended conflicts | 0 |
 | Spanish-only quotes covered | 2/2 |
-| Dates read correctly | 9/9 |
+| Dates read correctly | 13/13 |
 | Ready tasks with source coverage | 34/34 |
 
-Evaluation data: [machine-readable report](../../evaluation/first-day/report.json) · [readable report](../../evaluation/first-day/report.md). These counts come from fictional packets.
+Evaluation data: [machine-readable report](../../evaluation/first-day/report.json) · [readable report](../../evaluation/first-day/report.md). These counts come from fictional packets. The first two false-positive traps were used to design the value-matching rules, so they are not held out; traps 03 and 04 and the two added conflict packets were written afterward.

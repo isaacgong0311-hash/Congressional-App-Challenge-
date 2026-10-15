@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { runGroqExtraction } from "../../../features/first-day/server/extract-page";
 import { FirstDayExtractionSchema } from "../../../features/first-day/server/extraction-schema";
-import { validatePageProposals } from "../../../features/first-day/server/validate-page";
+import { filterPageProposals } from "../../../features/first-day/server/validate-page";
 import { providerErrorSummary } from "../../../lib/provider-error";
 import {
   apiError,
@@ -217,19 +217,23 @@ export function createExtractionHandler(dependencies: ExtractionDependencies) {
         );
       }
 
-      const evidenceIssues = validatePageProposals(parsed.data);
-      if (evidenceIssues.length > 0) {
+      // Keep verified proposals and drop only the ones the page does not
+      // support. A page whose every proposal fails is still an error.
+      const { page, dropped } = filterPageProposals(parsed.data);
+      if (dropped.length > 0) {
         console.error(
-          "first-day extraction evidence error",
+          "first-day extraction dropped proposals",
           providerErrorSummary({
             requestId: logRequestId,
             route: "/api/first-day/extract",
             kind: "schema",
             durationMs: Date.now() - startedAt,
-            issueCount: evidenceIssues.length,
-            issueCodes: evidenceIssues,
+            issueCount: dropped.length,
+            issueCodes: dropped.map((item) => item.issue),
           }),
         );
+      }
+      if (parsed.data.facts.length > 0 && page.facts.length === 0) {
         return errorResponse(
           "INVALID_PROVIDER_RESPONSE",
           "Could not read this page. Try a clearer, well-lit photo.",
@@ -238,7 +242,7 @@ export function createExtractionHandler(dependencies: ExtractionDependencies) {
         );
       }
 
-      return apiJson(parsed.data);
+      return apiJson(page);
     } catch (error) {
       const timedOut = controller.signal.aborted;
       const providerStatus =

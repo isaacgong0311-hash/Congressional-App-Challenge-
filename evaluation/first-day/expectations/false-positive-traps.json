@@ -34,5 +34,53 @@
     "expectedConflicts": [],
     "expectedReadyTaskIds": [],
     "expectedClarificationTaskIds": []
+  },
+  {
+    "fixtureId": "false-positive-trap-03",
+    "expectedFacts": [
+      {
+        "semanticKey": "orientation.date",
+        "originalValue": "August 14, 2027 at 5:30 p.m.",
+        "quote": "Orientation is on August 14, 2027 at 5:30 p.m."
+      },
+      {
+        "semanticKey": "orientation.date",
+        "originalValue": "14 de agosto de 2027 a las 5:30 p. m.",
+        "quote": "La orientación es el 14 de agosto de 2027 a las 5:30 p. m."
+      }
+    ],
+    "expectedConflicts": [],
+    "expectedReadyTaskIds": [],
+    "expectedClarificationTaskIds": [],
+    "expectedDates": [
+      {
+        "semanticKey": "orientation.date",
+        "originalValue": "August 14, 2027 at 5:30 p.m.",
+        "normalizedValue": null
+      },
+      {
+        "semanticKey": "orientation.date",
+        "originalValue": "14 de agosto de 2027 a las 5:30 p. m.",
+        "normalizedValue": null
+      }
+    ]
+  },
+  {
+    "fixtureId": "false-positive-trap-04",
+    "expectedFacts": [
+      {
+        "semanticKey": "registration.location",
+        "originalValue": "Library",
+        "quote": "Enrollment takes place in the library."
+      },
+      {
+        "semanticKey": "registration.location",
+        "originalValue": "Biblioteca",
+        "quote": "La inscripción será en la biblioteca."
+      }
+    ],
+    "expectedConflicts": [],
+    "expectedReadyTaskIds": [],
+    "expectedClarificationTaskIds": []
   }
 ]

@@ -69,7 +69,7 @@ export function createCompetitionProof(
     familyBoundary:
       "A person confirms facts and records what the school said before the plan changes.",
     limitation:
-      "These are synthetic regression checks, not independently measured accuracy. No real-family document study has been completed. Provider latency and cost were not measured in the offline run.",
+      "These are synthetic regression checks that replay recorded extractions through the checking and planning code, so they do not measure the live model or real-world accuracy. No real-family document study has been completed. Provider latency and cost were not measured in the offline run.",
   };
 }
 

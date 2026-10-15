@@ -1,34 +1,135 @@
 [
   {
     "fixtureId": "ambiguous-date-01",
-    "expectedFacts": [{"semanticKey": "registration.deadline", "originalValue": "next Friday", "quote": "Enrollment closes next Friday."}],
+    "expectedFacts": [
+      {
+        "semanticKey": "registration.deadline",
+        "originalValue": "next Friday",
+        "quote": "Enrollment closes next Friday."
+      }
+    ],
     "expectedConflicts": [],
-    "expectedReadyTaskIds": ["task-live-open-enrollment", "task-live-attend-registration-deadline"],
+    "expectedReadyTaskIds": [
+      "task-live-open-enrollment",
+      "task-live-attend-registration-deadline"
+    ],
     "expectedClarificationTaskIds": [],
-    "expectedDates": [{"semanticKey": "registration.deadline", "originalValue": "next Friday", "normalizedValue": null}]
+    "expectedDates": [
+      {
+        "semanticKey": "registration.deadline",
+        "originalValue": "next Friday",
+        "normalizedValue": null
+      }
+    ]
   },
   {
     "fixtureId": "ambiguous-date-02",
-    "expectedFacts": [{"semanticKey": "orientation.date", "originalValue": "the second week of August", "quote": "Orientation happens during the second week of August."}],
+    "expectedFacts": [
+      {
+        "semanticKey": "orientation.date",
+        "originalValue": "the second week of August",
+        "quote": "Orientation happens during the second week of August."
+      }
+    ],
     "expectedConflicts": [],
-    "expectedReadyTaskIds": ["task-live-open-enrollment", "task-live-attend-orientation-date"],
+    "expectedReadyTaskIds": [
+      "task-live-open-enrollment",
+      "task-live-attend-orientation-date"
+    ],
     "expectedClarificationTaskIds": [],
-    "expectedDates": [{"semanticKey": "orientation.date", "originalValue": "the second week of August", "normalizedValue": null}]
+    "expectedDates": [
+      {
+        "semanticKey": "orientation.date",
+        "originalValue": "the second week of August",
+        "normalizedValue": null
+      }
+    ]
   },
   {
     "fixtureId": "ambiguous-date-03",
-    "expectedFacts": [{"semanticKey": "registration.appointment_date", "originalValue": "after the fall holiday", "quote": "Meet the registrar after the fall holiday."}],
+    "expectedFacts": [
+      {
+        "semanticKey": "registration.appointment_date",
+        "originalValue": "after the fall holiday",
+        "quote": "Meet the registrar after the fall holiday."
+      }
+    ],
     "expectedConflicts": [],
-    "expectedReadyTaskIds": ["task-live-open-enrollment", "task-live-attend-registration-appointment-date"],
+    "expectedReadyTaskIds": [
+      "task-live-open-enrollment",
+      "task-live-attend-registration-appointment-date"
+    ],
     "expectedClarificationTaskIds": [],
-    "expectedDates": [{"semanticKey": "registration.appointment_date", "originalValue": "after the fall holiday", "normalizedValue": null}]
+    "expectedDates": [
+      {
+        "semanticKey": "registration.appointment_date",
+        "originalValue": "after the fall holiday",
+        "normalizedValue": null
+      }
+    ]
   },
   {
     "fixtureId": "ambiguous-date-04",
-    "expectedFacts": [{"semanticKey": "records.deadline", "originalValue": "before classes begin", "quote": "Records are due before classes begin."}],
+    "expectedFacts": [
+      {
+        "semanticKey": "records.deadline",
+        "originalValue": "before classes begin",
+        "quote": "Records are due before classes begin."
+      }
+    ],
     "expectedConflicts": [],
-    "expectedReadyTaskIds": ["task-live-open-enrollment", "task-live-attend-records-deadline"],
+    "expectedReadyTaskIds": [
+      "task-live-open-enrollment",
+      "task-live-attend-records-deadline"
+    ],
     "expectedClarificationTaskIds": [],
-    "expectedDates": [{"semanticKey": "records.deadline", "originalValue": "before classes begin", "normalizedValue": null}]
+    "expectedDates": [
+      {
+        "semanticKey": "records.deadline",
+        "originalValue": "before classes begin",
+        "normalizedValue": null
+      }
+    ]
+  },
+  {
+    "fixtureId": "ambiguous-date-05",
+    "expectedFacts": [
+      {
+        "semanticKey": "orientation.date",
+        "originalValue": "August 14, 2027 at 5:30 p.m.",
+        "quote": "Orientation is August 14, 2027 at 5:30 p.m."
+      },
+      {
+        "semanticKey": "orientation.date",
+        "originalValue": "August 14, 2027 at 9:00 a.m.",
+        "quote": "Orientation is August 14, 2027 at 9:00 a.m."
+      }
+    ],
+    "expectedConflicts": [
+      {
+        "semanticKey": "orientation.date",
+        "values": [
+          "August 14, 2027 at 5:30 p.m.",
+          "August 14, 2027 at 9:00 a.m."
+        ]
+      }
+    ],
+    "expectedReadyTaskIds": [],
+    "expectedClarificationTaskIds": [
+      "task-live-clarify-orientation-date",
+      "task-live-review-plan"
+    ],
+    "expectedDates": [
+      {
+        "semanticKey": "orientation.date",
+        "originalValue": "August 14, 2027 at 5:30 p.m.",
+        "normalizedValue": null
+      },
+      {
+        "semanticKey": "orientation.date",
+        "originalValue": "August 14, 2027 at 9:00 a.m.",
+        "normalizedValue": null
+      }
+    ]
   }
 ]

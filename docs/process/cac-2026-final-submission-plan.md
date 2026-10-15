@@ -24,7 +24,7 @@ This is an appraisal, not a predicted score. Congressional offices judge differe
 3. **Homepage pitch does not match the video pitch.** The video says "newcomer families, school enrollment." The homepage hero says "A bill, school note, or official letter" with *Explain a letter* as the primary button. A judge who clicks through from the video lands on the generic tool, which dilutes the strongest idea. (The First Day demo is the real product; `/explain` is a side feature.)
 4. **Team and AI disclosure may be inconsistent.** README lists Isaac as the only team member, but git history has commits from `kd228` (initial commit) and `vihansanthosh516-byte` (three "Script 1" commits, co-authored by Claude). The AI disclosure names OpenAI Codex only. Rules allow up to four members, each must be eligible and complete the exit questionnaire, and disclosure must be accurate. Resolve this before submitting.
 5. **Eligibility date for reused code.** Rules say eligible work is coded after 2025-10-30. This repo starts 2026-09-15 but imports `TRANSLATEtheform` at `479ff86`. Verify when that repo was created and keep the disclosure explicit about what is new.
-6. **Self-graded evaluation.** 46/46 and 12/12 come from fixtures written by the same team and are already described honestly as regression results. Keep it that way. The one known false conflict (`false-positive-trap-02`) is a useful honest detail, not a problem.
+6. **Self-graded evaluation.** 46/46 and 12/12 come from fixtures written by the same team and are already described honestly as regression results. Keep it that way. The packets replay recorded extractions, so they do not measure the live model; say so.
 7. **Live path depends on one free-tier provider (Groq).** A judge who uploads a real photo during review may hit a rate limit. The fictional demo is the safe path, so make sure every link and the video point there first.
 8. **Process sprawl.** 13 plans and specs, 15 submission docs, a manifest of "not yet" rows. Judges read none of it. The risk is polishing documents instead of shipping the video.
 
@@ -72,8 +72,8 @@ Both read `AGENTS.md`; this repo uses a Next.js with breaking changes, so the ag
 ### B2. Measure latency and cost *(optional, needs provider key; skip if short on time)*
 - Run `npm run smoke:providers` at least 10 times, record median and worst case, and log token usage. Fill the "not measured" rows in `docs/submission/scalability-and-cost.md`. Use the provider's current price page; do not guess prices.
 
-### B3. Investigate the one false conflict *(optional stretch, after the video fallback exists)*
-- `false-positive-trap-02`: an English and Spanish description of the same place is flagged as a conflict. Find the cause in the conflict logic. Fix only if a general rule (not a fixture-specific patch) is clear, and add a new held-out packet. If fixed, update the numbers via `npm run sync:readme` and the demo script. If not, leave the honest limitation as is.
+### B3. Investigate the one false conflict *(done 2026-10-14)*
+- Fixed with general value matching (case, accents, word order, English/Spanish place and month names, same date in different forms) in `app/features/first-day/domain/value-normalization.ts`, plus semantic-key canonicalization and per-proposal validation. Traps 03/04 and two conflict packets were added afterward; the set is now 32 packets. Traps 01/02 are not held out because they motivated the rules.
 
 ### C1. Release hygiene *(after code freeze)*
 - Run the full gate on the final commit, deploy, confirm `/api/health` returns that commit SHA, record the Vercel deployment ID, create an annotated tag, and update `docs/submission/submission-manifest.md` and `docs/submission/checklist.md` with exact evidence.

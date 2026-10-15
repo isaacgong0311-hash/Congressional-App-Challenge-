@@ -46,13 +46,13 @@
 
 ## 2:25–2:50 — Engineering proof and close
 
-> I built Lantern with Next.js, TypeScript, Zod, Vitest, and Playwright. In 28 synthetic packets it kept 46 of 46 exact quotes and found 12 of 12 intended conflicts. One equivalent English-Spanish location also triggered a false conflict; the report shows that limit. AI-assisted development is disclosed, while people confirm facts and code derives the plan. Lantern helps a family leave with a plan they can explain.
+> I built Lantern with Next.js, TypeScript, Zod, Vitest, and Playwright. In 32 synthetic packets it kept 54 of 54 exact quotes and found 14 of 14 intended conflicts, with no unintended conflicts. These packets replay recorded extractions, so they test the checking code, not the live model. AI-assisted development is disclosed, while people confirm facts and code derives the plan. Lantern helps a family leave with a plan they can explain.
 
 **On screen:** Open **See how Lantern earns trust**. Show the tool list, AI/code/family boundary, synthetic result denominators, and limitation statement. End with the Lantern name visible.
 
 ## Recording notes
 
-- Speak “46 out of 46 in our synthetic set,” not “one hundred percent accurate.” Mention the one recorded false conflict when showing the results.
+- Speak “54 out of 54 in our synthetic set,” not “one hundred percent accurate.” Say that the set replays recorded extractions and does not measure the live model.
 - Use ← and → to move between beats. Press H to fold or reopen the recording cues.
 - Keep cursor motion slow and purposeful; never circle decorative elements.
 - Use browser zoom that leaves every quoted source readable in the final upload.

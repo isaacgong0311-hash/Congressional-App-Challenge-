@@ -120,5 +120,127 @@
       }
     ],
     "confirmedFactIds": []
+  },
+  {
+    "fixtureId": "false-positive-trap-03",
+    "scenario": "false_positive_traps",
+    "pages": [
+      {
+        "pageIndex": 1,
+        "response": {
+          "schemaVersion": "first-day-extraction-v1",
+          "requestId": "eval-false-positive-trap-03-1",
+          "documentId": "false-positive-trap-03-1",
+          "document": {
+            "label": "English orientation letter",
+            "confidence": 0.97,
+            "originalText": "SYNTHETIC TEST DOCUMENT\nOrientation is on August 14, 2027 at 5:30 p.m.",
+            "photoQualityNote": null
+          },
+          "facts": [
+            {
+              "clientKey": "fact",
+              "kind": "date",
+              "semanticKey": "orientation.date",
+              "label": "Orientation date",
+              "originalValue": "August 14, 2027 at 5:30 p.m.",
+              "normalizedValue": null,
+              "quote": "Orientation is on August 14, 2027 at 5:30 p.m.",
+              "location": "Line 2",
+              "confidence": 0.97
+            }
+          ]
+        }
+      },
+      {
+        "pageIndex": 2,
+        "response": {
+          "schemaVersion": "first-day-extraction-v1",
+          "requestId": "eval-false-positive-trap-03-2",
+          "documentId": "false-positive-trap-03-2",
+          "document": {
+            "label": "Recordatorio en español",
+            "confidence": 0.97,
+            "originalText": "SYNTHETIC TEST DOCUMENT\nLa orientación es el 14 de agosto de 2027 a las 5:30 p. m.",
+            "photoQualityNote": null
+          },
+          "facts": [
+            {
+              "clientKey": "fact",
+              "kind": "date",
+              "semanticKey": "orientation.date",
+              "label": "Fecha de orientación",
+              "originalValue": "14 de agosto de 2027 a las 5:30 p. m.",
+              "normalizedValue": null,
+              "quote": "La orientación es el 14 de agosto de 2027 a las 5:30 p. m.",
+              "location": "Line 2",
+              "confidence": 0.97
+            }
+          ]
+        }
+      }
+    ],
+    "confirmedFactIds": []
+  },
+  {
+    "fixtureId": "false-positive-trap-04",
+    "scenario": "false_positive_traps",
+    "pages": [
+      {
+        "pageIndex": 1,
+        "response": {
+          "schemaVersion": "first-day-extraction-v1",
+          "requestId": "eval-false-positive-trap-04-1",
+          "documentId": "false-positive-trap-04-1",
+          "document": {
+            "label": "Enrollment notice",
+            "confidence": 0.97,
+            "originalText": "SYNTHETIC TEST DOCUMENT\nEnrollment takes place in the library.",
+            "photoQualityNote": null
+          },
+          "facts": [
+            {
+              "clientKey": "fact",
+              "kind": "location",
+              "semanticKey": "enrollment.place",
+              "label": "Enrollment location",
+              "originalValue": "Library",
+              "normalizedValue": null,
+              "quote": "Enrollment takes place in the library.",
+              "location": "Line 2",
+              "confidence": 0.97
+            }
+          ]
+        }
+      },
+      {
+        "pageIndex": 2,
+        "response": {
+          "schemaVersion": "first-day-extraction-v1",
+          "requestId": "eval-false-positive-trap-04-2",
+          "documentId": "false-positive-trap-04-2",
+          "document": {
+            "label": "Aviso de inscripción",
+            "confidence": 0.97,
+            "originalText": "SYNTHETIC TEST DOCUMENT\nLa inscripción será en la biblioteca.",
+            "photoQualityNote": null
+          },
+          "facts": [
+            {
+              "clientKey": "fact",
+              "kind": "location",
+              "semanticKey": "registration.location",
+              "label": "Lugar de inscripción",
+              "originalValue": "Biblioteca",
+              "normalizedValue": null,
+              "quote": "La inscripción será en la biblioteca.",
+              "location": "Line 2",
+              "confidence": 0.97
+            }
+          ]
+        }
+      }
+    ],
+    "confirmedFactIds": []
   }
 ]

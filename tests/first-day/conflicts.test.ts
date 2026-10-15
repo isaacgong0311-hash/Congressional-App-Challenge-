@@ -99,6 +99,39 @@ describe("deterministic cross-document conflicts", () => {
     expect(detectConflicts(caseData)).toEqual([]);
   });
 
+  it("does not conflict when wording differs only by language or style", () => {
+    expect(detectConflicts(caseWithFacts([
+      fact("fact-a", "orientation.location", "Gymnasium"),
+      fact("fact-b", "orientation.location", "Gimnasio"),
+    ]))).toEqual([]);
+
+    expect(detectConflicts(caseWithFacts([
+      fact("fact-a", "orientation.date", "August 14, 2027 at 5:30 p.m."),
+      fact("fact-b", "orientation.date", "14 de agosto de 2027 a las 5:30 p. m."),
+    ]))).toEqual([]);
+  });
+
+  it("groups pages that name the same fact with equivalent keys", () => {
+    const conflicts = detectConflicts(caseWithFacts([
+      fact("fact-a", "orientation.place", "Cafeteria"),
+      fact("fact-b", "orientation.location", "Gym"),
+    ]));
+
+    expect(conflicts).toEqual([
+      expect.objectContaining({
+        id: "conflict-orientation-location",
+        factIds: ["fact-a", "fact-b"],
+      }),
+    ]);
+  });
+
+  it("still reports a different time on the same date", () => {
+    expect(detectConflicts(caseWithFacts([
+      fact("fact-a", "orientation.date", "August 14, 2027 at 5:30 p.m."),
+      fact("fact-b", "orientation.date", "August 14, 2027 at 9:00 a.m."),
+    ]))).toHaveLength(1);
+  });
+
   it("ignores a fact whose source was removed", () => {
     const caseData = caseWithFacts([
       fact("fact-a", "orientation.location", "Cafeteria"),

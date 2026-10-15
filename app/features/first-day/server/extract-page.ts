@@ -3,6 +3,7 @@ import { READING_MODEL } from "../../../lib/reading-model";
 import { generateText } from "ai";
 
 import { extractOuterJson } from "../../../lib/extract-json";
+import { PREFERRED_SEMANTIC_KEYS } from "../domain/semantic-keys";
 
 export type FirstDayPageExtractionInput = {
   bytes: Uint8Array;
@@ -54,7 +55,11 @@ export async function runGroqExtraction({
           `Write labels in ${language}. Preserve names, dates, locations, and contact details exactly as printed.`,
           "Return verbatim document text and proposed facts only.",
           "Every fact quote must appear exactly in originalText.",
-          "Use semantic keys in event.field form.",
+          "Use semantic keys in event.field form with lowercase letters, digits, and underscores.",
+          `Pages are read separately, so reuse one of these keys whenever it fits the fact: ${PREFERRED_SEMANTIC_KEYS.join(", ")}.`,
+          "Use the same key for the same real-world fact in any language. Only invent a new key when none of these fits.",
+          "Set originalValue to the value as printed, in the page's own language; do not translate it.",
+          "Keep each fact's quote to the single sentence or phrase that states the value.",
           "Do not produce tasks, eligibility decisions, district rules, conflict resolutions, or inferred requirements.",
           "Leave normalizedValue null for ambiguous or relative dates.",
           "Use a normalized YYYY-MM-DD value only for a complete, unambiguous calendar date.",
