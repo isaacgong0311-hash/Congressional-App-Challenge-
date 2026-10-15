@@ -1,0 +1,16 @@
+# Local output and development-only files are not part of the deployed app.
+.git/
+.github/
+.vercel/
+.next/
+node_modules/
+tmp/
+test-results/
+playwright-report/
+.lighthouseci/
+coverage/
+e2e/
+tests/
+docs/
+.env*
+*.tsbuildinfo
