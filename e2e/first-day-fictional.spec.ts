@@ -593,6 +593,12 @@ test("presenter keyboard shortcuts respect blockers and fold the cue panel", asy
   await page.goto("/first-day?demo=1&present=1");
   const guide = page.getByLabel("Guided demonstration");
 
+  // Clicking the first control waits for client hydration before exercising
+  // the window keyboard listener on a server-rendered page.
+  await guide.getByRole("button", { name: "Next beat" }).click();
+  await expect(guide.getByText("Fictional demo · Story beat 2 of 6")).toBeVisible();
+  await page.keyboard.press("ArrowLeft");
+  await expect(guide.getByText("Fictional demo · Story beat 1 of 6")).toBeVisible();
   await page.keyboard.press("ArrowRight");
   await expect(guide.getByText("Fictional demo · Story beat 2 of 6")).toBeVisible();
   await page.keyboard.press("ArrowRight");
