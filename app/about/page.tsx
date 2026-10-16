@@ -87,7 +87,7 @@ export default function AboutPage() {
         </section>
 
         <section className="info-shell info-grid two-column">
-          <article className="info-card bg-ink text-white">
+          <article className="info-card info-card-dark">
             <p className="text-xs font-extrabold uppercase tracking-[0.18em] !text-amber">
               What is real
             </p>

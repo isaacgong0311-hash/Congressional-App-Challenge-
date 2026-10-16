@@ -201,7 +201,10 @@ export function AccessibilityControls({
         onClick={onToggleHighContrast}
         type="button"
       >
-        ◐
+        <svg aria-hidden="true" className="h-[18px] w-[18px]" fill="none" viewBox="0 0 20 20">
+          <circle cx="10" cy="10" r="7.25" stroke="currentColor" strokeWidth="1.6" />
+          <path d="M10 2.75a7.25 7.25 0 0 1 0 14.5V2.75Z" fill="currentColor" />
+        </svg>
       </button>
     </div>
   );

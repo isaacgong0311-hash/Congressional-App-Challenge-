@@ -1571,3 +1571,131 @@
   }
   .fd-app main { padding-bottom: 10rem; }
 }
+
+/* Practice call (Step 5) */
+.fd-practice {
+  margin-top: 1rem;
+}
+
+.fd-practice-log {
+  margin-top: 1rem;
+  display: grid;
+  gap: 0.6rem;
+  list-style: none;
+  padding: 0;
+}
+
+.fd-practice-turn {
+  display: grid;
+  gap: 0.2rem;
+  max-width: 34rem;
+  border-radius: 1rem;
+  padding: 0.75rem 0.9rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.fd-practice-turn-office {
+  justify-self: start;
+  border: 1px solid #d5dcd7;
+  background: #f7f3e8;
+  color: #25332d;
+}
+
+.fd-practice-turn-family {
+  justify-self: end;
+  border: 1px solid #ccd6ff;
+  background: #eef2ff;
+  color: #26386f;
+}
+
+.fd-practice-speaker {
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+
+.fd-practice-tip {
+  margin-top: 1rem;
+  border: 1px solid #ead39e;
+  border-radius: 1rem;
+  background: #fff8df;
+  padding: 1rem;
+  color: #554823;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* Guided tour entry (Start step) */
+.fd-tour-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ead6a9;
+  border-radius: 1.5rem;
+  background: linear-gradient(100deg, #fff8e6, #fbf1d9);
+  padding: 1rem 1.25rem;
+  color: #3f2f0c;
+  box-shadow: 0 14px 40px rgba(121, 90, 24, 0.08);
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.fd-tour-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 18px 44px rgba(121, 90, 24, 0.14);
+}
+
+.fd-tour-card:focus-visible {
+  outline: 3px solid var(--lantern-amber);
+  outline-offset: 3px;
+}
+
+.fd-tour-icon {
+  display: flex;
+  height: 2.75rem;
+  width: 2.75rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 1rem;
+  background: #162a22;
+  color: #f7c864;
+}
+
+.fd-tour-title {
+  display: block;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+}
+
+.fd-tour-detail {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: #6b5524;
+}
+
+.fd-fact-card .fd-fact-state {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.fd-tour-card-inline {
+  display: none;
+}
+
+@media (max-width: 639px) {
+  .fd-tour-card-top {
+    display: none;
+  }
+
+  .fd-tour-card-inline {
+    display: flex;
+    margin: 1rem 0 0;
+    padding: 0.85rem 1rem;
+  }
+}

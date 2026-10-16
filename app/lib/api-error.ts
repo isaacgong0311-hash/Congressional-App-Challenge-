@@ -57,6 +57,18 @@ export function readingFailureMessage(
       return spanish
         ? "Hay demasiadas solicitudes en este momento. Espere un minuto e inténtelo de nuevo."
         : "Too many requests right now. Please wait a minute and try again.";
+    case "NO_TEXT_FOUND":
+      return spanish
+        ? "No encontramos palabras en esta foto. Asegúrese de que toda la carta esté en la foto, plana y con buena luz, y tome otra foto."
+        : "We couldn't find any words in this photo. Make sure the whole letter is in the frame, flat, and well lit, then take another photo.";
+    case "UNSUPPORTED_MEDIA":
+      return spanish
+        ? "Este tipo de archivo no funciona. Use una foto JPG o PNG."
+        : "This file type doesn't work. Please use a JPG or PNG photo.";
+    case "PAYLOAD_TOO_LARGE":
+      return spanish
+        ? "Esta foto es demasiado grande (más de 10 MB). Tome una foto nueva o elija una más pequeña."
+        : "This photo is too large (over 10 MB). Take a new photo or choose a smaller one.";
     case "PROVIDER_UNAVAILABLE":
       return spanish
         ? "La lectura de documentos no está disponible ahora. Puede probar la demo ficticia."
