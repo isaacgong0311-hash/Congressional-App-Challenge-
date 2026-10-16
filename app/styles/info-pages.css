@@ -89,3 +89,9 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
+
+.info-card.info-card-dark {
+  border-color: transparent;
+  background: var(--lantern-ink);
+  color: white;
+}

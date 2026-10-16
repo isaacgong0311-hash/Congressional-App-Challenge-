@@ -17,6 +17,7 @@ import { LetterIntake } from "./letter-intake";
 import { LetterResults } from "./letter-results";
 import { buildLetterReminderCalendar } from "./letter-calendar";
 import { sampleLetterResult } from "./sample-letter-result";
+import type { SpeechStatus } from "./letter-results";
 import type { Category } from "../../resources";
 
 const LANGUAGES: { label: string; bcp47: string; tts: string }[] = [
@@ -57,7 +58,8 @@ export default function LetterWorkspace({
   const [loadingMsg, setLoadingMsg] = useState(0);
   const [result, setResult] = useState<Result | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [speaking, setSpeaking] = useState(false);
+  const [speechStatus, setSpeechStatus] = useState<SpeechStatus>("idle");
+  const speaking = speechStatus === "preparing" || speechStatus === "speaking";
   const [checked, setChecked] = useState<Set<number>>(new Set());
   const [copiedLetter, setCopiedLetter] = useState(false);
   const [translatedLetter, setTranslatedLetter] = useState<string | null>(null);
@@ -76,6 +78,7 @@ export default function LetterWorkspace({
   const [formTab, setFormTab] = useState<0 | 1 | 2>(0);
   const previewUrl = useRef<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const speechRunRef = useRef(0);
   const initialLanguageAppliedRef = useRef(false);
 
   const lang = LANGUAGES.find((l) => l.label === language) ?? LANGUAGES[0];
@@ -175,7 +178,18 @@ export default function LetterWorkspace({
 
   function onPick(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0];
+    e.target.value = "";
     if (!f) return;
+    const pickError = f.type !== "image/jpeg" && f.type !== "image/png"
+      ? "UNSUPPORTED_MEDIA"
+      : f.size <= 0 || f.size > 10 * 1024 * 1024
+        ? "PAYLOAD_TOO_LARGE"
+        : null;
+    if (pickError) {
+      reset();
+      setError(readingFailureMessage(pickError, language, ""));
+      return;
+    }
     if (previewUrl.current) URL.revokeObjectURL(previewUrl.current);
     const url = URL.createObjectURL(f);
     previewUrl.current = url;
@@ -291,18 +305,53 @@ export default function LetterWorkspace({
     setError(null);
   }
 
-  function stopSpeaking() {
+  function stopSpeaking(next: SpeechStatus = "idle") {
+    speechRunRef.current += 1;
     if (typeof window !== "undefined") window.speechSynthesis?.cancel();
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current = null;
     }
-    setSpeaking(false);
+    setSpeechStatus(next);
+  }
+
+  function speakWithBrowser(text: string, run: number) {
+    const synth = typeof window !== "undefined" ? window.speechSynthesis : undefined;
+    if (!synth || typeof SpeechSynthesisUtterance === "undefined") {
+      setSpeechStatus("unavailable");
+      return;
+    }
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = lang.tts;
+    const voices = synth.getVoices();
+    const prefix = lang.tts.split("-")[0].toLowerCase();
+    const voice = voices.find((v) => v.lang.toLowerCase().replace("_", "-") === lang.tts.toLowerCase())
+      ?? voices.find((v) => v.lang.toLowerCase().startsWith(prefix));
+    if (voice) u.voice = voice;
+    let started = false;
+    u.onstart = () => { started = true; if (speechRunRef.current === run) setSpeechStatus("speaking"); };
+    u.onend = () => { if (speechRunRef.current === run) setSpeechStatus(started ? "finished" : "unavailable"); };
+    u.onerror = (event) => {
+      if (speechRunRef.current !== run) return;
+      if (event.error === "canceled" || event.error === "interrupted") return;
+      setSpeechStatus(started ? "error" : "unavailable");
+    };
+    synth.cancel();
+    synth.speak(u);
+    // Some browsers accept speak() but never start (no voice installed).
+    window.setTimeout(() => {
+      if (speechRunRef.current === run && !started && !synth.speaking) {
+        synth.cancel();
+        setSpeechStatus("unavailable");
+      }
+    }, 4000);
   }
 
   async function readAloud() {
     if (!result || typeof window === "undefined") return;
     if (speaking) { stopSpeaking(); return; }
+    const run = ++speechRunRef.current;
+    setSpeechStatus("preparing");
 
     const text = [
       result.meaning,
@@ -314,37 +363,42 @@ export default function LetterWorkspace({
       .join(" ")
       .slice(0, 2500);
 
-    // Try ElevenLabs high-quality multilingual TTS first.
+    // Try high-quality multilingual server speech first, but never wait long.
     try {
+      const controller = new AbortController();
+      const timer = window.setTimeout(() => controller.abort(), 8000);
       const res = await fetch("/api/speak", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text, bcp47: lang.bcp47 }),
-      });
+        signal: controller.signal,
+      }).finally(() => window.clearTimeout(timer));
+      if (speechRunRef.current !== run) return;
       if (res.ok) {
         const blob = await res.blob();
+        if (speechRunRef.current !== run) return;
         const url = URL.createObjectURL(blob);
         const audio = new Audio(url);
         audioRef.current = audio;
-        setSpeaking(true);
-        audio.onended = () => { setSpeaking(false); URL.revokeObjectURL(url); audioRef.current = null; };
-        audio.onerror = () => { setSpeaking(false); URL.revokeObjectURL(url); audioRef.current = null; };
-        void audio.play();
-        return;
+        const cleanup = () => { URL.revokeObjectURL(url); if (audioRef.current === audio) audioRef.current = null; };
+        audio.onended = () => { cleanup(); if (speechRunRef.current === run) setSpeechStatus("finished"); };
+        audio.onerror = () => { cleanup(); if (speechRunRef.current === run) speakWithBrowser(text, run); };
+        try {
+          await audio.play();
+          if (speechRunRef.current === run) setSpeechStatus("speaking");
+          return;
+        } catch {
+          cleanup();
+          if (speechRunRef.current !== run) return;
+          // Playback blocked: fall through to browser speech.
+        }
       }
     } catch {
-      // fall through to browser TTS
+      if (speechRunRef.current !== run) return;
+      // fall through to browser speech
     }
 
-    // Browser SpeechSynthesis fallback (always available in Chrome/Safari).
-    if (!window.speechSynthesis) return;
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang = lang.tts;
-    u.onend = () => setSpeaking(false);
-    u.onerror = () => setSpeaking(false);
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.speak(u);
-    setSpeaking(true);
+    speakWithBrowser(text, run);
   }
 
   function downloadCalendar(): boolean {
@@ -531,15 +585,15 @@ export default function LetterWorkspace({
 
         {/* Visual progress steps */}
         {loading && (
-          <div className="letter-processing-card mt-6" role="status" aria-label="Analyzing your letter">
+          <div className="letter-processing-card mt-6" role="status" aria-label={language === "Spanish" ? "Analizando su carta" : "Analyzing your letter"}>
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="lantern-eyebrow">Working securely</p>
-                <p className="mt-2 text-lg font-black tracking-[-0.025em] text-ink">Analyzing your letter</p>
-                <p className="mt-1 text-sm text-muted">{LOADING_STEPS[loadingMsg].label}</p>
+                <p className="lantern-eyebrow">{language === "Spanish" ? "Trabajando de forma segura" : "Working securely"}</p>
+                <p className="mt-2 text-lg font-black tracking-[-0.025em] text-ink">{language === "Spanish" ? "Analizando su carta" : "Analyzing your letter"}</p>
+                <p className="mt-1 text-sm text-muted">{language === "Spanish" ? LOADING_STEPS[loadingMsg].es : LOADING_STEPS[loadingMsg].label}</p>
               </div>
               <span className="rounded-full border border-cobalt/20 bg-white px-3 py-1 text-xs font-extrabold text-cobalt">
-                {`${loadingMsg + 1} of ${LOADING_STEPS.length}`}
+                {`${loadingMsg + 1} ${language === "Spanish" ? "de" : "of"} ${LOADING_STEPS.length}`}
               </span>
             </div>
             <progress className="mt-4 h-2 w-full accent-cobalt" max={LOADING_STEPS.length} value={loadingMsg + 1} />
@@ -578,8 +632,8 @@ export default function LetterWorkspace({
               <Link className="mt-3 inline-flex min-h-11 items-center text-sm font-bold underline underline-offset-4" href="/first-day?demo=1">
                 {language === "Spanish" ? "Probar la demo ficticia" : "Try the fictional demo"}
               </Link>
-              {file ? (
-                <div className="mt-3 flex flex-wrap gap-2">
+              <div className="mt-3 flex flex-wrap gap-2">
+                {file ? (
                   <button
                     className="min-h-11 rounded-xl bg-red-800 px-4 text-sm font-bold text-white hover:bg-red-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-700 focus-visible:ring-offset-2"
                     onClick={explain}
@@ -587,15 +641,15 @@ export default function LetterWorkspace({
                   >
                     {language === "Spanish" ? "Intentar de nuevo" : "Try again"}
                   </button>
-                  <button
-                    className="min-h-11 rounded-xl border border-red-300 bg-white px-4 text-sm font-bold text-red-800 hover:bg-red-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-700"
-                    onClick={reset}
-                    type="button"
-                  >
-                    {language === "Spanish" ? "Elegir otra foto" : "Choose another photo"}
-                  </button>
-                </div>
-              ) : null}
+                ) : null}
+                <button
+                  className="min-h-11 rounded-xl border border-red-300 bg-white px-4 text-sm font-bold text-red-800 hover:bg-red-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-700"
+                  onClick={reset}
+                  type="button"
+                >
+                  {language === "Spanish" ? "Elegir otra foto" : "Choose another photo"}
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -619,7 +673,7 @@ export default function LetterWorkspace({
             setActiveTab={setActiveTab}
             setScamExpanded={setScamExpanded}
             simplify={simplify}
-            speaking={speaking}
+            speechStatus={speechStatus}
             toggleChecked={toggleChecked}
             translatedLetter={translatedLetter}
             translateLetter={translateLetter}

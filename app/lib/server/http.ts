@@ -4,6 +4,7 @@ export const ApiErrorCodeSchema = z.enum([
   "INVALID_REQUEST",
   "UNSUPPORTED_MEDIA",
   "PAYLOAD_TOO_LARGE",
+  "NO_TEXT_FOUND",
   "PROVIDER_UNAVAILABLE",
   "RATE_LIMITED",
   "PROVIDER_TIMEOUT",

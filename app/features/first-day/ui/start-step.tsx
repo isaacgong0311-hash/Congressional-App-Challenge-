@@ -30,6 +30,7 @@ export function StartStep({
 }: StartStepProps) {
   return (
     <section className="fd-enter">
+      {allowLive ? <TourCard className="fd-tour-card-top" language={language} /> : null}
       <div className="fd-hero overflow-hidden rounded-[2rem] border border-[#dce2dc] bg-[#fbfcf8] shadow-[0_24px_80px_rgba(24,46,38,.08)]">
         <div className="grid lg:grid-cols-[1.08fr_.92fr]">
           <div className="p-7 sm:p-10 lg:p-14">
@@ -85,19 +86,20 @@ export function StartStep({
               {allowLive ? (
                 <button
                   className="fd-secondary-button"
-                  disabled={providerCapability !== "available"}
+                  disabled={providerCapability === "unavailable"}
                   onClick={onStartLive}
                   type="button"
                 >
                   <DocumentIcon className="h-4 w-4" />
                   {translated(
                     language,
-                    "Open the sample-page upload workspace",
-                    "Abrir espacio para subir páginas de ejemplo",
+                    "Upload your own school pages",
+                    "Subir sus propias páginas escolares",
                   )}
                 </button>
               ) : null}
             </div>
+            {allowLive ? <TourCard className="fd-tour-card-inline" language={language} /> : null}
             <p className="mt-4 max-w-xl text-xs leading-5 text-[#65716b]">
               {allowLive
                 ? translated(
@@ -111,19 +113,13 @@ export function StartStep({
                     "Documentos ficticios. No necesita una cuenta ni subir archivos.",
                   )}
             </p>
-            {allowLive && providerCapability !== "available" ? (
+            {allowLive && providerCapability === "unavailable" ? (
               <p aria-live="polite" className="mt-4 text-sm text-[#65716b]">
-                {providerCapability === "checking"
-                  ? translated(
-                      language,
-                      "Checking live document availability…",
-                      "Comprobando la disponibilidad de documentos…",
-                    )
-                  : translated(
-                      language,
-                      "Live document reading is unavailable right now. The complete sample still works.",
-                      "La lectura de documentos no está disponible ahora. El ejemplo completo sigue funcionando.",
-                    )}
+                {translated(
+                  language,
+                  "Uploading your own pages isn't working right now. The full example above still works.",
+                  "Subir sus propias páginas no funciona en este momento. El ejemplo completo sigue funcionando.",
+                )}
               </p>
             ) : null}
             {allowLive && providerCapability === "unavailable" ? (
@@ -134,8 +130,8 @@ export function StartStep({
               >
                 {translated(
                   language,
-                  "Check availability again",
-                  "Comprobar disponibilidad de nuevo",
+                  "Try uploading again",
+                  "Intentar subir de nuevo",
                 )}
               </button>
             ) : null}
@@ -227,5 +223,28 @@ export function StartStep({
         ))}
       </div>
     </section>
+  );
+}
+
+function TourCard({ className, language }: { className: string; language: Language }) {
+  return (
+        <a className={`fd-tour-card ${className}`} href="/first-day?demo=1">
+          <span className="fd-tour-icon" aria-hidden="true">
+            <SparkIcon className="h-5 w-5" />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="fd-tour-title">
+              {translated(language, "New here? Take the 2-minute guided tour", "¿Es nuevo? Haga el recorrido guiado de 2 minutos")}
+            </span>
+            <span className="fd-tour-detail">
+              {translated(
+                language,
+                "Follow one fictional family from three school letters to a plan, including the moment Lantern catches two letters that disagree.",
+                "Siga a una familia ficticia desde tres cartas escolares hasta un plan, incluido el momento en que Lantern detecta dos cartas que no coinciden.",
+              )}
+            </span>
+          </span>
+          <ArrowRightIcon className="h-5 w-5 shrink-0" />
+        </a>
   );
 }

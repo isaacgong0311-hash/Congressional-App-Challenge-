@@ -196,6 +196,14 @@ export function FactsStep(props: FactsStepProps) {
     (left, right) => rank[currentFactView(caseData, left).state] - rank[currentFactView(caseData, right).state],
   );
   const currentFacts = ordered.filter((fact) => currentFactView(caseData, fact).state !== "superseded");
+  // Facts that were already confirmed when this step opened are settled; fold
+  // them away so the page leads with what still needs the family's answer.
+  // Facts confirmed during this visit stay in place so the change is visible.
+  const [settledOnArrival] = useState(
+    () => new Set(currentFacts.filter((fact) => currentFactView(caseData, fact).state === "confirmed").map((fact) => fact.id)),
+  );
+  const activeFacts = currentFacts.filter((fact) => !settledOnArrival.has(fact.id));
+  const settledFacts = currentFacts.filter((fact) => settledOnArrival.has(fact.id));
   const historyFacts = ordered.filter((fact) => currentFactView(caseData, fact).state === "superseded");
   const nextUnresolved = ordered.find((fact) => currentFactView(caseData, fact).state === "proposed");
   const pending = facts.filter((fact) => currentFactView(caseData, fact).state === "proposed").length;
@@ -263,10 +271,24 @@ export function FactsStep(props: FactsStepProps) {
       </div>
 
       <div className="mt-8 space-y-4">
-        {currentFacts.map((fact) => (
+        {activeFacts.map((fact) => (
           <FactReviewCard {...props} fact={fact} key={fact.id} />
         ))}
       </div>
+      {settledFacts.length > 0 ? (
+        <details className="fd-settled-facts mt-6 rounded-feature border border-ink/10 bg-white/70 p-4">
+          <summary className="min-h-11 cursor-pointer py-3 font-bold text-ink">
+            {translated(
+              language,
+              `Already confirmed (${settledFacts.length}) · show the sources`,
+              `Ya confirmados (${settledFacts.length}) · ver las fuentes`,
+            )}
+          </summary>
+          <div className="mt-3 space-y-4">
+            {settledFacts.map((fact) => <FactReviewCard {...props} fact={fact} key={fact.id} />)}
+          </div>
+        </details>
+      ) : null}
       {historyFacts.length > 0 ? (
         <details className="mt-6 rounded-feature border border-ink/10 bg-white/70 p-4">
           <summary className="min-h-11 cursor-pointer py-3 font-bold text-muted">

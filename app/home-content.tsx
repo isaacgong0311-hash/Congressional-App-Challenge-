@@ -285,7 +285,7 @@ export default function HomeContent() {
                 <p className="home-versus-note">{copy("Both exact quotes stay visible. You confirm the answer.", "Ambas citas exactas quedan visibles. Usted confirma la respuesta.")}</p>
               </article>
             </div>
-            <p className="home-example-label">{copy("The generic summary is an invented example of the failure Lantern is built to avoid, not output from a named product.", "El resumen genérico es un ejemplo inventado del error que Lantern busca evitar, no la respuesta de un producto específico.")}</p>
+            <p className="home-example-label">{copy("This is a made-up example of the kind of summary Lantern is built to avoid — not output from any real product.", "Este es un ejemplo inventado del tipo de resumen que Lantern busca evitar, no la respuesta de un producto real.")}</p>
           </div>
         </section>
         <section

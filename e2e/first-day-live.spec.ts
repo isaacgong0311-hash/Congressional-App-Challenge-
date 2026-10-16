@@ -163,7 +163,7 @@ test("live intake preserves partial success, retry, removal, and late-response r
 
   await page.goto("/first-day");
   await page
-    .getByRole("button", { name: "Open the sample-page upload workspace" })
+    .getByRole("button", { name: "Upload your own school pages" })
     .click();
   await page.getByLabel("School page images").setInputFiles([
     { name: "success.png", mimeType: "image/png", buffer: Buffer.from("synthetic-one") },
@@ -248,7 +248,7 @@ test("live source questions cite only supplied passages and recover from AI fail
   });
 
   await page.goto("/first-day");
-  await page.getByRole("button", { name: "Open the sample-page upload workspace" }).click();
+  await page.getByRole("button", { name: "Upload your own school pages" }).click();
   await expect(page.getByRole("region", { name: "Ask about these pages." })).toHaveCount(0);
   await page.getByLabel("School page images").setInputFiles({
     name: "requirements.png", mimeType: "image/png", buffer: Buffer.from("synthetic"),
@@ -282,17 +282,17 @@ test("live entry explains an unavailable provider and retries without reloading"
 
   await page.goto("/first-day");
   const liveButton = page.getByRole("button", {
-    name: "Open the sample-page upload workspace",
+    name: "Upload your own school pages",
   });
   await expect(liveButton).toBeDisabled();
   await expect(
     page.getByText(
-      "Live document reading is unavailable right now. The complete sample still works.",
+      "Uploading your own pages isn't working right now. The full example above still works.",
     ),
   ).toBeVisible();
 
   available = true;
-  await page.getByRole("button", { name: "Check availability again" }).click();
+  await page.getByRole("button", { name: "Try uploading again" }).click();
   await expect(liveButton).toBeEnabled();
 });
 
@@ -328,7 +328,7 @@ test("source-backed facts can be confirmed, corrected, or marked unclear in EN a
   for (const spanish of [false, true]) {
     await page.goto("/first-day");
     if (spanish) await page.getByRole("button", { name: "ES", exact: true }).click();
-    await page.getByRole("button", { name: spanish ? "Abrir espacio para subir páginas de ejemplo" : "Open the sample-page upload workspace" }).click();
+    await page.getByRole("button", { name: spanish ? "Subir sus propias páginas escolares" : "Upload your own school pages" }).click();
     await page.getByLabel(spanish ? "Imágenes de páginas escolares" : "School page images").setInputFiles({
       name: "synthetic.png", mimeType: "image/png", buffer: Buffer.from("synthetic-test-page"),
     });
@@ -385,7 +385,7 @@ test("a successfully read page with no facts explains the next action", async ({
   });
 
   await page.goto("/first-day");
-  await page.getByRole("button", { name: "Open the sample-page upload workspace" }).click();
+  await page.getByRole("button", { name: "Upload your own school pages" }).click();
   await page.getByLabel("School page images").setInputFiles({
     name: "unclear.png",
     mimeType: "image/png",

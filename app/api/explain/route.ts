@@ -260,6 +260,7 @@ export async function POST(req: Request) {
             "- For scamAgencyFacts: cite what the REAL agency does vs. the scam tactic shown in the letter. Include the real contact number or .gov URL if known.",
             "- For whatHappensIfNothing: be factual and calm — 'Your account may be closed' not 'You will lose everything'. Empty string if no action is required at all.",
             "- For photoQualityNote: only flag if the photo prevents reading key parts. null if acceptable quality.",
+            "- If the image shows no readable document text at all (for example a blank page, a person, an object, or a photo too blurry to read), set originalText to an empty string and confidence to 0. Do not describe or guess at a letter you cannot read.",
             "",
             "Respond with ONLY a single valid JSON object — no markdown, no code fences, no text before or after. Use EXACTLY these keys and value types:",
             JSON_SHAPE,
@@ -300,6 +301,15 @@ export async function POST(req: Request) {
       );
       if (attempt === 0 && !abortSignal.aborted) continue;
       return fail("INVALID_PROVIDER_RESPONSE", readingUnavailable(language), 502, true);
+    }
+
+    if (!parsed.data.originalText.trim()) {
+      return fail(
+        "NO_TEXT_FOUND",
+        "We couldn't find any words in this photo. Make sure the whole letter is in the frame, flat, and well lit, then take another photo.",
+        422,
+        false,
+      );
     }
 
     return apiJson(parsed.data);
