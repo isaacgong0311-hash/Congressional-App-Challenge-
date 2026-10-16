@@ -7,6 +7,7 @@ import type {
 import { factDisplayValue, sourceLocation, sourceTitle, translated, type Language } from "./first-day-copy";
 import { Eyebrow, SourceButton, type SourceOpener } from "./first-day-shared";
 import { CheckIcon, MessageIcon, WarningIcon } from "./icons";
+import { PracticeConversation } from "./practice-conversation";
 
 export type BlockerStepProps = {
   caseData: FirstDayCase;
@@ -28,7 +29,6 @@ export function BlockerStep({
   onResolveConflict,
 }: BlockerStepProps) {
   const [copied, setCopied] = useState(false);
-  const [practiceNote, setPracticeNote] = useState("");
   const [selection, setSelection] = useState<{ conflictId: string; factId: string } | null>(null);
   const conflict =
     caseData.conflicts.find((item) => item.id === conflictId) ??
@@ -247,18 +247,9 @@ export function BlockerStep({
       {!resolution ? (
         <details className="mt-5 rounded-feature border border-ink/10 bg-white/75 p-5">
           <summary className="min-h-11 cursor-pointer py-2 font-bold text-ink">
-            {translated(language, "Practice the conversation (simulated)", "Practicar la conversación (simulada)")}
+            {translated(language, "Practice the call with the school office (simulated)", "Practicar la llamada a la oficina escolar (simulada)")}
           </summary>
-          <label className="mt-4 block text-sm font-semibold text-muted" htmlFor="fd-practice-note">
-            {translated(language, "Write a practice answer. This does not update the plan.", "Escriba una respuesta de práctica. Esto no actualiza el plan.")}
-          </label>
-          <textarea
-            className="mt-2 min-h-28 w-full rounded-xl border border-ink/15 bg-white p-3 text-sm outline-none focus:border-cobalt focus:ring-2 focus:ring-cobalt/20"
-            id="fd-practice-note"
-            onChange={(event) => setPracticeNote(event.currentTarget.value)}
-            placeholder={translated(language, "For practice only…", "Solo para practicar…")}
-            value={practiceNote}
-          />
+          <PracticeConversation language={language} preparedQuestion={preparedQuestion} />
         </details>
       ) : null}
     </section>

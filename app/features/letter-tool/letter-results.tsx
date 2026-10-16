@@ -31,6 +31,8 @@ const Assistant = dynamic(() => import("../../Assistant"), {
   ssr: false,
 });
 
+export type SpeechStatus = "idle" | "preparing" | "speaking" | "finished" | "unavailable" | "error";
+
 type LanguageOption = { label: string; bcp47: string; tts: string };
 
 const URGENCY_STYLES: Record<Result["urgency"], string> = {
@@ -80,7 +82,7 @@ export function LetterResults({
   result,
   scamExpanded,
   simplify,
-  speaking,
+  speechStatus,
   translatedLetter,
   translatingLetter,
   copyLetter,
@@ -103,7 +105,7 @@ export function LetterResults({
   result: Result;
   scamExpanded: boolean;
   simplify: boolean;
-  speaking: boolean;
+  speechStatus: SpeechStatus;
   translatedLetter: string | null;
   translatingLetter: boolean;
   copyLetter: () => void;
@@ -121,6 +123,15 @@ export function LetterResults({
   const [printNotice, setPrintNotice] = useState(false);
   const es = lang.label === "Spanish";
   const copy = (english: string, spanish: string) => es ? spanish : english;
+  const speaking = speechStatus === "preparing" || speechStatus === "speaking";
+  const speechMessage: Record<SpeechStatus, string> = {
+    idle: "",
+    preparing: copy("Getting the audio ready…", "Preparando el audio…"),
+    speaking: copy("Reading aloud… Press Stop reading to end.", "Leyendo en voz alta… Pulse Detener la lectura para terminar."),
+    finished: copy("Finished reading.", "Lectura terminada."),
+    unavailable: copy("Read-aloud isn't available in this browser. Try Chrome or Safari, or check that your device's sound is on.", "La lectura en voz alta no está disponible en este navegador. Pruebe Chrome o Safari, o revise que el sonido esté activado."),
+    error: copy("Reading stopped because of a problem. Press Read aloud to try again.", "La lectura se detuvo por un problema. Pulse Leer en voz alta para intentarlo de nuevo."),
+  };
   const deadlineIsValid = validReminderDate(result.deadlineISO);
   const kd = result.keyDetails;
   const hasDetails = Boolean(kd && (kd.sender || kd.contactPhone || kd.accountNumber || kd.amountDue));
@@ -265,22 +276,30 @@ export function LetterResults({
                           aria-pressed={speaking}
                         >
                           {speaking ? <StopIcon className="h-4 w-4" /> : <VolumeIcon className="h-4 w-4" />}
-                          {speaking ? copy("Stop", "Detener") : copy("Read aloud", "Leer en voz alta")}
+                          {speaking ? copy("Stop reading", "Detener la lectura") : copy("Read aloud", "Leer en voz alta")}
+                          {speaking ? <span className="letter-speaking-bars" aria-hidden="true"><span /><span /><span /></span> : null}
                         </button>
                       </div>
+                      <p
+                        aria-live="polite"
+                        className={`letter-speech-status mt-2 text-sm ${speechStatus === "unavailable" || speechStatus === "error" ? "font-semibold text-amber-800" : "text-muted"}`}
+                        data-status={speechStatus}
+                        role="status"
+                      >
+                        {speechMessage[speechStatus]}
+                      </p>
                       <p className="mt-2 text-base leading-relaxed text-ink/80">{result.meaning}</p>
                       <div className="mt-4 rounded-xl border border-ink/10 bg-canvas p-3 text-sm text-muted">
                         <p><span className="font-semibold">{copy("Why I think this:", "Por qué lo creemos:")}</span> {result.whyThisType}</p>
-                        <div className="mt-2 flex items-center gap-2">
-                          <span className="font-semibold">{copy("Confidence:", "Confianza:")}</span>
-                          <span className="inline-flex h-2 w-24 overflow-hidden rounded-full bg-ink/10">
-                            <span className={`h-full ${result.confidence >= 60 ? "bg-confirmed" : "bg-amber"}`} style={{ width: `${result.confidence}%` }} />
+                        <p className="mt-2">
+                          <span className={`letter-confidence-pill ${result.confidence >= 80 ? "is-high" : result.confidence >= 60 ? "is-medium" : "is-low"}`}>
+                            {result.confidence >= 80
+                              ? copy("Clear reading — still check the original letter", "Lectura clara: aun así revise la carta original")
+                              : result.confidence >= 60
+                                ? copy("Partly clear — check the original letter", "Lectura parcial: revise la carta original")
+                                : copy("Hard to read — the photo may be unclear", "Difícil de leer: la foto podría no ser clara")}
                           </span>
-                          <span>{result.confidence}%</span>
-                        </div>
-                        {result.confidence < 60 && (
-                          <p className="mt-1 text-amber-700">{copy("Please double-check — the photo may be unclear.", "Revise la carta original: la foto podría no ser clara.")}</p>
-                        )}
+                        </p>
                       </div>
                     </div>
 

@@ -80,7 +80,9 @@ test("the fictional letter sample opens a bundled result without provider calls"
   await page.getByRole("button", { name: /Try a sample/ }).click();
   await page.getByRole("button", { name: "Explain this letter" }).click();
   await expect(page.getByRole("heading", { name: "Fictional Medicaid denial notice" })).toBeVisible();
-  await expect(page.getByText("June 25, 2026", { exact: false }).first()).toBeVisible();
+  await expect(page.getByText("January 29, 2027", { exact: false }).first()).toBeVisible();
+  await expect(page.getByText("Clear reading — still check the original letter")).toBeVisible();
+  await expect(page.getByText(/Confidence:|\d+%/)).toHaveCount(0);
 
   await page.getByRole("button", { name: "Explain another letter" }).click();
   await page.getByRole("tab", { name: "Options" }).click();
