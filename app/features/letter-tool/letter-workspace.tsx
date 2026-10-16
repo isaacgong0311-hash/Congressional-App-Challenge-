@@ -19,6 +19,7 @@ import { buildLetterReminderCalendar } from "./letter-calendar";
 import { sampleLetterResult } from "./sample-letter-result";
 import type { SpeechStatus } from "./letter-results";
 import type { Category } from "../../resources";
+import { prepareImageForUpload, readJsonResponse } from "../../lib/prepare-image";
 
 const LANGUAGES: { label: string; bcp47: string; tts: string }[] = [
   { label: "English", bcp47: "en", tts: "en-US" },
@@ -219,7 +220,7 @@ export default function LetterWorkspace({
         return;
       }
       const body = new FormData();
-      body.append("image", file);
+      body.append("image", await prepareImageForUpload(file));
       body.append("language", language);
       body.append("readingLevel", simplify ? "simple" : "standard");
       for (let attempt = 0; attempt < 2; attempt += 1) {
@@ -229,7 +230,7 @@ export default function LetterWorkspace({
             body,
             signal: AbortSignal.timeout(58_000),
           });
-          const data: unknown = await res.json();
+          const data = await readJsonResponse(res);
           if (!res.ok) {
             const responseError = publicApiError(
               data,
@@ -480,7 +481,7 @@ export default function LetterWorkspace({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: body, language: lang.label }),
       });
-      const data: unknown = await res.json();
+      const data = await readJsonResponse(res);
       if (res.ok && data && typeof data === "object" && "translation" in data && typeof data.translation === "string") {
         setTranslatedLetter(data.translation);
       } else if (!res.ok) {

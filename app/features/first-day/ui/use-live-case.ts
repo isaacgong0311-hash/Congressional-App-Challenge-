@@ -24,6 +24,7 @@ import {
 import type { FirstDayCase, FirstDayExtractionResponse } from "../domain/types";
 import { FirstDayExtractionSchema } from "../server/extraction-schema";
 import { translated, type StepId } from "./first-day-copy";
+import { prepareImageForUpload, readJsonResponse } from "../../../lib/prepare-image";
 
 export { factHasActiveSource };
 
@@ -110,7 +111,7 @@ export function useLiveCase({
     async function processPage() {
       try {
         const form = new FormData();
-        form.append("image", pageFile);
+        form.append("image", await prepareImageForUpload(pageFile));
         form.append("language", language === "Español" ? "Spanish" : "English");
         form.append("documentId", documentId);
         form.append("requestId", requestId);
@@ -120,7 +121,7 @@ export function useLiveCase({
           body: form,
           signal: AbortSignal.any([controller.signal, AbortSignal.timeout(58_000)]),
         });
-        const payload: unknown = await response.json();
+        const payload = await readJsonResponse(response);
         if (!response.ok) {
           const failure = publicApiError(
             payload,
