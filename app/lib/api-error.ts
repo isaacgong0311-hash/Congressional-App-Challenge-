@@ -55,8 +55,8 @@ export function readingFailureMessage(
   switch (code) {
     case "RATE_LIMITED":
       return spanish
-        ? "Hay demasiadas solicitudes en este momento. Espere un minuto e inténtelo de nuevo."
-        : "Too many requests right now. Please wait a minute and try again.";
+        ? "Hay demasiadas solicitudes en este momento. Espere un minuto e inténtelo de nuevo, o pruebe la demo ficticia."
+        : "Too many requests right now. Please wait a minute and try again, or use the fictional demo.";
     case "PROVIDER_UNAVAILABLE":
       return spanish
         ? "La lectura de documentos no está disponible ahora. Puede probar la demo ficticia."
@@ -67,13 +67,13 @@ export function readingFailureMessage(
         : "Reading took too long. Please try again or use the fictional demo.";
     case "INVALID_PROVIDER_RESPONSE":
       return spanish
-        ? "No pudimos comprobar la respuesta de lectura. Inténtelo de nuevo."
-        : "We couldn't verify the reading response. Please try again.";
+        ? "No pudimos comprobar la respuesta de lectura. Inténtelo de nuevo o pruebe la demo ficticia."
+        : "We couldn't verify the reading response. Please try again or use the fictional demo.";
     case "PROVIDER_REJECTED":
     case "INTERNAL_ERROR":
       return spanish
-        ? "No pudimos leer el documento en este momento. Inténtelo de nuevo más tarde."
-        : "We couldn't read the document right now. Please try again later.";
+        ? "No pudimos leer el documento en este momento. Inténtelo de nuevo más tarde o pruebe la demo ficticia."
+        : "We couldn't read the document right now. Please try again later or use the fictional demo.";
     default:
       return fallback;
   }

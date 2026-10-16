@@ -63,8 +63,8 @@ export function proxy(req: NextRequest) {
         error: {
           code: "RATE_LIMITED",
           message: spanish
-            ? "Hay demasiadas solicitudes en este momento. Espere un minuto e inténtelo de nuevo."
-            : "Too many requests right now. Please wait a minute and try again.",
+            ? "Hay demasiadas solicitudes en este momento. Espere un minuto e inténtelo de nuevo, o pruebe la demo ficticia."
+            : "Too many requests right now. Please wait a minute and try again, or use the fictional demo.",
           retryable: false,
         },
       },
