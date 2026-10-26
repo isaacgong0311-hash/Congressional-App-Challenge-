@@ -116,11 +116,12 @@ export default function AboutPage() {
             <p className="text-xs font-extrabold uppercase tracking-[0.18em] !text-cobalt">
               Access and pricing
             </p>
-            <h2 className="mt-4 text-3xl">The demo is free. There is no paid plan.</h2>
+            <h2 className="mt-4 text-3xl">Lantern is free for families.</h2>
             <p className="mt-4 max-w-3xl">
-              Lantern is a student project. There is no subscription, school
-              contract, or public signup today. A future model would need to be
-              tested with families and educators before pricing is set.
+            Lantern is a student project, and we are committed to keeping it free
+            for families. There is no subscription, no paywall, and no account
+            required. We will keep testing with families and educators as we
+            improve it.
             </p>
             <Link className="mt-5 inline-flex font-bold text-cobalt underline decoration-cobalt/30 underline-offset-4" href="/contact">
               Share feedback or ask about a future pilot <ArrowUpRightIcon className="ml-2 h-5 w-5" />
